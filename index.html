@@ -4,8 +4,12 @@
     background-color: #f0f0f0;
     font-family: system-ui, sans-serif;
   }
-  img {
-    /* display: none; */
+  .huge-cursor {
+    visibility: hidden;
+    position: fixed;
+    pointer-events: none;
+    /* cursor: progress; */
+    /* cu */
   }
   .desc {
     cursor: none;
@@ -72,41 +76,41 @@
 </style>
 <p>Cursors</p>
 
-<img src="alias.svg" id="alias" />
-<img src="all-scroll.svg" id="all-scroll" />
-<img src="auto.svg" id="auto" />
-<img src="cell.svg" id="cell" />
-<img src="col-resize.svg" id="col-resize" />
-<img src="context-menu.svg" id="context-menu" />
-<img src="copy.svg" id="copy" />
-<img src="crosshair.svg" id="crosshair" />
-<img src="default.svg" id="default" />
-<img src="e-resize.svg" id="e-resize" />
-<img src="ew-resize.svg" id="ew-resize" />
-<img src="grab.svg" id="grab" />
-<img src="grabbing.svg" id="grabbing" />
-<img src="help.svg" id="help" />
-<img src="move.svg" id="move" />
-<img src="n-resize.svg" id="n-resize" />
-<img src="ne-resize.svg" id="ne-resize" />
-<img src="nesw-resize.svg" id="nesw-resize" />
-<img src="no-drop.svg" id="no-drop" />
-<img src="not-allowed.svg" id="not-allowed" />
-<img src="ns-resize.svg" id="ns-resize" />
-<img src="nw-resize.svg" id="nw-resize" />
-<img src="nwse-resize.svg" id="nwse-resize" />
-<img src="pointer.svg" id="pointer" />
-<img src="progress.svg" id="progress" />
-<img src="row-resize.svg" id="row-resize" />
-<img src="s-resize.svg" id="s-resize" />
-<img src="se-resize.svg" id="se-resize" />
-<img src="sw-resize.svg" id="sw-resize" />
-<img src="text.svg" id="text" />
-<img src="vertical-text.svg" id="vertical-text" />
-<img src="w-resize.svg" id="w-resize" />
-<img src="wait.svg" id="wait" />
-<img src="zoom-in.svg" id="zoom-in" />
-<img src="zoom-out.svg" id="zoom-out" />
+<img src="alias.svg" id="alias" class="huge-cursor" />
+<img src="all-scroll.svg" id="all-scroll" class="huge-cursor" />
+<img src="auto.svg" id="auto" class="huge-cursor" />
+<img src="cell.svg" id="cell" class="huge-cursor" />
+<img src="col-resize.svg" id="col-resize" class="huge-cursor" />
+<img src="context-menu.svg" id="context-menu" class="huge-cursor" />
+<img src="copy.svg" id="copy" class="huge-cursor" />
+<img src="crosshair.svg" id="crosshair" class="huge-cursor" />
+<img src="default.svg" id="default" class="huge-cursor" />
+<img src="e-resize.svg" id="e-resize" class="huge-cursor" />
+<img src="ew-resize.svg" id="ew-resize" class="huge-cursor" />
+<img src="grab.svg" id="grab" class="huge-cursor" />
+<img src="grabbing.svg" id="grabbing" class="huge-cursor" />
+<img src="help.svg" id="help" class="huge-cursor" />
+<img src="move.svg" id="move" class="huge-cursor" />
+<img src="n-resize.svg" id="n-resize" class="huge-cursor" />
+<img src="ne-resize.svg" id="ne-resize" class="huge-cursor" />
+<img src="nesw-resize.svg" id="nesw-resize" class="huge-cursor" />
+<img src="no-drop.svg" id="no-drop" class="huge-cursor" />
+<img src="not-allowed.svg" id="not-allowed" class="huge-cursor" />
+<img src="ns-resize.svg" id="ns-resize" class="huge-cursor" />
+<img src="nw-resize.svg" id="nw-resize" class="huge-cursor" />
+<img src="nwse-resize.svg" id="nwse-resize" class="huge-cursor" />
+<img src="pointer.svg" id="pointer" class="huge-cursor" />
+<img src="progress.svg" id="progress" class="huge-cursor" />
+<img src="row-resize.svg" id="row-resize" class="huge-cursor" />
+<img src="s-resize.svg" id="s-resize" class="huge-cursor" />
+<img src="se-resize.svg" id="se-resize" class="huge-cursor" />
+<img src="sw-resize.svg" id="sw-resize" class="huge-cursor" />
+<img src="text.svg" id="text" class="huge-cursor" />
+<img src="vertical-text.svg" id="vertical-text" class="huge-cursor" />
+<img src="w-resize.svg" id="w-resize" class="huge-cursor" />
+<img src="progress.svg" id="wait" class="huge-cursor" />
+<img src="zoom-in.svg" id="zoom-in" class="huge-cursor" />
+<img src="zoom-out.svg" id="zoom-out" class="huge-cursor" />
 
 <div class="cursor-table-wrap">
   <h2>CSS <code>cursor</code> keywords</h2>
@@ -501,24 +505,55 @@
 </div>
 
 <script>
-  const descriptions =Array.from(document.querySelectorAll('.desc'));
+  const descElements = Array.from(document.querySelectorAll(".desc"));
+  const cursorTypes = descElements.map((e) => e.parentElement.style.cursor);
 
-  let currentBigCursor = document.getElementById('none');
+  let currentBigCursor = null;
+  let CURSOR_SOURCE_DIMENSION = 64;
+  let cursorScale = 4;
+  let cursorCenterOffset = (cursorScale * CURSOR_SOURCE_DIMENSION) / 2;
+  let cursorDimension = CURSOR_SOURCE_DIMENSION * cursorScale;
 
-  const lastCursorPosition = {clientX: 0, clientY: 0};
-  const
-
-  document.addEventListener('pointermove', (event) => {
-      lastCursorPosition.clientX = event.clientX;
-      lastCursorPosition.clientY = event.clientY;
+  const cursorImages = cursorTypes.map((type) => document.getElementById(type));
+  cursorImages.forEach((image) => {
+    if (!image) {
+      return;
+    }
+    image.style.width = `${cursorDimension}px`;
+    image.style.height = `${cursorDimension}px`;
   });
 
-  descriptions.forEach(description => {
-      description.addEventListener('mouseenter', () => {
-          description.style.backgroundColor = 'rgba(0,0,0,0.1)';
-      });
-      description.addEventListener('mouseleave', () => {
-          description.style.backgroundColor = 'transparent';
-      });
+  const lastCursorPosition = { clientX: 0, clientY: 0 };
+
+  document.addEventListener("pointermove", (e) => {
+    updateCursorPosition(e);
+  });
+
+  function updateCursorPosition(event) {
+    if (!currentBigCursor) {
+      return;
+    }
+    lastCursorPosition.clientX = event.clientX;
+    lastCursorPosition.clientY = event.clientY;
+    currentBigCursor.style.left = `${event.clientX - cursorCenterOffset}px`;
+    currentBigCursor.style.top = `${event.clientY - cursorCenterOffset}px`;
+  }
+
+  descElements.forEach((element, index) => {
+    element.addEventListener("pointerenter", (e) => {
+      currentBigCursor = document.getElementById(cursorTypes[index]);
+      if (!currentBigCursor) {
+        return;
+      }
+
+      currentBigCursor.style.visibility = "visible";
+      updateCursorPosition(e);
+    });
+    element.addEventListener("pointerleave", () => {
+      if (currentBigCursor !== null) {
+        currentBigCursor.style.visibility = "hidden";
+        // currentBigCursor = null;
+      }
+    });
   });
 </script>
