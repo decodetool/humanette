@@ -1,0 +1,14 @@
+README.md
+  h_0dbcbba47c7061 6-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "28a204f2e412b2c36b93c92dad01cbdb993815e0",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
