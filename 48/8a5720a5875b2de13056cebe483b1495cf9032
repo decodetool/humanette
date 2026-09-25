@@ -1,0 +1,16 @@
+.npmignore
+  h_0dbcbba47c7061 1
+package.json
+  h_0dbcbba47c7061 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "488a5720a5875b2de13056cebe483b1495cf9032",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
