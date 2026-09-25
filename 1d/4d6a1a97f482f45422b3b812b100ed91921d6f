@@ -1,0 +1,58 @@
+README.md
+  h_0dbcbba47c7061 1,3-9
+index.html
+  h_0dbcbba47c7061 7-12,79-113,508-509,511-515,517-524,528-529,532-550,552-556
+  s_229cfb7505be16::t_2ba927e8786456 525-526,551,557
+progress.svg
+  h_0dbcbba47c7061 5,14,75,78
+  s_7e837a33b5ec6e::t_77e3cdcad37b49 2-4,6-9,12-13,16-25
+alias.svg
+  s_229cfb7505be16::t_74dd18f67c18c9 3,7
+all-scroll.svg
+  s_229cfb7505be16::t_32772a1eef902e 4
+auto.svg
+  s_229cfb7505be16::t_26871a4e21d455 3
+col-resize.svg
+  s_229cfb7505be16::t_08602c96e028b6 3
+default.svg
+  s_229cfb7505be16::t_4ec824e12ab5e3 3
+grabbing.svg
+  s_229cfb7505be16::t_d5cc2b34dd34f0 4
+move.svg
+  s_229cfb7505be16::t_6f65d133c7c0e3 4
+pointer.svg
+  s_229cfb7505be16::t_f28141c4f747a3 3
+wait.svg
+  s_229cfb7505be16::t_130c64cbf73eaa 2-8,11-13,15-24,74,77
+zoom-out.svg
+  s_229cfb7505be16::t_888c6f0831893a 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1d4d6a1a97f482f45422b3b812b100ed91921d6f",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_229cfb7505be16": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d68e-4f94-7682-a2d9-edf04f30d3a2",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    },
+    "s_7e837a33b5ec6e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d91c-e8bf-7721-aff9-fba0ef53adc4",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
