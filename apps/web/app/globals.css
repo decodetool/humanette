@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+@theme {
+  --color-paper: #f5f3ec;
+  --color-ink: #202a25;
+  --color-muted: #737b70;
+  --color-line: #d9ddd2;
+  --color-accent: #e85836;
+  --color-sage: #e6ecdf;
+  --font-sans: 'Avenir Next', Avenir, 'Trebuchet MS', sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-mono: 'SFMono-Regular', Consolas, monospace;
+}
+@layer base {
+  body {
+    @apply bg-paper text-ink antialiased;
+  }
+  button,
+  a,
+  select,
+  summary {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    outline: 2px solid #e85836;
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: #f4c4ab;
+  }
+}
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-7xl px-6 md:px-12;
+  }
+  .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[.18em] text-muted;
+  }
+  .primary {
+    @apply inline-flex items-center justify-center gap-3 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors hover:bg-accent disabled:opacity-50;
+  }
+  .secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-line bg-white/40 px-5 py-3 text-sm font-medium hover:border-ink;
+  }
+  .field {
+    @apply w-full rounded-md border border-line bg-white/70 px-3 py-2 font-mono text-xs;
+  }
+}

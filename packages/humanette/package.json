@@ -1,0 +1,71 @@
+{
+  "name": "humanette",
+  "version": "1.1.0",
+  "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./motion": {
+      "types": "./dist/motion.d.ts",
+      "import": "./dist/motion.js"
+    },
+    "./playwright": {
+      "types": "./dist/playwright.d.ts",
+      "import": "./dist/playwright.js"
+    },
+    "./browser": "./dist/humanette.global.js",
+    "./assets/*": "./dist/assets/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "LICENSE-APACHE-2.0",
+    "NOTICE.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node scripts/build.mjs && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "prepack": "bun run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decodetool/humanette.git",
+    "directory": "packages/humanette"
+  },
+  "homepage": "https://github.com/decodetool/humanette",
+  "license": "ISC",
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "cursor",
+    "automation",
+    "playwright",
+    "demo",
+    "recording",
+    "pointer"
+  ],
+  "devDependencies": {
+    "playwright-core": "^1.58.0"
+  },
+  "peerDependencies": {
+    "playwright-core": ">=1.58.0"
+  },
+  "peerDependenciesMeta": {
+    "playwright-core": {
+      "optional": true
+    }
+  }
+}
