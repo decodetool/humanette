@@ -1,0 +1,151 @@
+apps/web/tests/site.spec.ts
+  s_408157d782cb56::t_6aafe4a03591e2 21,58,82
+  s_408157d782cb56::t_3211ee0a1ff8c9 1-20,22-57,59-81
+apps/web/components/preview.tsx
+  s_408157d782cb56::t_0cc440f83de1fe 2-186
+  s_408157d782cb56::t_e9b3c4002528e9 1,187
+packages/humanette/src/resolve-cursor.ts
+  s_408157d782cb56::t_cf87f367f004e9 1-2
+  s_408157d782cb56::t_c330fbec44de45 3-24
+  s_408157d782cb56::t_7aa99690d3ec53 25-44
+packages/humanette/src/motion.ts
+  s_408157d782cb56::t_0cc440f83de1fe 5-8,10-22,25-37,39-40,42-43,46-54,56-61,65-80,83-100,102-124,126-146,148-170,172-175,178-220
+  s_408157d782cb56::t_cf87f367f004e9 1-3
+  s_408157d782cb56::t_0b8916c2a83774 4,9,23-24,38,41,44-45,55,62-64,81-82,101,125,147,171,176-177,221
+  s_408157d782cb56::t_61afd46b0b6dcb 222-224
+packages/humanette/test/motion.test.mjs
+  s_408157d782cb56::t_0cc440f83de1fe 1,3-27,29-37,39-58,60-67
+  s_408157d782cb56::t_ec0589c09df03f 2,28,38,59,68
+packages/humanette/scripts/build.mjs
+  s_408157d782cb56::t_1660836a4bcaa9 1-4,6-19
+  s_408157d782cb56::t_1c607783d0c93a 5
+  s_408157d782cb56::t_37deaa19fb166a 20-63
+apps/web/app/layout.tsx
+  s_408157d782cb56::t_e9b3c4002528e9 1-7
+  s_408157d782cb56::t_29f8a94e40b727 8-46
+.github/workflows/ci.yml
+  s_408157d782cb56::t_2d7290ad459a08 1-30
+packages/humanette/package.json
+  s_408157d782cb56::t_d0dab46179f5d0 1-56
+  s_408157d782cb56::t_38325bcc6ec142 57-71
+apps/web/components/hero-demo.tsx
+  s_408157d782cb56::t_e9b3c4002528e9 1-4
+  s_408157d782cb56::t_9cf28492800e9e 5-25
+packages/humanette/NOTICE.md
+  s_408157d782cb56::t_d0dab46179f5d0 1-9
+README.md
+  s_408157d782cb56::t_2d7290ad459a08 1,3,5-40
+AGENTS.md
+  s_408157d782cb56::t_2d7290ad459a08 1-13
+apps/web/components/workbench-loader.tsx
+  s_408157d782cb56::t_625b253e243632 1-3
+  s_408157d782cb56::t_47ddde450396d1 4-6
+examples/legacy/README.md
+  s_408157d782cb56::t_d0dab46179f5d0 1-9
+docs/history/cursor-capture-investigation.md
+  s_408157d782cb56::t_2d7290ad459a08 1-83
+apps/web/package.json
+  s_408157d782cb56::t_0b8916c2a83774 1
+  s_408157d782cb56::t_f6fcbc79463119 2-28
+apps/web/app/demos/page.tsx
+  s_408157d782cb56::t_625b253e243632 1-4
+  s_408157d782cb56::t_4119c12bb9a663 5-18
+apps/web/playwright.config.ts
+  s_408157d782cb56::t_6aafe4a03591e2 1-2
+  s_408157d782cb56::t_e42a22e7206620 3-17
+apps/web/tsconfig.json
+  s_408157d782cb56::t_1660836a4bcaa9 1
+  s_408157d782cb56::t_6d904a6f3310de 2-30
+turbo.json
+  s_408157d782cb56::t_6e63372cf1250a 1
+  s_408157d782cb56::t_bb2c4fa2b381e1 2-10
+apps/web/postcss.config.mjs
+  s_408157d782cb56::t_0b8916c2a83774 1
+apps/web/app/page.tsx
+  s_408157d782cb56::t_e9b3c4002528e9 1-8
+  s_408157d782cb56::t_c1422d72e35e4b 9-118
+docs/release-and-deployment.md
+  s_408157d782cb56::t_d0dab46179f5d0 1-33
+scripts/pack-check.mjs
+  s_408157d782cb56::t_2d7290ad459a08 1-21
+  s_408157d782cb56::t_fd0ecaa7723584 22-80
+.gitignore
+  s_408157d782cb56::t_1660836a4bcaa9 2-14
+examples/record-demo.mjs
+  s_408157d782cb56::t_2d7290ad459a08 1-28
+  s_408157d782cb56::t_6a22ddab6761ae 29-75
+packages/humanette/src/index.ts
+  s_408157d782cb56::t_0cc440f83de1fe 6-18,23-26,28,30-81,83-101,103,105-141,144-164,167-204,206-314,317-319,321-349,351-383,385-393,395-428,430-489
+  s_408157d782cb56::t_c330fbec44de45 1-5,19-22,27,29,102,104,142-143,165-166,205,315-316,320,350,384,394,429,490-493
+  s_408157d782cb56::t_3609ccf093f2ca 82
+package.json
+  s_408157d782cb56::t_0b8916c2a83774 4
+  s_408157d782cb56::t_1660836a4bcaa9 2-3,5-8,15-16
+  s_408157d782cb56::t_2d7290ad459a08 17-18
+  s_408157d782cb56::t_9c15ee933571c1 19-21,30-42
+apps/web/next.config.ts
+  s_408157d782cb56::t_1660836a4bcaa9 1-3
+packages/humanette/README.md
+  s_408157d782cb56::t_d0dab46179f5d0 1-92
+apps/web/app/globals.css
+  s_408157d782cb56::t_e9b3c4002528e9 1-26
+  s_408157d782cb56::t_7650ad9ce94573 27-50
+apps/web/app/docs/page.tsx
+  s_408157d782cb56::t_6aafe4a03591e2 1-23
+  s_408157d782cb56::t_97b8ce0fe50ce4 24-191
+packages/humanette/src/cursors.ts
+  s_408157d782cb56::t_c330fbec44de45 1-15
+  s_408157d782cb56::t_dac9dcc565898b 16-56
+packages/humanette/LICENSE
+  s_408157d782cb56::t_d0dab46179f5d0 1-15
+.prettierrc.json
+  s_408157d782cb56::t_cf87f367f004e9 1
+apps/web/app/workbench/page.tsx
+  s_408157d782cb56::t_625b253e243632 1-5
+  s_408157d782cb56::t_80ac5f0d783a5d 6-26
+docs/architecture.md
+  s_408157d782cb56::t_d0dab46179f5d0 1-30
+apps/web/components/workbench.tsx
+  s_408157d782cb56::t_cf29de5457fcb3 8
+  s_408157d782cb56::t_6aafe4a03591e2 3,12
+  s_408157d782cb56::t_625b253e243632 1-2,4-7,9-11,13-36
+  s_408157d782cb56::t_dfb4e2f0098059 37-224
+packages/humanette/src/playwright.ts
+  s_408157d782cb56::t_ec0589c09df03f 1-72
+  s_408157d782cb56::t_c27f455f9e2f16 73-175
+packages/humanette/tsconfig.json
+  s_408157d782cb56::t_1660836a4bcaa9 1
+  s_408157d782cb56::t_1dc22e9de05696 2-14
+packages/humanette/src/virtual.d.ts
+  s_408157d782cb56::t_1660836a4bcaa9 1
+  s_408157d782cb56::t_56646d335bb073 2-4
+apps/web/components/cursor-tour.tsx
+  s_408157d782cb56::t_625b253e243632 1-14
+  s_408157d782cb56::t_a3cd8b270e255b 15-230
+apps/web/next-env.d.ts
+  s_408157d782cb56::t_52fd00051c8680 1-7
+bun.lock
+  s_408157d782cb56::t_6b74679d31c95b 1-353
+examples/legacy/decode-color-grid.mjs
+  s_408157d782cb56::t_80f6920e3aa420 1-212
+examples/legacy/decode-color-grid.test.mjs
+  s_408157d782cb56::t_f705ac855d5b58 1-41
+packages/humanette/LICENSE-APACHE-2.0
+  s_408157d782cb56::t_24bb45313bae2d 1-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a9dea0a6923d4b745b7d72d0bd0b786719c90a57",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
