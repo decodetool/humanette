@@ -13,7 +13,8 @@
   },
   "scripts": {
     "dev": "turbo dev",
-    "example": "bun run --cwd packages/humanette build && bun run examples/record-demo.mjs",
+    "example:playwright": "bun run --cwd packages/humanette build && bun run examples/record-demo.mjs",
+    "example:playwright:headful": "bun run --cwd packages/humanette build && bun run examples/record-demo.mjs --headful",
     "build": "turbo build",
     "test": "turbo test",
     "typecheck": "turbo typecheck",

@@ -16,7 +16,8 @@ Turborepo + Bun workspaces. The website is Next.js, React, TypeScript, and Tailw
 ```sh
 bun install --frozen-lockfile
 bun dev                    # localhost:3410
-bun example                # record the Playwright demo (dev server must be running)
+bun example:playwright     # record the demo (dev server must be running)
+bun example:playwright:headful # watch live in Chromium, without recording
 bun check                  # types, unit tests, production builds
 bun run test:e2e            # real browser integration
 bun run pack:check          # fresh npm consumer of the actual tarball
@@ -24,9 +25,14 @@ bun run pack:check          # fresh npm consumer of the actual tarball
 
 Node 22+ and Bun 1.3.14. Before browser tests, run bunx playwright install chromium from apps/web.
 
-Each `bun example` run saves its video, screenshot, and manifest in a new timestamped
-`out/humanette-demo-…` directory. Optionally choose a fresh directory with
-`bun example out/my-take`; existing takes are never overwritten.
+`bun example:playwright` replaces `out/playwright-example.webm`, plus its
+`playwright-example.png` screenshot and `playwright-example.json` manifest.
+Old timestamped takes are left untouched.
+
+`bun example:playwright:headful` runs the same actions visibly without recording,
+so you can compare live movement against the captured video. It waits briefly before
+starting and leaves the window open afterward; close the window to exit.
+Run `bun dev` in another terminal first.
 
 Playwright is pinned to `1.64.0-alpha-2026-09-28` for native Chromium recording
 with `recordVideo.fps: 60`. This is an intentional prerelease dependency.

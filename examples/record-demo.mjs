@@ -1,28 +1,38 @@
 // Deterministic real-input demo. Start bun dev first; no LLM calls during the take.
 import { chromium } from 'playwright-core';
 import { createHuman } from 'humanette/playwright';
-import { mkdir, writeFile, access } from 'node:fs/promises';
+import { mkdir, writeFile, rename } from 'node:fs/promises';
 import { resolve } from 'node:path';
-const take = new Date().toISOString().replaceAll(':', '-');
-const output = resolve(process.argv[2] ?? `out/humanette-demo-${take}`);
-try {
-  await access(output);
-  throw Error('Choose a new output directory; refusing to overwrite a take.');
-} catch (e) {
-  if (e.code !== 'ENOENT') throw e;
+const args = process.argv.slice(2);
+if (args.some((arg) => arg !== '--headful')) {
+  throw Error('Usage: bun example:playwright or bun example:playwright:headful');
 }
-await mkdir(output, { recursive: true });
-const browser = await chromium.launch();
+const headful = args.includes('--headful');
+const output = resolve('out');
+const videoPath = resolve(output, 'playwright-example.webm');
+if (!headful) await mkdir(output, { recursive: true });
+const browser = await chromium.launch({ headless: !headful });
 try {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
     deviceScaleFactor: 2,
-    recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 60 },
+    ...(headful
+      ? {}
+      : {
+          recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 60 },
+        }),
   });
   const page = await context.newPage();
   await page.goto('http://localhost:3410/demos');
   const human = await createHuman(page, { seed: 42, scale: 2.5 });
   try {
+    if (headful) {
+      await page.bringToFront();
+      console.log(
+        'Running live without recording. The window stays open afterward; close it to exit.',
+      );
+      await human.wait(1200);
+    }
     await human.click('#save');
     await human.type('#name', 'A human touch', { selectAll: true, delay: 55 });
     const r = await page.locator('#select-text').evaluate((el) => {
@@ -50,28 +60,39 @@ try {
       result.delivered !== 'Delivered'
     )
       throw Error('Postflight failed: ' + JSON.stringify(result));
-    await writeFile(
-      resolve(output, 'manifest.json'),
-      JSON.stringify(
-        {
-          seed: 42,
-          viewport: [1280, 800],
-          dpr: 2,
-          videoSize: [1280, 800],
-          capture: 'Playwright recordVideo at requested 60 fps; distinct source-frame delivery depends on browser workload',
-          requestedFps: 60,
-          result,
-        },
-        null,
-        2,
-      ),
-    );
-    await page.screenshot({ path: resolve(output, 'final.png') });
+    if (!headful) {
+      await writeFile(
+        resolve(output, 'playwright-example.json'),
+        JSON.stringify(
+          {
+            seed: 42,
+            viewport: [1280, 800],
+            dpr: 2,
+            videoSize: [1280, 800],
+            capture:
+              'Playwright recordVideo at requested 60 fps; distinct source-frame delivery depends on browser workload',
+            requestedFps: 60,
+            result,
+          },
+          null,
+          2,
+        ),
+      );
+      await page.screenshot({ path: resolve(output, 'playwright-example.png') });
+    } else {
+      console.log('Demo complete. Close the browser window to exit.');
+      await page.waitForEvent('close', { timeout: 0 });
+    }
   } finally {
     await human.dispose();
   }
   await context.close();
+  if (!headful) {
+    // Playwright finalizes a generated filename on context close. Atomically
+    // replace only our fixed example video, without accumulating named takes.
+    await rename(await page.video().path(), videoPath);
+    console.log('Saved ' + videoPath + ' (replaces the previous example recording).');
+  }
 } finally {
   await browser.close();
 }
-console.log('Saved take and manifest to ' + output);
