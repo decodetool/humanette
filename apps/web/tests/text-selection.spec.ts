@@ -25,7 +25,7 @@ for (const width of [1280, 390]) {
     await seek(page, 850);
     await expect.poll(selectedWidth).toBe(0);
     await seek(page, 1100);
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.7');
+    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.4');
     await expect.poll(selectedWidth).toBeGreaterThan(0);
     expect(await selectedWidth()).toBeLessThan((await label.boundingBox())!.width * 0.8);
     await page.screenshot({ path: `test-results/text-selection-${width}.png` });
@@ -50,7 +50,7 @@ test('real text drags fade the cursor, but hover and release stay opaque', async
     await human.moveTo('#select-text');
     await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
     await page.mouse.down();
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.7');
+    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.4');
     await page.mouse.up();
     await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
   } finally {

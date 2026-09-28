@@ -36,7 +36,7 @@ export const defaults: Readonly<FeedbackOptions> = Object.freeze({
   releaseRadius: 48,
   releaseDuration: 200,
   motionBlur: 0.2,
-  textSelectionOpacity: 0.7,
+  textSelectionOpacity: 0.4,
 });
 export const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
 export const easeOut = (t: number) => 1 - (1 - clamp(t)) ** 3;

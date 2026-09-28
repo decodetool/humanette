@@ -53,7 +53,7 @@ scale: 2.5; color: #397ef3; filled: true; motionBlur: 0.2. Press: radius 16, dur
 
 Feedback is behind the artwork. It grows on press, holds steady, then expands and fades on release. Quick releases start from the currently displayed state. Pointer size is not subject to OS cursor-size limits.
 
-textSelectionOpacity defaults to 0.7 (0–1). While the mouse is held with a text or vertical-text cursor, the artwork and its motion trail become translucent so selected letters remain readable. Hover and release restore full opacity. Set it to 1 to disable, or tune it in Pointer Lab.
+textSelectionOpacity defaults to 0.4 (0–1). While the mouse is held with a text or vertical-text cursor, the artwork and its motion trail become translucent so selected letters remain readable. Hover and release restore full opacity. Set it to 1 to disable, or tune it in Pointer Lab.
 
 ### Custom artwork
 

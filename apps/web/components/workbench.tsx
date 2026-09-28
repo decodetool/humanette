@@ -16,7 +16,7 @@ const schema = {
   color: '#397ef3',
   filled: true as boolean,
   motionBlur: [0.2, 0, 0.6, 0.01],
-  textSelectionOpacity: [0.7, 0, 1, 0.05],
+  textSelectionOpacity: [0.4, 0, 1, 0.05],
   pressRadius: [16, 1, 60, 1],
   pressDuration: [90, 10, 500, 5],
   pressOpacity: [0.16, 0, 1, 0.01],
