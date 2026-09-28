@@ -1,0 +1,29 @@
+packages/humanette/test/motion.test.mjs
+  s_408157d782cb56::t_8bc0cd9645736f 58
+packages/humanette/README.md
+  s_408157d782cb56::t_8bc0cd9645736f 56
+apps/web/app/docs/page.tsx
+  s_408157d782cb56::t_8bc0cd9645736f 120
+packages/humanette/src/motion.ts
+  s_408157d782cb56::t_8bc0cd9645736f 39
+apps/web/components/workbench.tsx
+  s_408157d782cb56::t_8bc0cd9645736f 19
+apps/web/tests/text-selection.spec.ts
+  s_408157d782cb56::t_8bc0cd9645736f 28,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "89a37614f61a4bd4e61aec3f799c5346a3fc19f9",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
