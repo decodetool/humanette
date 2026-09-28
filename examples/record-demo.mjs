@@ -19,7 +19,7 @@ try {
     ...(headful
       ? {}
       : {
-          recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 60 },
+          recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 120 },
         }),
   });
   const page = await context.newPage();
@@ -70,8 +70,8 @@ try {
             dpr: 2,
             videoSize: [1280, 800],
             capture:
-              'Playwright recordVideo at requested 60 fps; distinct source-frame delivery depends on browser workload',
-            requestedFps: 60,
+              'Playwright recordVideo at requested 120 fps; distinct source-frame delivery depends on browser workload',
+            requestedFps: 120,
             result,
           },
           null,

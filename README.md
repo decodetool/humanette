@@ -35,10 +35,11 @@ starting and leaves the window open afterward; close the window to exit.
 Run `bun dev` in another terminal first.
 
 Playwright is pinned to `1.64.0-alpha-2026-09-28` for native Chromium recording
-with `recordVideo.fps: 60`. This is an intentional prerelease dependency.
+with `recordVideo.fps: 120`. This is an intentional prerelease dependency.
 After installing/upgrading it, run `bunx playwright install chromium` from
 `apps/web` to install its matching browser. Requested output FPS is not a
-guarantee of 60 distinct source frames.
+guarantee of 120 distinct source frames. Cursor input currently targets 60 updates
+per second independently of the encoded recording rate.
 
 ## Use the package
 
