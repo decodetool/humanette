@@ -1,0 +1,21 @@
+README.md
+  s_408157d782cb56::t_c76b348915cf75 38,41-42
+examples/record-demo.mjs
+  s_408157d782cb56::t_c76b348915cf75 22,73-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9989d9e17050f48c628a88bd945bd74451490163",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
