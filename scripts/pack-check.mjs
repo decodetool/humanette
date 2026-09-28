@@ -37,7 +37,7 @@ execFileSync(
     '--no-audit',
     '--no-fund',
     join(scratch, packed.filename),
-    'playwright-core@1.63.0',
+    'playwright-core@1.64.0-alpha-2026-09-28',
     '@types/node@22',
   ],
   { cwd: scratch, stdio: 'pipe' },

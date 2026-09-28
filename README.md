@@ -28,6 +28,12 @@ Each `bun example` run saves its video, screenshot, and manifest in a new timest
 `out/humanette-demo-…` directory. Optionally choose a fresh directory with
 `bun example out/my-take`; existing takes are never overwritten.
 
+Playwright is pinned to `1.64.0-alpha-2026-09-28` for native Chromium recording
+with `recordVideo.fps: 60`. This is an intentional prerelease dependency.
+After installing/upgrading it, run `bunx playwright install chromium` from
+`apps/web` to install its matching browser. Requested output FPS is not a
+guarantee of 60 distinct source frames.
+
 ## Use the package
 
 ```ts

@@ -17,7 +17,7 @@ try {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
     deviceScaleFactor: 2,
-    recordVideo: { dir: output, size: { width: 1280, height: 800 } },
+    recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 60 },
   });
   const page = await context.newPage();
   await page.goto('http://localhost:3410/demos');
@@ -58,7 +58,8 @@ try {
           viewport: [1280, 800],
           dpr: 2,
           videoSize: [1280, 800],
-          capture: 'Playwright recordVideo; source FPS is recorder-controlled, not guaranteed 60',
+          capture: 'Playwright recordVideo at requested 60 fps; distinct source-frame delivery depends on browser workload',
+          requestedFps: 60,
           result,
         },
         null,
