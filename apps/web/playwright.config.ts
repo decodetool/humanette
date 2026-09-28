@@ -4,13 +4,13 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   use: {
-    baseURL: 'http://127.0.0.1:3410',
+    baseURL: 'http://localhost:3410',
     viewport: { width: 1280, height: 900 },
     deviceScaleFactor: 2,
   },
   webServer: {
     command: 'bun run start',
-    url: 'http://127.0.0.1:3410',
+    url: 'http://localhost:3410',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
   },

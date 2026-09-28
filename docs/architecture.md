@@ -21,6 +21,8 @@ The stable, DPR-aware full-surface canvas came from the agent-browser investigat
 
 Cursor geometry and feedback use CSS pixels; SVG hotspot coordinates are scaled with the image. For short moves there is a minimum duration. Cubic ease-out makes travel start quickly and slow into the target, including the curve's lateral bend. Pressed movement follows input exactly; free movement has elapsed-time smoothing. No idle paint loop or perpetual held-disk animation.
 
+Clamp playback progress to both ends of 0–1. The first requestAnimationFrame timestamp can precede a performance.now() start sample, so an upper-only clamp emits negative timeline time. The browser regression covers this offset through the actual Play demo button, not just the pure motion model.
+
 Capture before/after checks belong outside the recorded sequence. Rehearse and batch the take, without an LLM decision loop. Check actual source pixels, not only encoded dimensions/FPS. Enter/keyup, settle, select all inside the editor, insert text, Escape avoids the leading-newline label bug. Persistent tools/styles should not be redundantly reselected.
 
 ## Known limits

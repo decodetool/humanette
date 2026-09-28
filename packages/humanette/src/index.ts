@@ -294,7 +294,9 @@ export function createHumanette(input: HumanetteOptions = {}) {
           return;
         }
         const tick = (now: number) => {
-          const p = Math.min(1, (now - start) / duration);
+          // RAF supplies the frame timestamp, which can precede the instant
+          // performance.now() sampled playback start. Never emit negative time.
+          const p = Math.max(0, Math.min(1, (now - start) / duration));
           try {
             callback(p);
           } catch (error) {
