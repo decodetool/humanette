@@ -1,0 +1,27 @@
+apps/web/playwright.config.ts
+  s_408157d782cb56::t_b92a3020bd9fec 7,13
+packages/humanette/src/index.ts
+  s_408157d782cb56::t_a340b94fc7e08a 297-299
+apps/web/tests/playback-clock.spec.ts
+  s_408157d782cb56::t_6204a87f4b7dd6 1-12,17,20-23
+  s_408157d782cb56::t_ff2afd959983fb 13-16,18-19
+  s_408157d782cb56::t_c9e143f5db49df 24-33
+docs/architecture.md
+  s_408157d782cb56::t_a340b94fc7e08a 24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2a7e095f10b23fbcd09bde695843726cade03bd3",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
