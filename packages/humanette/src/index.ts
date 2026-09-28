@@ -166,6 +166,9 @@ export function createHumanette(input: HumanetteOptions = {}) {
     // cursor-only frames after a larger drag update. No idle paint loop.
     ctx.clearRect(0, 0, b.w, b.h);
     const f = frameOverride ?? feedbackAt(pressEvents, now - epoch, config);
+    const selectingText = pressed && (resolved === 'text' || resolved === 'vertical-text');
+    const cursorOpacity = selectingText ? config.textSelectionOpacity : 1;
+    host.dataset.cursorOpacity = String(cursorOpacity);
     if (visible && resolved !== 'none') {
       ctx.save();
       ctx.globalAlpha = f.opacity;
@@ -181,7 +184,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
       if (asset && image?.complete && image.naturalWidth) {
         const paint = (x: number, y: number, alpha: number, blur = 0) => {
           ctx.save();
-          ctx.globalAlpha = alpha;
+          ctx.globalAlpha = alpha * cursorOpacity;
           ctx.filter = blur ? 'blur(' + blur + 'px)' : 'none';
           ctx.translate(x, y);
           ctx.scale(config.scale * f.scale, config.scale * f.scale);

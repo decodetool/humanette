@@ -54,6 +54,8 @@ test('timeline is seekable, validates ordering, and ends released', () => {
   );
   assert.throws(() => options({ scale: 0 }));
   assert.throws(() => options({ holdOpacity: 2 }));
+  assert.throws(() => options({ textSelectionOpacity: 1.1 }));
+  assert.equal(options().textSelectionOpacity, 0.7);
   assert.throws(() => options({ scale: 'large' }));
   assert.equal('root' in options({ root: {} }), false);
 });

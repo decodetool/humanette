@@ -117,9 +117,9 @@ export default function Docs() {
             ))}
           </div>
           <p className="mt-5 text-sm leading-7 text-muted">
-            Feedback options: scale, color, filled, motionBlur; pressRadius, pressDuration,
-            pressOpacity, pressScale; holdRadius, holdOpacity, ringWidth; releaseRadius,
-            releaseDuration.{' '}
+            Feedback options: scale, color, filled, motionBlur, textSelectionOpacity (0.7 by
+            default, 1 to keep text-drag cursors opaque); pressRadius, pressDuration, pressOpacity,
+            pressScale; holdRadius, holdOpacity, ringWidth; releaseRadius, releaseDuration.{' '}
             <Link href="/workbench" className="text-accent underline">
               Tune them in Pointer Lab
             </Link>{' '}

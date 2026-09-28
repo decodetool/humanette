@@ -20,6 +20,7 @@ export interface FeedbackOptions {
   releaseRadius: number;
   releaseDuration: number;
   motionBlur: number;
+  textSelectionOpacity: number;
 }
 export const defaults: Readonly<FeedbackOptions> = Object.freeze({
   scale: 2.5,
@@ -35,6 +36,7 @@ export const defaults: Readonly<FeedbackOptions> = Object.freeze({
   releaseRadius: 48,
   releaseDuration: 200,
   motionBlur: 0.2,
+  textSelectionOpacity: 0.7,
 });
 export const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
 export const easeOut = (t: number) => 1 - (1 - clamp(t)) ** 3;
@@ -58,7 +60,7 @@ export function options(input: Partial<FeedbackOptions> = {}): FeedbackOptions {
   }
   if (value.scale <= 0 || value.pressDuration <= 0 || value.releaseDuration <= 0)
     throw new RangeError('Scale and durations must be positive.');
-  for (const key of ['pressOpacity', 'holdOpacity', 'motionBlur'] as const)
+  for (const key of ['pressOpacity', 'holdOpacity', 'motionBlur', 'textSelectionOpacity'] as const)
     if (value[key] > 1) throw new RangeError(`${key} must be 0–1.`);
   if (typeof value.filled !== 'boolean' || typeof value.color !== 'string')
     throw new TypeError('Invalid appearance options.');

@@ -27,24 +27,44 @@ export function Preview({
   compact = false,
 }: PreviewProps) {
   const root = useRef<HTMLDivElement>(null),
+    text = useRef<HTMLSpanElement>(null),
     human = useRef<Humanette | null>(null),
     [playing, setPlaying] = useState(false),
     [localTime, setLocalTime] = useState(0),
     [rate, setRate] = useState(1),
     [error, setError] = useState('');
+  const [geometry, setGeometry] = useState({
+    scale: 1,
+    left: 130,
+    width: 300,
+    y: 215,
+    edges: [0, 300],
+  });
   const events = given ?? scenarios[scenario],
     duration = timelineDuration(events),
     current = time ?? localTime;
-  const live = useRef({ events, config, current });
-  live.current = { events, config, current };
+  const live = useRef({ events, config, current, geometry });
+  live.current = { events, config, current, geometry };
+  function normalized() {
+    const { events, geometry: g } = live.current;
+    // Built-in choreography follows the measured text. Edited timelines retain
+    // their literal stage coordinates.
+    return events === scenarios.text
+      ? events.map((e) =>
+          e.type === 'move' && e.y === 215
+            ? { ...e, x: g.left + ((e.x - 130) / 300) * g.width, y: g.y }
+            : e,
+        )
+      : events;
+  }
   function mapped() {
-    const scale = (root.current?.clientWidth ?? 720) / 720;
-    return live.current.events.map((e) =>
+    const scale = live.current.geometry.scale;
+    return normalized().map((e) =>
       e.type === 'move' ? { ...e, x: e.x * scale, y: e.y * scale } : e,
     );
   }
   const initial = () => {
-    const scale = (root.current?.clientWidth ?? 720) / 720;
+    const scale = live.current.geometry.scale;
     return { x: 72 * scale, y: 92 * scale };
   };
   useEffect(() => {
@@ -53,11 +73,34 @@ export function Preview({
     const seek = () => h.seek(mapped(), live.current.current, initial());
     void h.ready.then(seek).catch((e) => setError(String(e)));
     const observer = new ResizeObserver(() => {
+      const stage = root.current!.getBoundingClientRect();
+      const label = text.current!;
+      const bounds = label.getBoundingClientRect();
+      if (!stage.width || !bounds.width) return;
+      const scale = stage.width / 720;
+      const range = document.createRange();
+      const node = label.firstChild!;
+      const edges = [0];
+      for (let i = 1; i <= (node.textContent?.length ?? 0); i++) {
+        range.setStart(node, 0);
+        range.setEnd(node, i);
+        edges.push(range.getBoundingClientRect().width / scale);
+      }
+      const g = {
+        scale,
+        left: (bounds.left - stage.left) / scale,
+        width: bounds.width / scale,
+        y: (bounds.top + bounds.height / 2 - stage.top) / scale,
+        edges,
+      };
+      live.current.geometry = g;
+      setGeometry(g);
       h.stop();
       setPlaying(false);
       seek();
     });
     observer.observe(root.current!);
+    observer.observe(text.current!);
     return () => {
       observer.disconnect();
       h.dispose();
@@ -72,7 +115,7 @@ export function Preview({
   useEffect(() => {
     human.current?.configure(config ?? {});
     human.current?.seek(mapped(), current, initial());
-  }, [config, current, events]);
+  }, [config, current, events, geometry]);
   function update(t: number) {
     setLocalTime(t);
     onTime?.(t);
@@ -93,7 +136,30 @@ export function Preview({
       setPlaying(false);
     }
   }
-  const state = sampleTimeline(events, current, options(config));
+  const timeline = normalized();
+  const state = sampleTimeline(timeline, current, options(config));
+  let anchor: number | undefined;
+  let endpoint = state.x;
+  if (scenario === 'text') {
+    for (const e of timeline) {
+      if (e.at > current) break;
+      if (e.type === 'down') {
+        anchor = sampleTimeline(timeline, e.at).x;
+        endpoint = state.x;
+      }
+      if (e.type === 'up') endpoint = sampleTimeline(timeline, e.at).x;
+    }
+  }
+  const snap = (x: number) =>
+    geometry.edges.reduce(
+      (nearest, edge) =>
+        Math.abs(edge - (x - geometry.left)) < Math.abs(nearest - (x - geometry.left))
+          ? edge
+          : nearest,
+      0,
+    );
+  const start = anchor === undefined ? 0 : Math.min(snap(anchor), snap(endpoint));
+  const end = anchor === undefined ? 0 : Math.max(snap(anchor), snap(endpoint));
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-[#fafbf7] shadow-[0_16px_50px_-35px_#26302460]">
       <div className="flex justify-between border-b border-line bg-white/70 px-5 py-3">
@@ -121,10 +187,16 @@ export function Preview({
         >
           {scenario === 'click' && current > 950 ? 'Changes saved ✓' : 'Save changes'}
         </div>
-        <div className="absolute left-[18%] top-[50%] font-display text-[clamp(14px,2.2vw,25px)]">
+        <div className="absolute left-[18%] top-[50%] whitespace-nowrap font-display text-[clamp(14px,2.2vw,25px)]">
           <span
-            style={{ background: scenario === 'text' && current > 890 ? '#c9ddfb' : undefined }}
-          >
+            aria-hidden
+            data-testid="selection-highlight"
+            className="pointer-events-none absolute inset-0 origin-left bg-[#c9ddfb]"
+            style={{
+              transform: `translateX(${start * geometry.scale}px) scaleX(${(end - start) / geometry.width})`,
+            }}
+          />
+          <span ref={text} data-testid="selection-text" className="relative inline-block">
             Select these words.
           </span>
         </div>
