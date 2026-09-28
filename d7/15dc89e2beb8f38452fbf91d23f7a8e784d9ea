@@ -1,0 +1,24 @@
+examples/record-demo.mjs
+  s_408157d782cb56::t_c78b0a1ee7a5da 6-7
+package.json
+  s_408157d782cb56::t_c78b0a1ee7a5da 16
+README.md
+  s_408157d782cb56::t_c78b0a1ee7a5da 19,27-29
+  s_408157d782cb56::t_53bc795756a691 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d715dc89e2beb8f38452fbf91d23f7a8e784d9ea",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
