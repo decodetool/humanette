@@ -3,7 +3,8 @@ import { chromium } from 'playwright-core';
 import { createHuman } from 'humanette/playwright';
 import { mkdir, writeFile, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
-const output = resolve(process.argv[2] ?? 'out/humanette-demo');
+const take = new Date().toISOString().replaceAll(':', '-');
+const output = resolve(process.argv[2] ?? `out/humanette-demo-${take}`);
 try {
   await access(output);
   throw Error('Choose a new output directory; refusing to overwrite a take.');

@@ -16,12 +16,17 @@ Turborepo + Bun workspaces. The website is Next.js, React, TypeScript, and Tailw
 ```sh
 bun install --frozen-lockfile
 bun dev                    # localhost:3410
+bun example                # record the Playwright demo (dev server must be running)
 bun check                  # types, unit tests, production builds
 bun run test:e2e            # real browser integration
 bun run pack:check          # fresh npm consumer of the actual tarball
 ```
 
 Node 22+ and Bun 1.3.14. Before browser tests, run bunx playwright install chromium from apps/web.
+
+Each `bun example` run saves its video, screenshot, and manifest in a new timestamped
+`out/humanette-demo-…` directory. Optionally choose a fresh directory with
+`bun example out/my-take`; existing takes are never overwritten.
 
 ## Use the package
 
