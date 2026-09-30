@@ -1,0 +1,44 @@
+apps/web/components/example-player.tsx
+  s_408157d782cb56::t_bf00a92d65e4f4 197
+  s_408157d782cb56::t_d411a9a0690a0f 199
+apps/web/tests/examples.spec.ts
+  s_408157d782cb56::t_6d728af9cc0a0f 31,37,46,197-204,206-208,210-218,231-248,250-266
+  s_408157d782cb56::t_bf00a92d65e4f4 195,249,267
+  s_408157d782cb56::t_75a14fe84940e3 219-226,228-230
+  s_408157d782cb56::t_d411a9a0690a0f 196,205,209
+  s_408157d782cb56::t_1d6c5267cd5c14 268-269
+apps/web/components/site-nav.tsx
+  h_0dbcbba47c7061 35,38,45
+apps/web/tests/design.spec.ts
+  s_408157d782cb56::t_27f9e993b54ff3 3-24
+  s_408157d782cb56::t_63459359858e19 25-28
+apps/web/components/code-block.tsx
+  s_408157d782cb56::t_27f9e993b54ff3 20
+apps/web/app/globals.css
+  s_408157d782cb56::t_bf00a92d65e4f4 100,102-104,106-108,121
+  s_408157d782cb56::t_d411a9a0690a0f 101,110-115,117-119
+  s_408157d782cb56::t_75a14fe84940e3 105,109,116,120
+apps/web/app/page.tsx
+  h_0dbcbba47c7061 13-14,17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "21b2bfd19e4f51609befe5429fdcbb119b66913b",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
