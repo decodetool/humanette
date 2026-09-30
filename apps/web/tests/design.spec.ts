@@ -1,5 +1,31 @@
 import { test, expect } from '@playwright/test';
 
+test('favicon keeps its size and aligns the cursor near the right edge without clipping', async ({
+  page,
+}) => {
+  const response = await page.request.get('/icon.svg');
+  expect(response.ok()).toBe(true);
+  await page.setContent(await response.text());
+  const icon = page.locator('svg');
+  await expect(icon).toHaveAttribute('width', '32');
+  await expect(icon).toHaveAttribute('height', '32');
+  const bounds = await icon.evaluate((element) => {
+    const frame = element.getBoundingClientRect();
+    const arrow = element.querySelector('g')!.getBoundingClientRect();
+    return {
+      right: frame.right - arrow.right,
+      left: arrow.left - frame.left,
+      top: arrow.top - frame.top,
+      bottom: frame.bottom - arrow.bottom,
+    };
+  });
+  expect(bounds.right).toBeGreaterThan(0);
+  expect(bounds.right).toBeLessThan(2);
+  expect(bounds.left).toBeGreaterThan(bounds.right);
+  expect(bounds.top).toBeGreaterThanOrEqual(0);
+  expect(bounds.bottom).toBeGreaterThanOrEqual(0);
+});
+
 test('theme starts from system, then persists a two-state choice; navigation and copy', async ({
   page,
   context,
