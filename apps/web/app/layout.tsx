@@ -27,8 +27,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </a>
           <SiteNav />
           <main id="main">{children}</main>
-          <footer className="shell mt-16 border-t border-line py-8 text-center text-xs text-muted">
-            Made with ❤️ by <a href="https://decode.dev">Decode</a>
+          <footer className="shell mt-16 border-t border-line py-8 text-center text-base text-muted">
+            Made with ❤️ by{' '}
+            <a
+              href="https://decode.dev"
+              className="font-medium text-ink underline underline-offset-4 transition-colors hover:text-accent"
+            >
+              Decode
+            </a>
           </footer>
         </ThemeProvider>
       </body>
