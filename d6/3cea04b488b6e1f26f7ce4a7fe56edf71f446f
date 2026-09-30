@@ -1,0 +1,28 @@
+apps/web/tests/design.spec.ts
+  s_408157d782cb56::t_9edf5d89fa9d19 20-22
+apps/web/components/example-player.tsx
+  s_408157d782cb56::t_27734db930ff86 199-201
+apps/web/components/site-nav.tsx
+  s_408157d782cb56::t_27734db930ff86 35-52
+apps/web/app/icon.svg
+  s_408157d782cb56::t_27734db930ff86 1-2
+apps/web/tests/examples.spec.ts
+  s_408157d782cb56::t_9edf5d89fa9d19 79-101,103-104,111
+  s_408157d782cb56::t_4350333835d6f0 102,105-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d63cea04b488b6e1f26f7ce4a7fe56edf71f446f",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
