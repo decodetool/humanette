@@ -109,6 +109,9 @@
   .icon-button {
     @apply inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-sage hover:text-ink;
   }
+  .nav-icon {
+    @apply hover:bg-transparent;
+  }
   .copy-button {
     @apply opacity-30 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100;
   }

@@ -35,14 +35,14 @@ export function SiteNav() {
         <div className="flex items-center gap-1">
           <a
             href="https://github.com/decodetool/humanette"
-            className="icon-button"
+            className="icon-button nav-icon"
             aria-label="GitHub"
             title="GitHub"
           >
             <Icon name="github" />
           </a>
           <button
-            className="icon-button"
+            className="icon-button nav-icon"
             aria-label={`Switch to ${next} mode`}
             title={`Switch to ${next} mode`}
             onClick={() => setTheme(next)}
