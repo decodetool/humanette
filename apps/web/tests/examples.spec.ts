@@ -10,6 +10,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
   await expect(page.getByRole('slider')).toHaveCount(0);
   await expect(page.getByRole('contentinfo')).toHaveText('Made with ❤️ by Decode');
   await expect(page.getByRole('contentinfo')).toHaveCSS('font-size', '16px');
+  await expect(page.getByRole('contentinfo')).toHaveCSS('border-top-width', '0px');
   await expect(page.getByRole('contentinfo').getByRole('link')).toHaveCSS(
     'text-decoration-line',
     'underline',

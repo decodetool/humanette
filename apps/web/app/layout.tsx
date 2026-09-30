@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </a>
           <SiteNav />
           <main id="main">{children}</main>
-          <footer className="shell mt-16 border-t border-line py-8 text-center text-base text-muted">
+          <footer className="shell mt-16 py-8 text-center text-base text-muted">
             Made with ❤️ by{' '}
             <a
               href="https://decode.dev"
