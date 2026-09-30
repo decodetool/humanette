@@ -1,0 +1,61 @@
+AGENTS.md
+  s_408157d782cb56::t_156f6478f8f786 13-14
+apps/web/app/examples/page.tsx
+  s_408157d782cb56::t_92f651cab4e1a2 4
+apps/web/components/code-block.tsx
+  s_408157d782cb56::t_92f651cab4e1a2 24,61
+apps/web/app/page.tsx
+  s_408157d782cb56::t_92f651cab4e1a2 2,4
+  h_0dbcbba47c7061 13-14
+apps/web/app/docs/page.tsx
+  s_408157d782cb56::t_f23566c3767775 5,8-9,39-47,61
+  s_408157d782cb56::t_92f651cab4e1a2 4,6-7,10-11,18-19,31-38,48-60,62
+apps/web/content/agent-guide.ts
+  s_408157d782cb56::t_54e6f732d69359 1-73
+  s_408157d782cb56::t_12ea4cd8e4b754 74-76
+apps/web/app/docs.md/route.ts
+  s_408157d782cb56::t_54e6f732d69359 1-10
+apps/web/tests/examples.spec.ts
+  s_408157d782cb56::t_fe7704cb350e3b 31
+apps/web/content/documentation.ts
+  s_408157d782cb56::t_ee9fe35b26bd00 1-96
+apps/web/app/llms.txt/route.ts
+  s_408157d782cb56::t_54e6f732d69359 1-5
+apps/web/app/layout.tsx
+  s_408157d782cb56::t_92f651cab4e1a2 6,18
+apps/web/app/robots.ts
+  s_408157d782cb56::t_54e6f732d69359 1-5
+apps/web/tests/design.spec.ts
+  s_408157d782cb56::t_92f651cab4e1a2 55
+apps/web/app/workbench/page.tsx
+  s_408157d782cb56::t_156f6478f8f786 4
+apps/web/tests/agent-docs.spec.ts
+  s_408157d782cb56::t_156f6478f8f786 1-4,8-26,36-38,44-49,51-70,72-73,78-90,95-96
+  s_408157d782cb56::t_f2d8374e684880 5-7,27-35,39-43,71,74-77,91-94
+  s_408157d782cb56::t_fe7704cb350e3b 50
+apps/web/app/llms-full.txt/route.ts
+  s_408157d782cb56::t_54e6f732d69359 1-10
+apps/web/app/sitemap.ts
+  s_408157d782cb56::t_54e6f732d69359 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0f03c64321065f7c7c4f044236d2db3b8db97615",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
