@@ -44,12 +44,12 @@ execFileSync(
 );
 await writeFile(
   join(scratch, 'consumer.mjs'),
-  "import {cursors,createHumanette} from 'humanette'; import {humanPoint} from 'humanette/motion'; import {createHuman} from 'humanette/playwright'; if(!cursors.default.src.startsWith('data:')||typeof createHuman!=='function'||typeof createHumanette!=='function'||humanPoint({x:0,y:0},{x:2,y:3},1).x!==2)throw Error('consumer failed'); console.log('Fresh npm consumer: runtime imports and embedded assets OK');",
+  "import {cursors,createHumanette} from 'humanette/internal'; import {humanPoint} from 'humanette/motion'; import {createHuman} from 'humanette'; if(!cursors.default.src.startsWith('data:')||typeof createHuman!=='function'||typeof createHumanette!=='function'||humanPoint({x:0,y:0},{x:2,y:3},1).x!==2)throw Error('consumer failed'); console.log('Fresh npm consumer: runtime imports and embedded assets OK');",
 );
 execFileSync(process.execPath, ['consumer.mjs'], { cwd: scratch, stdio: 'inherit' });
 await writeFile(
   join(scratch, 'consumer.ts'),
-  "import {createHumanette,type TimelineEvent} from 'humanette'; import {createHuman} from 'humanette/playwright'; import type {Page} from 'playwright-core'; const events:TimelineEvent[]=[{at:0,type:'move',x:1,y:2,duration:300}]; const make=async(page:Page)=>{const h=await createHuman(page);await h.click('#save');}; const pointer=()=>createHumanette({scale:2.5}).play(events);",
+  "import {createHumanette,type TimelineEvent} from 'humanette/internal'; import {createHuman} from 'humanette'; import type {Page} from 'playwright-core'; const events:TimelineEvent[]=[{at:0,type:'move',x:1,y:2,duration:300}]; const make=async(page:Page)=>{const h=await createHuman(page);await h.click('#save');}; const pointer=()=>createHumanette({scale:2.5}).play(events);",
 );
 execFileSync(
   process.execPath,

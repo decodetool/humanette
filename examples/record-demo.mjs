@@ -1,6 +1,6 @@
 // Deterministic real-input demo. Start bun dev first; no LLM calls during the take.
 import { chromium } from 'playwright-core';
-import { createHuman } from 'humanette/playwright';
+import { createHuman } from 'humanette';
 import { mkdir, writeFile, rename } from 'node:fs/promises';
 import { resolve } from 'node:path';
 const args = process.argv.slice(2);
@@ -15,16 +15,16 @@ const browser = await chromium.launch({ headless: !headful });
 try {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
-    deviceScaleFactor: 2,
+    deviceScaleFactor: 1,
     ...(headful
       ? {}
       : {
-          recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 120 },
+          recordVideo: { dir: output, size: { width: 1280, height: 800 }, fps: 60 },
         }),
   });
   const page = await context.newPage();
-  await page.goto('http://localhost:3410/demos');
-  const human = await createHuman(page, { seed: 42, scale: 2.5 });
+  await page.goto('http://localhost:3410/examples/live');
+  const human = await createHuman(page, { seed: 42, scale: 4 });
   try {
     if (headful) {
       await page.bringToFront();
@@ -33,8 +33,8 @@ try {
       );
       await human.wait(1200);
     }
-    await human.click('#save');
-    await human.type('#name', 'A human touch', { selectAll: true, delay: 55 });
+    await human.click('#save', { duration: 1200 });
+    await human.type('#name', 'A human touch', { selectAll: true, delay: 55, duration: 1200 });
     const r = await page.locator('#select-text').evaluate((el) => {
       const range = document.createRange();
       range.selectNodeContents(el);

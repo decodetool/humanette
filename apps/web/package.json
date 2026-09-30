@@ -15,6 +15,7 @@
     "humanette": "workspace:*",
     "motion": "^12",
     "next": "16.3.6",
+    "prism-react-renderer": "^2.4.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

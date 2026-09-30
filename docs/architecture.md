@@ -13,7 +13,11 @@ createHumanette paints a cursor, press feedback, and optionally modifier chords.
 
 createHuman(page) delivers real input through Playwright. It centers locators, scrolls them into view, samples motion against elapsed time, awaits delivery, adds a small aim pause, and releases held input on failures. It rejects parallel actions. It does not implement a recorder.
 
-The workbench imports the package renderer and pure model; its controls are the same options consumers receive. A small visual fixture reacts to the seekable timeline for preview purposes only. The /demos page is a separate real-input fixture with actual selection and pointer capture.
+The package root exports the Playwright API. The old humanette/playwright import remains a compatibility alias; humanette/internal is reserved for the site's renderer and workbench. Future automation adapters can use their own subpaths without changing the current Playwright-first documentation.
+
+The workbench imports the shared renderer and pure model; its controls are the same options consumers receive. The /examples page shows three explicitly labeled visual previews with matching Playwright snippets. They autoplay while visible, respect reduced motion, pause offscreen, and return the cursor home before looping. They do not dispatch real DOM input. The /examples/live route retains the real-input fixture, motion reference, and CSS cursor gallery used by Playwright tests and the recording example. /demos redirects to /examples.
+
+selectText(locator) measures visible text runs (including nested spans and wrapped lines) and performs a real drag. It assumes left-to-right selectable text; specialized editors and form fields should use explicit coordinates or keyboard commands.
 
 ## Preserved learnings
 

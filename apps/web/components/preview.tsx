@@ -9,7 +9,7 @@ import {
   type Humanette,
   type TimelineEvent,
   type FeedbackOptions,
-} from 'humanette';
+} from 'humanette/internal';
 export interface PreviewProps {
   events?: TimelineEvent[];
   config?: Partial<FeedbackOptions>;
@@ -68,10 +68,17 @@ export function Preview({
     return { x: 72 * scale, y: 92 * scale };
   };
   useEffect(() => {
+    let active = true;
     const h = createHumanette({ root: root.current!, ...live.current.config });
     human.current = h;
     const seek = () => h.seek(mapped(), live.current.current, initial());
-    void h.ready.then(seek).catch((e) => setError(String(e)));
+    void h.ready
+      .then(() => {
+        if (active) seek();
+      })
+      .catch((e) => {
+        if (active) setError(String(e));
+      });
     const observer = new ResizeObserver(() => {
       const stage = root.current!.getBoundingClientRect();
       const label = text.current!;
@@ -102,6 +109,7 @@ export function Preview({
     observer.observe(root.current!);
     observer.observe(text.current!);
     return () => {
+      active = false;
       observer.disconnect();
       h.dispose();
       human.current = null;
@@ -161,29 +169,27 @@ export function Preview({
   const start = anchor === undefined ? 0 : Math.min(snap(anchor), snap(endpoint));
   const end = anchor === undefined ? 0 : Math.max(snap(anchor), snap(endpoint));
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-[#fafbf7] shadow-[0_16px_50px_-35px_#26302460]">
-      <div className="flex justify-between border-b border-line bg-white/70 px-5 py-3">
-        <div className="flex items-center gap-1.5">
-          <i className="h-2 w-2 rounded-full bg-[#e4bdb0]" />
-          <i className="h-2 w-2 rounded-full bg-[#e5d7ae]" />
-          <i className="h-2 w-2 rounded-full bg-[#bfd1b8]" />
-          <span className="ml-4 font-mono text-[10px] text-muted">a small, repeatable moment</span>
-        </div>
-        <span className="font-mono text-[10px] text-muted">seed 42</span>
+    <div className="overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="flex justify-between border-b border-line bg-sage px-4 py-2.5">
+        <span className="font-mono text-[11px] text-muted">
+          demo /{' '}
+          {scenario === 'text' ? 'text selection' : scenario === 'drag' ? 'drag & drop' : 'click'}
+        </span>
+        <span className="font-mono text-[11px] text-muted">seed 42</span>
       </div>
       <div
         ref={root}
         data-testid="preview-stage"
-        className="relative aspect-[720/400] w-full overflow-hidden bg-[radial-gradient(#c8cebf_1px,transparent_1px)] bg-size-[22px_22px]"
+        className="preview-surface relative aspect-[720/400] w-full overflow-hidden"
       >
         <div className="absolute left-[7%] top-[13%] text-[clamp(9px,1.1vw,13px)]">
-          <span className="eyebrow">YOUR NEXT BIG THING</span>
+          <span className="eyebrow">EXAMPLE PROJECT</span>
           <p className="mt-3 font-display text-[clamp(20px,3vw,36px)] leading-none">
-            Made to be shown.
+            A clear next step.
           </p>
         </div>
         <div
-          className={`absolute left-[69%] top-[20%] flex h-[14%] w-[20%] items-center justify-center rounded-lg text-center text-[clamp(8px,1vw,13px)] leading-tight text-white ${scenario === 'click' && current > 950 ? 'bg-[#57805b]' : 'bg-accent'}`}
+          className={`absolute left-[69%] top-[20%] flex h-[14%] w-[20%] items-center justify-center rounded-md text-center text-[clamp(8px,1vw,13px)] leading-tight ${scenario === 'click' && current > 950 ? 'bg-success-surface text-success' : 'bg-accent text-on-accent'}`}
         >
           {scenario === 'click' && current > 950 ? 'Changes saved ✓' : 'Save changes'}
         </div>
@@ -191,7 +197,7 @@ export function Preview({
           <span
             aria-hidden
             data-testid="selection-highlight"
-            className="pointer-events-none absolute inset-0 origin-left bg-[#c9ddfb]"
+            className="pointer-events-none absolute inset-0 origin-left bg-selection"
             style={{
               transform: `translateX(${start * geometry.scale}px) scaleX(${(end - start) / geometry.width})`,
             }}
@@ -200,8 +206,8 @@ export function Preview({
             Select these words.
           </span>
         </div>
-        <div className="absolute left-[68%] top-[71%] flex h-[17%] w-[19%] items-center justify-center rounded-lg border border-dashed border-[#a3b89a] bg-sage/50 text-center text-[clamp(8px,1vw,12px)] leading-tight text-muted">
-          Drop something good
+        <div className="absolute left-[68%] top-[71%] flex h-[17%] w-[19%] items-center justify-center rounded-md border border-dashed border-muted bg-sage text-center text-[clamp(8px,1vw,12px)] leading-tight text-muted">
+          Drop here
         </div>
         <div
           style={{
@@ -210,12 +216,12 @@ export function Preview({
                 ? `${Math.min(68, (state.x / 720) * 100 - 9)}%`
                 : '16%',
           }}
-          className="absolute top-[71%] flex h-[17%] w-[19%] items-center justify-center rounded-lg border border-[#a3b89a] bg-[#e0ead5] text-[clamp(10px,1vw,13px)] shadow-sm"
+          className="absolute top-[71%] flex h-[17%] w-[19%] items-center justify-center rounded-md border border-line bg-success-surface text-[clamp(10px,1vw,13px)]"
         >
           {scenario === 'drag' && current >= 2420 ? 'Delivered ✓' : 'Drag me'}
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3 border-t border-line bg-white/70 px-5 py-4">
+      <div className="flex flex-wrap items-center gap-3 border-t border-line bg-surface px-4 py-3">
         <button className="primary min-w-28 py-2!" onClick={play}>
           {playing ? 'Pause' : 'Play demo'} <span aria-hidden>↗</span>
         </button>
@@ -250,7 +256,7 @@ export function Preview({
         )}
       </div>
       {error && (
-        <p role="alert" className="p-4 text-sm text-red-700">
+        <p role="alert" className="p-4 text-sm text-danger">
           {error}
         </p>
       )}

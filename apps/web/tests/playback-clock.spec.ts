@@ -9,7 +9,7 @@ test('Play demo tolerates a frame timestamp just before playback started', async
     // Model a busy frame with a timestamp earlier than performance.now().
     window.requestAnimationFrame = (callback) => request((time) => callback(time - 100));
   });
-  await page.goto('/');
+  await page.goto('/workbench');
   await expect(page.locator('[data-humanette]')).toHaveCount(1);
   await page.evaluate(
     () =>

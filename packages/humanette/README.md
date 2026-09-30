@@ -1,94 +1,64 @@
 # humanette
 
-Natural pointer movement and legible feedback for product walkthroughs, agent recordings, and browser tests. Framework-independent. TypeScript included. SVGs bundled and embedded; no asset hosting required.
+Natural cursor movement and legible click feedback for Playwright product demos. TypeScript and all 35 cursor SVGs included.
 
 ```sh
-npm install humanette
-# or pnpm add humanette / bun add humanette
+npm install humanette playwright
+npx playwright install chromium
 ```
 
-## Follow real input
+## Use your Playwright page
 
 ```ts
-import { createHumanette } from 'humanette';
+import { createHuman } from 'humanette';
 
-const pointer = createHumanette({ follow: true, scale: 2.5 });
-await pointer.ready;
-// Record with your existing tool.
-pointer.dispose();
+const human = await createHuman(page, { scale: 4, seed: 42 });
+try {
+  await human.click(page.getByRole('button', { name: 'Save' }));
+  await human.type(page.getByLabel('Title'), 'Start', { selectAll: true });
+  await human.selectText(page.getByText('Select these words.'));
+  await human.drag(page.getByTestId('card'), page.getByTestId('drop'));
+  await human.press('Shift+2');
+} finally {
+  await human.dispose();
+}
 ```
 
-Importing is SSR-safe; call createHumanette only in a browser (in a React effect). Return pointer.dispose from the effect cleanup. The overlay is inert, hidden from accessibility, and removes its event listeners, timers, and temporary native-cursor styles when disposed.
+Pass an existing Playwright Page to createHuman. Continue to use Playwright for browser setup, navigation, assertions, app-readiness checks, and recording.
 
-## Real Playwright actions
+## API
+
+Targets accept Playwright Locator objects, CSS selector strings, or { x, y } in main-viewport CSS pixels. Locators are scrolled into view and centered before movement. Await each action in order.
+
+- createHuman(page, options?): attach the cursor. Options include scale, seed (42), settle (120 ms), fps (60 input samples/sec target), keyboard (false), and feedback appearance.
+- moveTo(target, { duration?, signal? }): move without clicking.
+- click(target, { duration?, signal? }): move, slow on arrival, settle, and click.
+- selectText(locatorOrSelector, { duration?, signal? }): drag across visible text, including nested spans and wrapped lines. Defaults to a 1400 ms selection drag. Assumes left-to-right selectable text; use keyboard commands for inputs and specialized editors.
+- drag(from, to, { duration?, signal? }): move to the source, hold, drag, and release. Defaults to a 900 ms drag.
+- type(target, text, { delay?, selectAll?, signal? }): click and insert characters through Playwright keyboard input. Delay defaults to 45 ms per character.
+- press(key): send a Playwright shortcut, such as ControlOrMeta+A.
+- wait(milliseconds, signal?): add a short presentation hold.
+- configure(appearance): update cursor size and feedback.
+- dispose(): remove the overlay and listeners after pending actions finish; keep the page open.
+
+Pass an AbortSignal to cancel supported actions. Held mouse input is released even when a drag is cancelled. The overlay is reinstalled after navigation on the next action. Humanette respects CSP and browser permissions.
+
+## Appearance
+
+Defaults: scale 2.5, color #397ef3, filled true, motionBlur 0.2, textSelectionOpacity 0.4. Examples use scale 4.
+
+Feedback sits behind the cursor, grows on press, holds steady, then expands and fades on release. Configure pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity, ringWidth, releaseRadius, and releaseDuration.
 
 ```ts
-import { createHuman } from 'humanette/playwright';
-
-const human = await createHuman(page, { seed: 42, settle: 120 });
-await human.click(page.getByRole('button', { name: 'Save' }));
-await human.type('#title', 'Start', { selectAll: true });
-await human.drag('#card', '#destination', { duration: 1100 });
-await human.press('Shift+2');
-await human.dispose();
+await human.configure({ scale: 4, textSelectionOpacity: 0.4 });
 ```
 
-Install Playwright separately. Targets may be CSS selectors, Playwright locators, or {x,y} viewport coordinates in CSS pixels. Actions use real Playwright input. Await them in order. Aborting a drag still releases the mouse. The adapter reinjects the overlay after navigation when the next action begins. It does not bypass CSP or browser permissions.
+Text-selection opacity applies while a text cursor is held down. Set it to 1 to keep the cursor opaque. Pointer size is not limited by the OS cursor settings. All artwork is embedded; no asset server is required.
 
-## Browser / visual API
+## Recording and boundaries
 
-- createHumanette({root?, follow?, hideNative?, keyboard?, theme?, ...appearance}): create a viewport overlay or a scoped preview. A custom root must be positioned with CSS.
-- ready: await image decoding before a take.
-- moveTo({x,y}, {duration?, seed?, signal?}): seeded curve with fast departure and slow arrival; positive duration in ms.
-- setPosition({x,y}), down(), up(): feed your own adapter.
-- configure(appearance), setCursor(cssKeyword), setTheme(theme): change appearance and artwork on the fly.
-- play(events, {rate?, signal?, onFrame?, initial?}), seek(events,time,initial?): deterministic visual playback/scrubbing.
-- stop(), hide(), dispose(): cancel playback, hide, or fully tear down.
+Use Playwright recordVideo or your existing screen recorder. Humanette does not encode video or guarantee capture FPS. Encoded FPS, input sampling, and distinct source frames are different measurements.
 
-**Visual methods do not dispatch DOM events or alter product state.** Use the Playwright adapter for real clicks, text selection (drag across measured text bounds), typing, and pointer-based drag/drop.
+Locator positions are sampled before movement, not continuously tracked. This adapter does not implement all locator.click actionability checks. CSS cursor inference is limited for cross-origin frames, closed shadow roots, native controls, and custom cursor images. Busy artwork is static. Keyboard badges are opt-in and display modifier chords only, never typed text.
 
-### Appearance defaults
-
-scale: 2.5; color: #397ef3; filled: true; motionBlur: 0.2. Press: radius 16, duration 90 ms, opacity 0.16, cursor scale 0.94. Hold: radius 30, opacity 0.2, outline width 1.5. Release: radius 48, duration 200 ms. Option keys are pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity, ringWidth, releaseRadius, releaseDuration.
-
-Feedback is behind the artwork. It grows on press, holds steady, then expands and fades on release. Quick releases start from the currently displayed state. Pointer size is not subject to OS cursor-size limits.
-
-textSelectionOpacity defaults to 0.4 (0–1). While the mouse is held with a text or vertical-text cursor, the artwork and its motion trail become translucent so selected letters remain readable. Hover and release restore full opacity. Set it to 1 to disable, or tune it in Pointer Lab.
-
-### Custom artwork
-
-```ts
-await pointer.setTheme({
-  pointer: {
-    src: '/my-pointer.svg',
-    width: 64, height: 64,
-    hotspot: [32, 32], // source image coordinates, scaled with the image
-  },
-});
-pointer.setCursor('auto'); // infer from CSS again
-```
-
-### Timelines
-
-```ts
-await pointer.play([
-  { at: 0, type: 'move', x: 400, y: 200, duration: 700, seed: 42 },
-  { at: 700, type: 'cursor', cursor: 'pointer' },
-  { at: 820, type: 'down' },
-  { at: 900, type: 'up' },
-]);
-```
-
-Times use ms. Coordinates use CSS pixels, relative to root when provided. Moves cannot overlap; down/up must alternate and finish released. Pure humanPoint, sampleTimeline, feedbackAt, validateTimeline, and moveDuration are available from humanette/motion without embedding the asset payload.
-
-### Script tag
-
-Copy the installed dist/humanette.global.js file to your site's public directory, load it with a script tag, then call Humanette.createHumanette({follow:true}). The classic bundle includes all SVGs. Nothing needs a CDN.
-
-## Boundaries
-
-Humanette is not a recorder or encoder. 60-fps output does not prove 60 unique captured frames. Input delivery and capture depend on the browser, page workload, and recorder. CSS auto is heuristic; closed shadow roots, cross-origin frames, native widgets, and custom image cursors cannot be fully inferred. Busy/progress artwork is static. Use the native CSS comparison badges in the project site's gallery to inspect mappings.
-
-keyboard:true opts into a modifier-chord badge only; ordinary typing and password text are not displayed. It is disabled by default.
-
-See the project website's Pointer Lab for Dialkit tuning, timeline editing, and portable preset export. See NOTICE.md for source and asset provenance.
+The project website includes Playwright examples, a recording guide, and Pointer Lab. The old humanette/playwright import remains a compatibility alias. No npm publishing, uploads, or telemetry happen automatically. See NOTICE.md for asset provenance.

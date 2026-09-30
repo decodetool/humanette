@@ -164,7 +164,11 @@ export function createHumanette(input: HumanetteOptions = {}) {
     };
     // Stable full-surface damage keeps Chromium's capture sampler from dropping
     // cursor-only frames after a larger drag update. No idle paint loop.
-    ctx.clearRect(0, 0, b.w, b.h);
+    // Clear in bitmap coordinates so every edge pixel is covered, including
+    // those rounded up from fractional CSS dimensions at the current DPR.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const f = frameOverride ?? feedbackAt(pressEvents, now - epoch, config);
     const selectingText = pressed && (resolved === 'text' || resolved === 'vertical-text');
     const cursorOpacity = selectingText ? config.textSelectionOpacity : 1;

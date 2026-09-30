@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createHumanette, cursors, cursorGroups } from 'humanette';
+import { createHumanette, cursors, cursorGroups } from 'humanette/internal';
+import { MotionReference } from './motion-reference';
 export function CursorTour() {
   const root = useRef<HTMLDivElement>(null),
     [hotspots, setHotspots] = useState(true),
@@ -10,6 +11,15 @@ export function CursorTour() {
     [offset, setOffset] = useState(0),
     [held, setHeld] = useState(false),
     [delivered, setDelivered] = useState(false);
+  const [query, setQuery] = useState('');
+  const groups = cursorGroups
+    .map((group) => ({
+      ...group,
+      types: group.types.filter((type) =>
+        `${type} ${group.name}`.toLowerCase().includes(query.trim().toLowerCase()),
+      ),
+    }))
+    .filter((group) => group.types.length);
   const drag = useRef<{ start: number; offset: number; max: number } | null>(null);
   useEffect(() => {
     if (!live) return;
@@ -18,9 +28,13 @@ export function CursorTour() {
   }, [live, scale]);
   return (
     <div ref={root}>
-      <div className="mb-8 flex flex-wrap items-center gap-4">
-        <button className={live ? 'primary' : 'secondary'} onClick={() => setLive(!live)}>
-          {live ? 'Custom cursor on' : 'Try the custom cursor'}
+      <div id="try-it" className="mb-5 flex flex-wrap items-center gap-4">
+        <button
+          aria-pressed={live}
+          className={live ? 'primary' : 'secondary'}
+          onClick={() => setLive(!live)}
+        >
+          {live ? 'Custom cursor on' : 'Enable custom cursor'}
         </button>
         <label className="flex items-center gap-2 text-xs">
           Scale{' '}
@@ -35,25 +49,31 @@ export function CursorTour() {
           />
           {scale.toFixed(1)}×
         </label>
-        <label className="flex items-center gap-2 text-xs">
-          <input
-            type="checkbox"
-            checked={hotspots}
-            onChange={(e) => setHotspots(e.target.checked)}
-          />
-          Show hotspots
-        </label>
+        <button
+          className="ml-auto text-link text-xs"
+          onClick={() => {
+            setSaved(false);
+            setOffset(0);
+            setDelivered(false);
+          }}
+        >
+          Reset demo
+        </button>
       </div>
-      <div className="mb-12 grid gap-4 md:grid-cols-3">
-        <section className="rounded-xl border border-line bg-white/50 p-6">
-          <p className="eyebrow mb-4">01 / REAL CLICK</p>
+      <div className="mb-6 grid divide-y divide-line rounded-lg border border-line bg-surface md:grid-cols-3 md:divide-x md:divide-y-0">
+        <section className="p-5">
+          <h2 className="mb-2 text-sm font-semibold">01. Click</h2>
+          <p className="mb-4 text-xs leading-5 text-muted">Watch the press and release feedback.</p>
           <button id="save" className="primary" onClick={() => setSaved(true)}>
             {saved ? 'Changes saved' : 'Save changes'}
           </button>
         </section>
-        <section className="rounded-xl border border-line bg-white/50 p-6">
-          <p className="eyebrow mb-4">02 / REAL SELECTION</p>
-          <p id="select-text" className="select-text font-display text-2xl">
+        <section className="p-5">
+          <h2 className="mb-2 text-sm font-semibold">02. Select & type</h2>
+          <p className="mb-4 text-xs leading-5 text-muted">
+            Drag across the text. The cursor fades as you select.
+          </p>
+          <p id="select-text" className="select-text text-xl tracking-tight">
             Make every move matter.
           </p>
           <label className="mt-3 block text-xs text-muted">
@@ -66,8 +86,11 @@ export function CursorTour() {
             />
           </label>
         </section>
-        <section className="rounded-xl border border-line bg-white/50 p-6">
-          <p className="eyebrow mb-4">03 / REAL DRAG</p>
+        <section className="p-5">
+          <h2 className="mb-2 text-sm font-semibold">03. Drag & drop</h2>
+          <p className="mb-4 text-xs leading-5 text-muted">
+            Move the card to the target. Feedback stays held.
+          </p>
           <div id="drag-track" className="relative h-20 rounded-lg bg-sage">
             <div
               id="drop"
@@ -81,7 +104,7 @@ export function CursorTour() {
               tabIndex={0}
               aria-label="Draggable card"
               style={{ transform: `translateX(${offset}px)`, cursor: held ? 'grabbing' : 'grab' }}
-              className="absolute left-1 top-3 flex h-14 w-22 touch-none items-center justify-center rounded border border-[#b8c9ad] bg-[#dce8d0] text-xs shadow-sm"
+              className="absolute left-1 top-3 flex h-14 w-22 touch-none items-center justify-center rounded border border-line bg-success-surface text-xs text-ink"
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight') {
                   setOffset(e.currentTarget.parentElement!.clientWidth - 96);
@@ -133,13 +156,36 @@ export function CursorTour() {
           </span>
         </section>
       </div>
-      <div id="cursor-gallery" className="mb-5">
-        <p className="eyebrow">THE COMPLETE CSS TOUR</p>
-        <h2 className="mt-3 font-display text-4xl">Every cursor, accounted for.</h2>
+      <MotionReference />
+      <div id="cursor-gallery" className="mb-5 border-t border-line pt-8">
+        <h2 className="text-2xl font-semibold tracking-tight">Cursor catalog</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          35 bundled SVGs. All 36 CSS keywords, including contextual auto and hidden none. Hover a
-          row for the custom version; hover its CSS badge to expose the native browser cursor.
-          Crosshairs mark our calibrated hotspots, not official OS metadata.
+          35 bundled SVGs mapped to 36 CSS keywords. With the custom cursor enabled, hover a row to
+          preview it. Hover the CSS badge to compare your browser’s native cursor.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          <input
+            aria-label="Filter cursors"
+            placeholder="Find a cursor or category…"
+            className="field max-w-xs"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <label className="flex items-center gap-2 text-xs">
+            <input
+              type="checkbox"
+              checked={hotspots}
+              onChange={(e) => setHotspots(e.target.checked)}
+            />
+            Show hotspots
+          </label>
+          <span role="status" className="text-xs text-muted">
+            {groups.reduce((sum, group) => sum + group.types.length, 0)} cursors
+          </span>
+        </div>
+        <p className="mt-3 text-xs text-muted">
+          Hotspots are visually calibrated, not official OS metadata. Wait and progress artwork is
+          static.
         </p>
       </div>
       <div className="overflow-x-auto rounded-xl border border-line">
@@ -153,7 +199,7 @@ export function CursorTour() {
               ))}
             </tr>
           </thead>
-          {cursorGroups.map((group) => (
+          {groups.map((group) => (
             <tbody key={group.name}>
               {group.types.map((type, i) => {
                 const asset = cursors[type];
@@ -175,7 +221,7 @@ export function CursorTour() {
                     )}
                     <td className="px-4 font-mono text-xs">{type}</td>
                     <td className="p-2">
-                      <div className="relative h-24 w-24">
+                      <div className="relative h-16 w-16">
                         {asset ? (
                           <>
                             <img src={asset.src} alt={type + ' cursor'} className="h-full w-full" />
@@ -213,7 +259,7 @@ export function CursorTour() {
                       <span
                         data-humanette-native
                         style={{ cursor: type }}
-                        className="inline-block rounded border border-line bg-white/50 px-3 py-2 font-mono text-[10px]"
+                        className="inline-block rounded border border-line bg-surface px-3 py-2 font-mono text-[10px]"
                       >
                         CSS
                       </span>
@@ -224,6 +270,11 @@ export function CursorTour() {
             </tbody>
           ))}
         </table>
+        {groups.length === 0 && (
+          <p className="p-6 text-sm text-muted">
+            No matching cursors. Try “text”, “resize”, or clear the search.
+          </p>
+        )}
       </div>
     </div>
   );

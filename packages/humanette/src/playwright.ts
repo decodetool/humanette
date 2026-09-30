@@ -128,6 +128,42 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
           await page.mouse.up();
         }
       }),
+    /** Select rendered text with real mouse input, including nested text nodes and wrapped lines. */
+    selectText: (target: Locator | string, opts: ActionOptions = {}) =>
+      action(async () => {
+        const locator = typeof target === 'string' ? page.locator(target) : target;
+        await locator.waitFor({ state: 'visible' });
+        await locator.scrollIntoViewIfNeeded();
+        const bounds = await locator.evaluate((element) => {
+          const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+          const rects: DOMRect[] = [];
+          while (walker.nextNode()) {
+            if (!walker.currentNode.textContent?.trim()) continue;
+            const range = document.createRange();
+            range.selectNodeContents(walker.currentNode);
+            rects.push(
+              ...Array.from(range.getClientRects()).filter((r) => r.width > 0 && r.height > 0),
+            );
+          }
+          const first = rects[0],
+            last = rects[rects.length - 1];
+          if (!first || !last) throw new Error('Target has no visible selectable text.');
+          return {
+            from: { x: first.left + 0.5, y: first.top + first.height / 2 },
+            to: { x: last.right - 0.5, y: last.top + last.height / 2 },
+          };
+        });
+        await move(bounds.from, { signal: opts.signal });
+        await sleep(settle, opts.signal);
+        await page.mouse.down();
+        try {
+          await sleep(90, opts.signal);
+          await move(bounds.to, { ...opts, duration: opts.duration ?? 1400 });
+          await sleep(80, opts.signal);
+        } finally {
+          await page.mouse.up();
+        }
+      }),
     /** Type through real keyboard input; selectAll replaces editor contents without a leading newline. */
     type: (
       target: Target,

@@ -44,7 +44,7 @@ per second independently of the encoded recording rate.
 ## Use the package
 
 ```ts
-import { createHuman } from 'humanette/playwright';
+import { createHuman } from 'humanette';
 
 const human = await createHuman(page, { seed: 42, scale: 2.5 });
 await human.click('#save');
@@ -53,6 +53,6 @@ await human.drag('#card', '#done');
 await human.dispose();
 ```
 
-For a presentation-only overlay, use createHumanette from humanette. Visual play/seek does not dispatch DOM events; the Playwright adapter delivers real input. Humanette does not record or encode videos itself.
+The package root exports the Playwright API. Use native Playwright locators, CSS selectors, or viewport coordinates. Humanette does not record or encode videos itself. The website's looping examples are visual previews; /examples/live is the real-input fixture used by the recording script.
 
 See [package API](packages/humanette/README.md), [architecture and learnings](docs/architecture.md), and [Vercel deployment / npm release](docs/release-and-deployment.md). The owner-supplied SVGs already present in docs/ are embedded and bundled; no remote asset service is needed. Confirm their provenance/redistribution permissions before release. No publish or deploy runs automatically.

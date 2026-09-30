@@ -1,114 +1,153 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-export const metadata: Metadata = { title: 'API & recording guide' };
-const browser = [
-  "import { createHumanette } from 'humanette';",
-  '',
-  'const pointer = createHumanette({ follow: true, scale: 2.5 });',
-  'await pointer.ready;',
-  '// It follows real input and resolves CSS cursor changes.',
-  '// Clean up on unmount / when capture ends:',
-  'pointer.dispose();',
-].join(String.fromCharCode(10));
-const automation = [
-  "import { createHuman } from 'humanette/playwright';",
-  '',
-  'const human = await createHuman(page, { seed: 42, settle: 120 });',
-  "await human.click(page.getByRole('button', { name: 'Save' }));",
-  "await human.type('#title', 'Start', { selectAll: true });",
-  "await human.drag('#card', '#drop-zone', { duration: 1100 });",
-  "await human.press('Shift+2');",
-  'await human.dispose();',
-].join(String.fromCharCode(10));
+import { CodeBlock } from '../../components/code-block';
+export const metadata: Metadata = { title: 'Docs' };
+const setup = `import { chromium } from 'playwright';
+import { createHuman } from 'humanette';
+
+const browser = await chromium.launch({ headless: false });
+try {
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3000'); // Your app
+  const human = await createHuman(page, { scale: 4 });
+
+  try {
+    await human.click(page.getByRole('button', { name: 'Save' }));
+    await human.type(page.getByLabel('Title'), 'Start', { selectAll: true });
+    await human.selectText(page.getByText('Select these words.'));
+    await human.drag(page.getByTestId('card'), page.getByTestId('drop'));
+  } finally {
+    await human.dispose();
+  }
+} finally {
+  await browser.close();
+}`;
+const recording = `import { chromium } from 'playwright';
+import { createHuman } from 'humanette';
+
+const browser = await chromium.launch();
+try {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 800 },
+    deviceScaleFactor: 2,
+    recordVideo: {
+      dir: 'out',
+      size: { width: 1280, height: 800 },
+    },
+  });
+  const page = await context.newPage();
+  const video = page.video()!;
+  try {
+    await page.goto('http://localhost:3000');
+    await page.getByRole('button', { name: 'Save' }).waitFor();
+    const human = await createHuman(page, { scale: 4, seed: 42 });
+    try {
+      await human.click(page.getByRole('button', { name: 'Save' }));
+      await human.wait(600); // Brief hold on the result
+    } finally {
+      await human.dispose();
+    }
+  } finally {
+    await context.close(); // Finalize the video before saving
+  }
+  await video.saveAs('out/demo.webm');
+  await video.delete(); // Remove Playwright’s generated filename
+} finally {
+  await browser.close();
+}`;
 const api = [
   [
-    'createHumanette(options)',
-    'Create the visual overlay. follow tracks real mouse input; root scopes a visual preview to a positioned container. Await ready to preload images.',
+    'createHuman(page, options?)',
+    'Attach to your existing Playwright page. Options include scale (cursor size), seed (repeatable paths), settle (aim pause, 120 ms by default), and fps (input sampling target, not recording FPS).',
   ],
   [
-    'moveTo({x,y}, {duration,seed,signal})',
-    'Move the visual pointer along a seeded, elapsed-time curve. Coordinates are CSS pixels relative to root, or the viewport without root. Does not click DOM elements.',
+    'human.click(target, { duration?, signal? })',
+    'Move to the target, slow down on approach, pause to aim, then send real mouse down/up.',
   ],
   [
-    'setPosition(point), down(), up()',
-    'Drive visual position and independent press/hold/release feedback from your own automation adapter.',
+    'human.moveTo(target, { duration?, signal? })',
+    'Move without clicking. A locator resolves to its center after scrolling into view. Coordinates are CSS pixels relative to the main viewport.',
   ],
   [
-    'configure(options), setCursor(type), setTheme(theme)',
-    'Change appearance or artwork at runtime. Theme entries contain src, width, height, and hotspot:[x,y] in source SVG coordinates.',
+    'human.selectText(locator, { duration?, signal? })',
+    'Drag from the first visible text line to the last. Accepts a locator or selector for ordinary selectable text, including nested spans and wrapped lines. For inputs, use type with selectAll or a keyboard shortcut.',
   ],
   [
-    'play(events, {rate,signal,onFrame}), seek(events, time)',
-    'Play or scrub a deterministic visual timeline. Events are move, down, up, and cursor; at and duration use milliseconds.',
+    'human.drag(from, to, { duration?, signal? })',
+    'Move to the source, hold the mouse, drag to the destination, then release. Sources and destinations may be locators, selectors, or coordinates. The mouse is released even when the drag is cancelled.',
   ],
   [
-    'stop(), hide(), dispose()',
-    'Cancel visual playback, hide the pointer, or remove the canvas, styles, timers, and listeners.',
+    'human.type(target, text, { delay?, selectAll?, signal? })',
+    'Click the target and insert text through Playwright keyboard input. Set selectAll to replace existing contents. Delay is per character in milliseconds.',
   ],
   [
-    'createHuman(page, options)',
-    'Playwright adapter. Real mouse and keyboard input with click, drag, type, press, wait, configure, and moveTo. Await actions serially.',
+    'human.press(key)',
+    'Send a Playwright keyboard shortcut, for example ControlOrMeta+A or Shift+2.',
   ],
   [
-    'humanPoint(), sampleTimeline(), feedbackAt()',
-    'Pure math for reproducible positions, seekable choreography, and quick-click-continuous feedback. Import from humanette/motion for no asset payload.',
+    'human.wait(milliseconds, signal?)',
+    'Add a short presentation pause. Use Playwright assertions or locator waits for application readiness.',
+  ],
+  [
+    'human.configure(appearance)',
+    'Change cursor size and feedback while the script is running. For example, await human.configure({ scale: 4, textSelectionOpacity: 0.4 }).',
+  ],
+  [
+    'human.dispose()',
+    'Remove the cursor overlay and its listeners. Await any running action before cleanup. Your Playwright page stays open.',
   ],
 ];
 export default function Docs() {
   return (
-    <div className="shell grid gap-12 pt-14 lg:grid-cols-[200px_minmax(0,1fr)]">
+    <div className="shell grid gap-12 pt-14 lg:grid-cols-[180px_minmax(0,1fr)]">
       <aside className="text-sm text-muted lg:sticky lg:top-8 lg:self-start">
-        <p className="eyebrow mb-5">FIELD NOTES / V1.1</p>
-        <nav className="flex flex-wrap gap-4 lg:flex-col">
-          {[
-            ['start', 'Get started'],
-            ['automation', 'Real automation'],
-            ['api', 'API reference'],
-            ['recording', 'Better recordings'],
-            ['limits', 'Honest limits'],
-          ].map(([id, label]) => (
-            <a key={id} href={'#' + id}>
-              {label}
-            </a>
-          ))}
+        <nav aria-label="Documentation sections" className="flex flex-wrap gap-4 lg:flex-col">
+          <Link href="/docs">Get started</Link>
+          <a href="#api">API reference</a>
+          <a href="#recording">Recording</a>
+          <a href="#limits">Limitations</a>
         </nav>
       </aside>
       <article className="min-w-0 max-w-4xl">
-        <h1 className="font-display text-6xl tracking-tight">Give your code a hand.</h1>
-        <p className="mt-5 text-lg leading-8 text-muted">
-          Humanette renders intent. Your automation drives the product. Your recording tool captures
-          the result.
+        <h1 className="text-4xl font-semibold tracking-tight">Get started</h1>
+        <p className="mt-4 text-base leading-7 text-muted">
+          Add natural cursor movement and visible clicks to your Playwright scripts. Use the
+          locators you already know. All cursor assets are bundled.
         </p>
-        <section id="start" className="mt-12">
-          <h2 className="font-display text-3xl">01 / Get started</h2>
-          <pre className="my-5 overflow-x-auto rounded-lg bg-sage p-5 text-sm">
-            npm install humanette
-          </pre>
-          <p className="text-sm leading-7 text-muted">
-            The browser entry is framework-independent and safe to import during SSR. Create it in a
-            React effect or after a page has loaded. All SVG artwork is embedded; no asset server is
-            required.
+        <div className="my-6">
+          <CodeBlock
+            label="Install"
+            language="bash"
+            code={'npm install humanette playwright\nnpx playwright install chromium'}
+          />
+        </div>
+        <section id="automation">
+          <h2 className="mb-4 mt-10 text-2xl font-semibold tracking-tight">
+            Run your first script
+          </h2>
+          <p className="mb-5 text-sm leading-7 text-muted">
+            Save this as demo.ts, replace the URL and locators with your app’s, then run{' '}
+            <code>bun demo.ts</code>. This opens a visible browser and performs real input.
           </p>
-          <Code text={browser} />
-          <p className="text-sm leading-7 text-muted">
-            No bundler? Copy <code>humanette/dist/humanette.global.js</code> from your installed
-            package into your public directory, include it with a script tag, then call{' '}
-            <code>Humanette.createHumanette()</code>. Respect your site’s CSP.
-          </p>
-        </section>
-        <section id="automation" className="mt-12">
-          <h2 className="font-display text-3xl">02 / Real actions, not pretend clicks</h2>
-          <Code text={automation} />
-          <p className="text-sm leading-7 text-muted">
-            Install Playwright separately. Selectors or locators resolve to centered targets after
-            scrolling into view. Pointer travel starts fast, slows to aim, then settles for 120 ms
-            before clicking. Drag uses real down/move/up and always releases, even on cancellation.
-            Pass an AbortSignal to interrupt movement, clicks, dragging, or typing.
+          <CodeBlock code={setup} />
+          <p className="mt-5 text-sm leading-7 text-muted">
+            Await actions in order. Keep normal Playwright navigation, assertions, and app-readiness
+            checks; use Humanette for the actions you want people to follow.
           </p>
         </section>
         <section id="api" className="mt-12">
-          <h2 className="font-display text-3xl">03 / The whole toolkit</h2>
-          <div className="mt-5 divide-y divide-line border-y border-line">
+          <h2 className="text-2xl font-semibold tracking-tight">API reference</h2>
+          <p className="my-5 text-sm leading-7 text-muted">
+            Prefer <code>page.getByRole()</code>, <code>page.getByLabel()</code>, or{' '}
+            <code>page.getByTestId()</code>. CSS selectors and manual coordinates work too.
+            Durations are in milliseconds.
+          </p>
+          <CodeBlock
+            code={
+              "await human.click(page.getByRole('button', { name: 'Save' }));\nawait human.moveTo({ x: 320, y: 180 });\nawait human.drag({ x: 100, y: 200 }, { x: 600, y: 200 });"
+            }
+          />
+          <div className="mt-6 divide-y divide-line border-y border-line">
             {api.map(([name, description]) => (
               <div key={name} className="py-5">
                 <h3 className="break-words font-mono text-xs text-accent">{name}</h3>
@@ -117,75 +156,54 @@ export default function Docs() {
             ))}
           </div>
           <p className="mt-5 text-sm leading-7 text-muted">
-            Feedback options: scale, color, filled, motionBlur, textSelectionOpacity (0.4 by
-            default, 1 to keep text-drag cursors opaque); pressRadius, pressDuration, pressOpacity,
-            pressScale; holdRadius, holdOpacity, ringWidth; releaseRadius, releaseDuration.{' '}
-            <Link href="/workbench" className="text-accent underline">
+            Appearance options include scale, color, filled, motionBlur, textSelectionOpacity,
+            pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity,
+            ringWidth, releaseRadius, and releaseDuration.{' '}
+            <Link href="/workbench" className="text-link">
               Tune them in Pointer Lab
-            </Link>{' '}
-            and export the actual configuration.
+            </Link>
+            .
           </p>
         </section>
         <section id="recording" className="mt-12">
-          <h2 className="font-display text-3xl">04 / Make a good take</h2>
-          <ol className="mt-5 list-decimal space-y-4 pl-5 text-sm leading-7 text-muted">
-            <li>
-              Prepare authentication, selectors, assets, and target geometry before capture.
-              Rehearse once. Run one deterministic script, not an agent decision loop between
-              actions.
-            </li>
-            <li>
-              Start with a 1280 × 800 CSS viewport at deviceScaleFactor 2. Inspect the actual
-              capture dimensions: a larger output file can still be an upscale of a low-resolution
-              source.
-            </li>
-            <li>
-              Use short, purposeful pauses. About 120 ms to settle before clicking. Wait for UI
-              readiness outside the take. Avoid multi-second sleeps between actions.
-            </li>
-            <li>
-              Use one stable DPR-aware canvas. Feedback stays behind the icon; held feedback is
-              static. A dragging pointer follows input exactly rather than lagging behind an object.
-            </li>
-            <li>
-              For rich-text shape labels, enter editing, select all inside the editor, insert text,
-              and exit. Do not send a second Enter that creates a leading paragraph.
-            </li>
-            <li>
-              Record an end hold and verify outcomes afterwards: exact labels, colors, selection,
-              and drop destination. Keep the script, seed, config, app revision, and viewport with
-              each take.
-            </li>
-          </ol>
+          <h2 className="text-2xl font-semibold tracking-tight">Record with Playwright</h2>
+          <p className="my-5 text-sm leading-7 text-muted">
+            Playwright records the page, including Humanette’s cursor. This example saves to one
+            fixed filename. Recording starts when the page is created, so navigation and loading are
+            included; trim that lead-in for a finished product video.
+          </p>
+          <CodeBlock code={recording} />
+          <p className="mt-5 text-sm leading-7 text-muted">
+            The video above is explicitly 1280 × 800. A device scale factor of 2 does not make that
+            video Retina resolution. Rehearse your script, avoid long pauses, and inspect the actual
+            output before increasing resolution or frame rate.
+          </p>
+          <p className="mt-3 text-sm leading-7 text-muted">
+            In this repository, run <code>bun dev</code>, then <code>bun example:playwright</code>.
+            To watch without recording, use <code>bun example:playwright:headful</code>. Compare
+            live movement with the recording before attributing stutter to input.
+          </p>
         </section>
-        <section id="limits" className="mt-12 rounded-xl border border-line bg-white/40 p-7">
-          <h2 className="font-display text-3xl">What it does. What it doesn’t.</h2>
+        <section id="limits" className="mt-12 border-t border-line pt-8">
+          <h2 className="text-2xl font-semibold tracking-tight">Limitations</h2>
           <p className="mt-4 text-sm leading-7 text-muted">
-            Humanette is not a video encoder and cannot guarantee 60 distinct captured frames per
-            second. CDP acknowledgements, the page workload, browser throttling, and your recorder
-            still matter. High-FPS metadata is not proof of smooth capture. The cursor is composited
-            in the page during capture, not afterwards.
+            Humanette is not a recorder and does not guarantee capture FPS. Input delivery and
+            distinct captured frames depend on browser workload and the recorder. A high-FPS file
+            can still contain repeated frames.
           </p>
           <p className="mt-3 text-sm leading-7 text-muted">
-            CSS auto uses conservative text inference. Closed shadow roots, cross-origin frames,
-            native menus, and custom URL cursor images cannot be fully inferred. Install an overlay
-            inside frames you control. Wait/progress artwork is currently static. SVG hotspots are
-            visually calibrated. Visual play/seek never synthesizes product state; use createHuman
-            for real automation.
+            Locators are measured before movement; targets that move during the approach can require
+            another attempt. The adapter does not reproduce all of Playwright locator.click’s
+            actionability checks. Text selection assumes ordinary left-to-right selectable content;
+            use coordinates or keyboard commands for specialized editors.
           </p>
           <p className="mt-3 text-sm leading-7 text-muted">
-            Keyboard badges are opt-in and show modifier chords only, not typed text. They are
-            disabled by default. No telemetry, no recording uploads, no third-party asset requests.
+            CSS cursor inference is limited across closed shadow roots, cross-origin frames, native
+            controls, and custom cursor images. Busy cursors are static. No telemetry, recording
+            uploads, or remote asset requests.
           </p>
         </section>
       </article>
     </div>
-  );
-}
-function Code({ text }: { text: string }) {
-  return (
-    <pre className="my-5 overflow-x-auto rounded-xl bg-ink p-6 font-mono text-xs leading-7 text-[#d7e4ca]">
-      <code>{text}</code>
-    </pre>
   );
 }

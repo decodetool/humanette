@@ -3,10 +3,14 @@
   "version": "1.1.0",
   "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/playwright.js",
+  "types": "./dist/playwright.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/playwright.d.ts",
+      "import": "./dist/playwright.js"
+    },
+    "./internal": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },

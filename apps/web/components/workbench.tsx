@@ -9,8 +9,9 @@ import {
   validateTimeline,
   type TimelineEvent,
   type FeedbackOptions,
-} from 'humanette';
+} from 'humanette/internal';
 import { Preview } from './preview';
+import { useTheme } from './theme-provider';
 const schema = {
   scale: [2.5, 0.5, 5, 0.1],
   color: '#397ef3',
@@ -28,6 +29,7 @@ const schema = {
   releaseDuration: [200, 20, 800, 10],
 } satisfies DialConfig;
 export function Workbench() {
+  const { resolved } = useTheme();
   const controls = useDialKitController('Pointer feel', schema, { id: 'humanette-feel-v1' });
   const config = options(controls.values as unknown as FeedbackOptions);
   const [scenario, setScenario] = useState<'click' | 'text' | 'drag'>('click'),
@@ -99,7 +101,7 @@ export function Workbench() {
   async function copy() {
     try {
       await navigator.clipboard.writeText(
-        'createHumanette(' + JSON.stringify(config, null, 2) + ')',
+        'const human = await createHuman(page, ' + JSON.stringify(config, null, 2) + ');',
       );
       setNotice('API configuration copied.');
     } catch {
@@ -114,6 +116,7 @@ export function Workbench() {
             {(['click', 'text', 'drag'] as const).map((s) => (
               <button
                 className={scenario === s ? 'primary py-2!' : 'secondary py-2!'}
+                aria-pressed={scenario === s}
                 onClick={() => changeScenario(s)}
                 key={s}
               >
@@ -121,7 +124,7 @@ export function Workbench() {
               </button>
             ))}
           </div>
-          <span className="eyebrow self-center">REAL PACKAGE · VISUAL PLAYBACK</span>
+          <span className="eyebrow self-center">VISUAL PLAYBACK</span>
         </div>
         <Preview events={events} config={config} time={time} onTime={setTime} scenario={scenario} />
         <div className="mt-5 flex flex-wrap gap-2">
@@ -149,10 +152,10 @@ export function Workbench() {
         <p aria-live="polite" className="mt-3 text-xs text-muted">
           {notice}
         </p>
-        <section className="mt-8 rounded-xl border border-line bg-white/35 p-5">
-          <div className="flex items-center justify-between">
+        <section className="mt-8 border-t border-line pt-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="font-display text-2xl">Choreograph the moment.</h2>
+              <h2 className="text-xl font-semibold">Timeline</h2>
               <p className="mt-1 text-xs text-muted">
                 Edit event times, coordinates, durations, cursor types, and seeds.
               </p>
@@ -186,7 +189,7 @@ export function Workbench() {
             />
           </label>
           {error && (
-            <p role="alert" className="mt-3 text-sm text-red-700">
+            <p role="alert" className="mt-3 text-sm text-danger">
               {error}
             </p>
           )}
@@ -197,8 +200,8 @@ export function Workbench() {
           </p>
         </section>
       </div>
-      <aside className="rounded-xl border border-line bg-white/50 p-4 lg:sticky lg:top-6">
-        <span className="eyebrow">DIAL IN YOUR SIGNATURE</span>
+      <aside className="min-w-0 lg:sticky lg:top-6">
+        <h2 className="text-sm font-semibold">Cursor & feedback</h2>
         <div className="my-4 flex flex-wrap gap-2">
           {[
             ['soft', 'Soft disk'],
@@ -214,7 +217,7 @@ export function Workbench() {
             </button>
           ))}
         </div>
-        <DialRoot mode="inline" theme="light" defaultOpen productionEnabled />
+        <DialRoot mode="inline" theme={resolved} defaultOpen productionEnabled />
         <p className="mt-4 text-xs leading-6 text-muted">
           Filled feedback sits behind the cursor. Press grows into hold; release expands and fades.
           These values configure the actual package renderer.

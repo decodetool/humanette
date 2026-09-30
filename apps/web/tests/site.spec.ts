@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { createHuman } from 'humanette/playwright';
+import { createHuman } from 'humanette';
 test('site and live renderer work at desktop and mobile widths', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Automation.');
-  await page.getByRole('button', { name: 'Play demo' }).click();
-  await expect(page.getByText('Changes saved ✓')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 }).first()).toContainText('Screen Studios');
+  await page.getByTestId('example-click').scrollIntoViewIfNeeded();
+  await expect(page.getByText('Clicked', { exact: true })).toBeVisible();
   await page.screenshot({ path: 'test-results/home.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -22,24 +23,14 @@ test('site and live renderer work at desktop and mobile widths', async ({ page }
 test('real adapter clicks, types, selects and drags; CSS comparisons restore native cursor', async ({
   page,
 }) => {
-  await page.goto('/demos');
+  await page.goto('/examples/live');
   const human = await createHuman(page, { scale: 2.5 });
   try {
     await human.click('#save');
     await expect(page.locator('#save')).toHaveText('Changes saved');
     await human.type('#name', 'Start', { selectAll: true, delay: 1 });
     await expect(page.locator('#name')).toHaveValue('Start');
-    const box = await page.locator('#select-text').evaluate((el) => {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      const r = range.getBoundingClientRect();
-      return { x: r.x, y: r.y, width: r.width, height: r.height };
-    });
-    await human.drag(
-      { x: box.x + 1, y: box.y + box.height / 2 },
-      { x: box.x + box.width - 1, y: box.y + box.height / 2 },
-      { duration: 400 },
-    );
+    await human.selectText(page.locator('#select-text'), { duration: 400 });
     expect(await page.evaluate(() => getSelection()?.toString())).toBe('Make every move matter.');
     await human.drag('#card', '#drop', { duration: 500 });
     await expect(page.locator('#card')).toHaveText('Delivered');
@@ -57,7 +48,7 @@ test('real adapter clicks, types, selects and drags; CSS comparisons restore nat
   await expect(page.locator('[data-humanette]')).toHaveCount(0);
 });
 test('disposing preserves an application cursor change while hovered', async ({ page }) => {
-  await page.goto('/demos');
+  await page.goto('/examples/live');
   const human = await createHuman(page);
   await human.moveTo('#save');
   await page.locator('#save').evaluate((element) => {

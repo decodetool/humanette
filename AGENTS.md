@@ -2,7 +2,7 @@
 
 Use Bun 1.3.14 and Turborepo. The site is apps/web (Next.js App Router, React, TypeScript, Tailwind v4). The publishable npm package is packages/humanette; root and site are private.
 
-Preserve the distinction between visual playback and real input. createHumanette never changes product state. createHuman from humanette/playwright uses real Playwright input. Never sell visual mock interactions as an E2E result.
+The public root import is Playwright-first: createHuman from humanette uses real Playwright input and accepts native locators, selectors, or coordinates. Keep documentation focused on this API. humanette/playwright remains a compatibility alias. humanette/internal exposes the visual engine for this repository's previews and workbench, not the public getting-started API. createHumanette never changes product state; never sell visual mock interactions as an E2E result.
 
 Keep workbench and production on the same package renderer/model. Maintain frame-rate-independent motion, a minimum duration for short moves, slow arrivals, configurable settle time, scaled hotspots, behind-icon feedback, and full lifecycle cleanup. No permanent idle rendering.
 
