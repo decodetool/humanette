@@ -31,6 +31,16 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     { exact: true },
   );
   await expect(heroCopy).toHaveCSS('text-align', 'center');
+  expect((await heroCopy.boundingBox())!.width).toBeGreaterThan(700);
+  const useCases = page.getByText(
+    'Create product walkthroughs, or let coding agents show their work.',
+    { exact: true },
+  );
+  const useCasesBox = (await useCases.boundingBox())!;
+  const getStartedBox = (await page
+    .getByRole('link', { name: 'Get started', exact: true })
+    .boundingBox())!;
+  expect(getStartedBox.y).toBeGreaterThan(useCasesBox.y + useCasesBox.height);
   await expect(
     page.getByText('Create product walkthroughs, or let coding agents show their work.', {
       exact: true,
