@@ -7,13 +7,14 @@ import {
   type Point,
   type FeedbackOptions,
 } from './motion.js';
-import type { Humanette } from './index.js';
+import type { Humanette, HumanetteOptions } from './index.js';
 type Surface = typeof window & {
   Humanette: { createHumanette(options: object): Humanette };
   __humanette?: Humanette;
 };
 export type Target = Point | Locator | string;
 export interface AutomationOptions extends Partial<FeedbackOptions> {
+  renderer?: HumanetteOptions['renderer'];
   seed?: number;
   settle?: number;
   fps?: number;

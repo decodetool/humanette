@@ -19,6 +19,8 @@ import {
 export * from './motion.js';
 export * from './cursors.js';
 export interface HumanetteOptions extends Partial<FeedbackOptions> {
+  /** Inline SVG artwork by default; canvas is retained for capture comparisons. */
+  renderer?: 'svg' | 'canvas';
   /** Omit for viewport overlay. A custom root must be positioned, e.g. position:relative. */
   root?: HTMLElement;
   follow?: boolean;
@@ -42,13 +44,40 @@ export function createHumanette(input: HumanetteOptions = {}) {
   host.dataset.humanette = '';
   host.setAttribute('aria-hidden', 'true');
   host.inert = true;
-  host.style.cssText = `all:initial!important;position:${root ? 'absolute' : 'fixed'}!important;inset:0!important;pointer-events:none!important;z-index:2147483646!important;contain:layout style!important;`;
+  host.style.cssText = `all:initial!important;position:${root ? 'absolute' : 'fixed'}!important;inset:0!important;overflow:hidden!important;pointer-events:none!important;z-index:2147483646!important;contain:layout style!important;`;
   const shadow = host.attachShadow({ mode: 'closed' }),
     canvas = document.createElement('canvas');
   canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
   shadow.append(canvas);
   (root ?? document.documentElement).append(host);
   const ctx = canvas.getContext('2d')!;
+  const renderer = input.renderer ?? 'svg';
+  host.dataset.renderer = renderer;
+  // Separate shadow scopes keep SVG filter IDs independent between the trail and cursor.
+  const svgLayers = Array.from({ length: 2 }, (_, index) => {
+    const layer = document.createElement('div');
+    layer.style.cssText = `position:absolute;left:0;top:0;pointer-events:none;display:none;${index === 0 ? 'filter:blur(2.5px);' : ''}`;
+    const scope = layer.attachShadow({ mode: 'closed' });
+    shadow.append(layer);
+    return {
+      layer,
+      scope,
+      template: undefined as SVGSVGElement | undefined,
+      svg: undefined as SVGSVGElement | undefined,
+      size: -1,
+      painted: false,
+    };
+  });
+  const svgTemplates = new Map<string, SVGSVGElement>();
+  const bundledSources = new Set(Object.values(cursors).map((asset) => asset.src));
+  // Keyboard labels stay above the cursor, as in the original single-canvas ordering.
+  const keyCanvas = input.keyboard ? document.createElement('canvas') : undefined;
+  const keyContext = keyCanvas?.getContext('2d');
+  if (keyCanvas) {
+    keyCanvas.style.cssText =
+      'position:absolute;left:50%;margin-left:-100px;bottom:24px;width:200px;height:40px;pointer-events:none;display:none;';
+    shadow.append(keyCanvas);
+  }
   let position: Point = { x: 0, y: 0 },
     visual: Point = { ...position },
     visible = false,
@@ -92,13 +121,26 @@ export function createHumanette(input: HumanetteOptions = {}) {
         asset.hotspot.length !== 2
       )
         throw new TypeError(`Invalid cursor asset: ${name}`);
+      if (renderer === 'svg' && bundledSources.has(asset.src)) {
+        // Only inline our own bundled artwork. Arbitrary theme URLs retain inert image semantics.
+        const source = atob(asset.src.slice(asset.src.indexOf(',') + 1));
+        const parsed = new DOMParser().parseFromString(source, 'image/svg+xml');
+        const svg = document.importNode(parsed.documentElement, true) as unknown as SVGSVGElement;
+        svg.style.cssText = 'display:block;overflow:visible;pointer-events:none;';
+        svgTemplates.set(name, svg);
+        images.delete(name);
+        return;
+      }
+      svgTemplates.delete(name);
       const image = new Image();
       images.set(name, image);
       image.src = asset.src;
       await image.decode();
       wake();
     });
-    return Promise.all(ready).then(() => undefined);
+    return Promise.all(ready).then(() => {
+      wake();
+    });
   }
   let ready = load();
   // Keep a rejection handler attached even if a consumer chooses not to await readiness.
@@ -162,17 +204,23 @@ export function createHumanette(input: HumanetteOptions = {}) {
       x: visual.x + (position.x - visual.x) * blend,
       y: visual.y + (position.y - visual.y) * blend,
     };
-    // Stable full-surface damage keeps Chromium's capture sampler from dropping
-    // cursor-only frames after a larger drag update. No idle paint loop.
+    // Feedback stays on a DPR-aware canvas behind the SVG artwork.
+    // The canvas renderer remains available to compare recording frame delivery.
     // Clear in bitmap coordinates so every edge pixel is covered, including
     // those rounded up from fractional CSS dimensions at the current DPR.
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const f = frameOverride ?? feedbackAt(pressEvents, now - epoch, config);
+    // A queued RAF timestamp can precede a newly delivered input event. Never
+    // sample before that event or its transition can look idle and stop RAF.
+    const feedbackTime = Math.max(now - epoch, pressEvents.at(-1)?.at ?? 0);
+    const f = frameOverride ?? feedbackAt(pressEvents, feedbackTime, config);
     const selectingText = pressed && (resolved === 'text' || resolved === 'vertical-text');
     const cursorOpacity = selectingText ? config.textSelectionOpacity : 1;
     host.dataset.cursorOpacity = String(cursorOpacity);
+    svgLayers.forEach((slot) => {
+      slot.painted = false;
+    });
     if (visible && resolved !== 'none') {
       ctx.save();
       ctx.globalAlpha = f.opacity;
@@ -184,15 +232,36 @@ export function createHumanette(input: HumanetteOptions = {}) {
       config.filled ? ctx.fill() : ctx.stroke();
       ctx.restore();
       const asset = theme[resolved] ?? theme.default,
-        image = images.get(resolved) ?? images.get('default');
-      if (asset && image?.complete && image.naturalWidth) {
+        image = images.get(resolved),
+        template = svgTemplates.get(resolved);
+      if (asset && (template || (image?.complete && image.naturalWidth))) {
         const paint = (x: number, y: number, alpha: number, blur = 0) => {
+          if (template) {
+            const slot = svgLayers[blur ? 0 : 1];
+            if (slot.template !== template) {
+              slot.svg = template.cloneNode(true) as SVGSVGElement;
+              slot.scope.replaceChildren(slot.svg);
+              slot.template = template;
+              slot.size = -1;
+            }
+            const scale = config.scale * f.scale;
+            // Size the vector viewport instead of upscaling a composited bitmap.
+            if (slot.size !== scale) {
+              slot.svg!.setAttribute('width', String(asset.width * scale));
+              slot.svg!.setAttribute('height', String(asset.height * scale));
+              slot.size = scale;
+            }
+            slot.painted = true;
+            slot.layer.style.transform = `translate(${x - asset.hotspot[0] * scale}px,${y - asset.hotspot[1] * scale}px)`;
+            slot.layer.style.opacity = String(alpha * cursorOpacity);
+            return;
+          }
           ctx.save();
           ctx.globalAlpha = alpha * cursorOpacity;
           ctx.filter = blur ? 'blur(' + blur + 'px)' : 'none';
           ctx.translate(x, y);
           ctx.scale(config.scale * f.scale, config.scale * f.scale);
-          ctx.drawImage(image, -asset.hotspot[0], -asset.hotspot[1], asset.width, asset.height);
+          ctx.drawImage(image!, -asset.hotspot[0], -asset.hotspot[1], asset.width, asset.height);
           ctx.restore();
         };
         const dx = visual.x - previous.x,
@@ -211,13 +280,28 @@ export function createHumanette(input: HumanetteOptions = {}) {
         paint(visual.x, visual.y, 1);
       }
     }
-    if (keyLabel && now < keyUntil) {
-      ctx.fillStyle = '#1c211ee8';
-      ctx.fillRect(b.w / 2 - 100, b.h - 64, 200, 40);
-      ctx.fillStyle = '#fff';
-      ctx.font = '15px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(keyLabel, b.w / 2, b.h - 39);
+    svgLayers.forEach(({ layer, painted }) => {
+      layer.style.display = painted ? 'block' : 'none';
+    });
+    if (keyCanvas && keyContext) {
+      keyCanvas.style.display = keyLabel && now < keyUntil ? 'block' : 'none';
+      if (keyLabel && now < keyUntil) {
+        const keyWidth = Math.ceil(200 * dpr),
+          keyHeight = Math.ceil(40 * dpr);
+        if (keyCanvas.width !== keyWidth || keyCanvas.height !== keyHeight) {
+          keyCanvas.width = keyWidth;
+          keyCanvas.height = keyHeight;
+        }
+        keyContext.setTransform(1, 0, 0, 1, 0, 0);
+        keyContext.clearRect(0, 0, keyCanvas.width, keyCanvas.height);
+        keyContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+        keyContext.fillStyle = '#1c211ee8';
+        keyContext.fillRect(0, 0, 200, 40);
+        keyContext.fillStyle = '#fff';
+        keyContext.font = '15px monospace';
+        keyContext.textAlign = 'center';
+        keyContext.fillText(keyLabel, 100, 25);
+      }
     }
     host.dataset.phase = f.phase;
     if (

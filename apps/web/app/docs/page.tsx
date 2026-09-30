@@ -1,108 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CodeBlock } from '../../components/code-block';
-export const metadata: Metadata = { title: 'Docs' };
-const setup = `import { chromium } from 'playwright';
-import { createHuman } from 'humanette';
-
-const browser = await chromium.launch({ headless: false });
-try {
-  const page = await browser.newPage();
-  await page.goto('http://localhost:3000'); // Your app
-  const human = await createHuman(page, { scale: 4 });
-
-  try {
-    await human.click(page.getByRole('button', { name: 'Save' }));
-    await human.type(page.getByLabel('Title'), 'Start', { selectAll: true });
-    await human.selectText(page.getByText('Select these words.'));
-    await human.drag(page.getByTestId('card'), page.getByTestId('drop'));
-  } finally {
-    await human.dispose();
-  }
-} finally {
-  await browser.close();
-}`;
-const recording = `import { chromium } from 'playwright';
-import { createHuman } from 'humanette';
-
-const browser = await chromium.launch();
-try {
-  const context = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
-    deviceScaleFactor: 2,
-    recordVideo: {
-      dir: 'out',
-      size: { width: 1280, height: 800 },
-    },
-  });
-  const page = await context.newPage();
-  const video = page.video()!;
-  try {
-    await page.goto('http://localhost:3000');
-    await page.getByRole('button', { name: 'Save' }).waitFor();
-    const human = await createHuman(page, { scale: 4, seed: 42 });
-    try {
-      await human.click(page.getByRole('button', { name: 'Save' }));
-      await human.wait(600); // Brief hold on the result
-    } finally {
-      await human.dispose();
-    }
-  } finally {
-    await context.close(); // Finalize the video before saving
-  }
-  await video.saveAs('out/demo.webm');
-  await video.delete(); // Remove Playwright’s generated filename
-} finally {
-  await browser.close();
-}`;
-const api = [
-  [
-    'createHuman(page, options?)',
-    'Attach to your existing Playwright page. Options include scale (cursor size), seed (repeatable paths), settle (aim pause, 120 ms by default), and fps (input sampling target, not recording FPS).',
-  ],
-  [
-    'human.click(target, { duration?, signal? })',
-    'Move to the target, slow down on approach, pause to aim, then send real mouse down/up.',
-  ],
-  [
-    'human.moveTo(target, { duration?, signal? })',
-    'Move without clicking. A locator resolves to its center after scrolling into view. Coordinates are CSS pixels relative to the main viewport.',
-  ],
-  [
-    'human.selectText(locator, { duration?, signal? })',
-    'Drag from the first visible text line to the last. Accepts a locator or selector for ordinary selectable text, including nested spans and wrapped lines. For inputs, use type with selectAll or a keyboard shortcut.',
-  ],
-  [
-    'human.drag(from, to, { duration?, signal? })',
-    'Move to the source, hold the mouse, drag to the destination, then release. Sources and destinations may be locators, selectors, or coordinates. The mouse is released even when the drag is cancelled.',
-  ],
-  [
-    'human.type(target, text, { delay?, selectAll?, signal? })',
-    'Click the target and insert text through Playwright keyboard input. Set selectAll to replace existing contents. Delay is per character in milliseconds.',
-  ],
-  [
-    'human.press(key)',
-    'Send a Playwright keyboard shortcut, for example ControlOrMeta+A or Shift+2.',
-  ],
-  [
-    'human.wait(milliseconds, signal?)',
-    'Add a short presentation pause. Use Playwright assertions or locator waits for application readiness.',
-  ],
-  [
-    'human.configure(appearance)',
-    'Change cursor size and feedback while the script is running. For example, await human.configure({ scale: 4, textSelectionOpacity: 0.4 }).',
-  ],
-  [
-    'human.dispose()',
-    'Remove the cursor overlay and its listeners. Await any running action before cleanup. Your Playwright page stays open.',
-  ],
-];
+import { install, releaseNotice, setupPrompt, sourceInstall } from '../../content/agent-guide';
+import { setup, recording, api } from '../../content/documentation';
+export const metadata: Metadata = {
+  title: 'Docs',
+  description:
+    'Set up Humanette with a coding-agent prompt or manual instructions. Learn the Playwright API, recording workflow, and limitations.',
+  alternates: { canonical: '/docs', types: { 'text/markdown': '/docs.md' } },
+};
 export default function Docs() {
   return (
     <div className="shell grid gap-12 pt-14 lg:grid-cols-[180px_minmax(0,1fr)]">
       <aside className="text-sm text-muted lg:sticky lg:top-8 lg:self-start">
         <nav aria-label="Documentation sections" className="flex flex-wrap gap-4 lg:flex-col">
           <Link href="/docs">Get started</Link>
+          <a href="#agent-setup">Set up with an agent</a>
+          <a href="#manual-install">Manual installation</a>
           <a href="#api">API reference</a>
           <a href="#recording">Recording</a>
           <a href="#limits">Limitations</a>
@@ -114,13 +28,38 @@ export default function Docs() {
           Add natural cursor movement and visible clicks to your Playwright scripts. Use the
           locators you already know. All cursor assets are bundled.
         </p>
-        <div className="my-6">
-          <CodeBlock
-            label="Install"
-            language="bash"
-            code={'npm install humanette playwright\nnpx playwright install chromium'}
-          />
-        </div>
+        <section id="agent-setup" className="mt-8">
+          <h2 className="text-2xl font-semibold tracking-tight">Set up with your coding agent</h2>
+          <p className="my-5 text-sm leading-7 text-muted">
+            Copy this prompt into your coding agent. It will ask for your app and flow if needed,
+            then add a runnable walkthrough. No skill installation is required.
+          </p>
+          <CodeBlock label="Setup prompt" language="text" code={setupPrompt} />
+          <p className="mt-4 text-sm leading-7 text-muted">
+            Agent-readable docs:{' '}
+            <a href="/llms.txt" className="text-link">
+              llms.txt
+            </a>{' '}
+            and{' '}
+            <a href="/docs.md" className="text-link">
+              the full Markdown guide
+            </a>
+            .
+          </p>
+        </section>
+        <section id="manual-install" className="mt-10">
+          <h2 className="text-2xl font-semibold tracking-tight">Manual installation</h2>
+          <p className="my-5 text-sm leading-7 text-muted">{releaseNotice}</p>
+          <p className="mb-5 text-sm leading-7 text-muted">
+            Build the official repository with Bun 1.3.14. The package supports Node.js 22 or newer.
+          </p>
+          <CodeBlock label="Build package" language="bash" code={sourceInstall} />
+          <p className="my-5 text-sm leading-7 text-muted">
+            In your app, install the tarball printed by <code>npm pack</code>. Replace the example
+            path and version with your generated file, and use your project’s package manager.
+          </p>
+          <CodeBlock label="Install" language="bash" code={install} />
+        </section>
         <section id="automation">
           <h2 className="mb-4 mt-10 text-2xl font-semibold tracking-tight">
             Run your first script

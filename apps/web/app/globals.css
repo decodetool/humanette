@@ -97,6 +97,28 @@
   .secondary {
     @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm font-medium hover:border-muted;
   }
+  .demo-click-target {
+    @apply border-slate-300 bg-slate-200 text-slate-800 shadow-xs;
+  }
+  .demo-click-target:hover,
+  .demo-click-target[data-hovered='true'] {
+    @apply border-slate-400 bg-slate-300;
+  }
+  .demo-click-target:active,
+  .demo-click-target[data-pressed='true'] {
+    @apply border-slate-500 bg-slate-400;
+  }
+  :root[data-theme='dark'] .demo-click-target {
+    @apply border-slate-600 bg-slate-700 text-white;
+  }
+  :root[data-theme='dark'] .demo-click-target:hover,
+  :root[data-theme='dark'] .demo-click-target[data-hovered='true'] {
+    @apply border-slate-500 bg-slate-600;
+  }
+  :root[data-theme='dark'] .demo-click-target:active,
+  :root[data-theme='dark'] .demo-click-target[data-pressed='true'] {
+    @apply border-slate-400 bg-slate-500;
+  }
   .field {
     @apply w-full rounded-md border border-line bg-surface px-3 py-2.5 font-mono text-sm text-ink placeholder:text-muted;
   }
@@ -108,6 +130,9 @@
   }
   .icon-button {
     @apply inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-sage hover:text-ink;
+  }
+  .nav-icon {
+    @apply hover:bg-transparent;
   }
   .copy-button {
     @apply opacity-30 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100;

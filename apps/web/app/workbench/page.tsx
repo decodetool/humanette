@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { WorkbenchLoader } from '../../components/workbench-loader';
-export const metadata: Metadata = { title: 'Pointer Lab' };
+export const metadata: Metadata = { title: 'Pointer Lab', alternates: { canonical: '/workbench' } };
 export default function Page() {
   return (
     <div className="shell pt-12">

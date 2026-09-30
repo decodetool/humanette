@@ -22,15 +22,7 @@ export function Examples() {
             <h2 className="mb-2 text-2xl font-semibold tracking-tight">{title}</h2>
             <ExamplePlayer scene={scene} scale={scale} />
             <div className="mt-1">
-              <CodeBlock
-                label={`${title} example`}
-                code={`import { chromium } from 'playwright';\nimport { createHuman } from 'humanette';\n\nconst browser = await chromium.launch({ headless: false });\ntry {\n  const page = await browser.newPage();\n  // Replace this URL and the locator below with your app's.\n  await page.goto('https://your-app.example');\n\n  const human = await createHuman(page, { scale: ${scale} });\n${actions[
-                  scene
-                ]
-                  .split('\n')
-                  .map((line) => '  ' + line)
-                  .join('\n')}\n  await human.dispose();\n} finally {\n  await browser.close();\n}`}
-              />
+              <CodeBlock label={`${title} example`} code={actions[scene]} />
             </div>
           </section>
         ))}

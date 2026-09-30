@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Examples } from '../../components/examples';
-export const metadata: Metadata = { title: 'Examples' };
+export const metadata: Metadata = { title: 'Examples', alternates: { canonical: '/examples' } };
 export default function Page() {
   return (
     <div className="shell max-w-4xl! pt-12">

@@ -1,5 +1,57 @@
 import { test, expect } from '@playwright/test';
 
+test('single-line snippets are compact with vertically centered copy controls', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/examples');
+    for (const name of ['Move and click', 'Text selection']) {
+      const copy = page.getByRole('button', { name: `Copy ${name} example`, exact: true });
+      const block = copy.locator('..');
+      await block.scrollIntoViewIfNeeded();
+      const box = (await block.boundingBox())!;
+      const button = (await copy.boundingBox())!;
+      expect(box.height).toBeLessThanOrEqual(44);
+      expect(Math.abs(button.y + button.height / 2 - (box.y + box.height / 2))).toBeLessThan(1);
+      await expect(block.locator('pre')).toHaveCSS('padding-top', '8px');
+      await expect(block.locator('pre')).toHaveCSS('padding-bottom', '8px');
+    }
+    const multiline = page
+      .getByRole('button', { name: 'Copy Drag & Drop example', exact: true })
+      .locator('..');
+    await expect(multiline.locator('pre')).toHaveCSS('padding-top', '20px');
+    await expect(multiline.locator('button')).toHaveCSS('top', '8px');
+  }
+});
+
+test('favicon keeps its size and aligns the cursor near the right edge without clipping', async ({
+  page,
+}) => {
+  const response = await page.request.get('/icon.svg');
+  expect(response.ok()).toBe(true);
+  await page.setContent(await response.text());
+  const icon = page.locator('svg');
+  await expect(icon).toHaveAttribute('width', '32');
+  await expect(icon).toHaveAttribute('height', '32');
+  const bounds = await icon.evaluate((element) => {
+    const frame = element.getBoundingClientRect();
+    const arrow = element.querySelector('g')!.getBoundingClientRect();
+    return {
+      right: frame.right - arrow.right,
+      left: arrow.left - frame.left,
+      top: arrow.top - frame.top,
+      bottom: frame.bottom - arrow.bottom,
+    };
+  });
+  expect(bounds.right).toBeGreaterThan(0);
+  expect(bounds.right).toBeLessThan(2);
+  expect(bounds.left).toBeGreaterThan(bounds.right);
+  expect(bounds.top).toBeGreaterThanOrEqual(0);
+  expect(bounds.bottom).toBeGreaterThanOrEqual(0);
+});
+
 test('theme starts from system, then persists a two-state choice; navigation and copy', async ({
   page,
   context,
@@ -17,10 +69,17 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await expect(page.getByRole('combobox', { name: 'Color theme' })).toHaveCount(0);
   const nav = page.getByRole('navigation', { name: 'Main', exact: true });
   await expect(nav.getByRole('link')).toHaveText(['Docs', 'Examples']);
+  const github = (await page.getByRole('link', { name: 'GitHub', exact: true }).boundingBox())!;
+  const theme = (await page.getByRole('button', { name: 'Switch to light mode' }).boundingBox())!;
+  expect(theme.x - github.x - github.width).toBeLessThanOrEqual(8);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('link', { name: 'Get started', exact: true }).click();
+  await expect(page).toHaveURL(/\/docs$/);
   await page.getByRole('button', { name: 'Copy Install', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveText('Copied');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('npm install humanette');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    'npm install /absolute/path/to/humanette-1.1.0.tgz playwright\nnpx playwright install chromium',
+  );
   await page.getByRole('link', { name: 'Examples', exact: true }).click();
   await expect(page.getByRole('link', { name: 'Examples', exact: true })).toHaveAttribute(
     'aria-current',
@@ -35,11 +94,7 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await expect(page.locator('.token.keyword').first()).toBeVisible();
   await page.getByRole('button', { name: 'Copy Move and click example' }).click();
   const example = await page.evaluate(() => navigator.clipboard.readText());
-  expect(example).toContain("from 'humanette'");
-  expect(example).toContain("from 'playwright'");
-  expect(example).toContain('await browser.newPage()');
-  expect(example).toContain("await page.goto('https://your-app.example')");
-  expect(example).toContain('await browser.close()');
+  expect(example).toBe("await human.click(page.getByRole('button', { name: 'Click me' }));");
   await page.goto('/docs');
   await expect(page.getByRole('link', { name: 'Get started', exact: true })).toHaveAttribute(
     'href',
