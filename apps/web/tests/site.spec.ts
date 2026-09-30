@@ -5,7 +5,7 @@ test('site and live renderer work at desktop and mobile widths', async ({ page }
   page.on('pageerror', (e) => errors.push(e.message));
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 }).first()).toContainText('Screen Studios');
+  await expect(page.getByRole('heading', { level: 1 }).first()).toContainText('Screen Studio');
   await page.getByTestId('example-click').scrollIntoViewIfNeeded();
   await expect(page.getByText('Clicked', { exact: true })).toBeVisible();
   await page.screenshot({ path: 'test-results/home.png', fullPage: true });

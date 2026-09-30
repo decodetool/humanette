@@ -13,15 +13,25 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     'href',
     'https://decode.dev',
   );
-  const install = page.locator('.code-block').first();
-  const installBox = (await install.boundingBox())!;
-  const copyBox = (await install.getByRole('button').boundingBox())!;
-  expect(installBox.height).toBeLessThanOrEqual(44);
-  expect(
-    Math.abs(copyBox.y + copyBox.height / 2 - installBox.y - installBox.height / 2),
-  ).toBeLessThan(1);
+  await expect(page.getByRole('link', { name: 'Get started', exact: true })).toHaveAttribute(
+    'href',
+    '/docs',
+  );
+  await expect(page.getByRole('button', { name: 'Copy Install', exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: 'Screen Studio for browser automation', exact: true }),
+  ).toBeVisible();
+  const heroCopy = page.getByText(
+    'Add large cursors, natural mouse movement, and visible clicks to your Playwright scripts.',
+    { exact: true },
+  );
+  await expect(heroCopy).toHaveCSS('text-align', 'center');
+  await expect(
+    page.getByText('Create product walkthroughs, or let coding agents show their work.', {
+      exact: true,
+    }),
+  ).toBeVisible();
   await expect(page.getByRole('heading', { level: 2 })).toHaveText([
-    'Use cases',
     'Move and click',
     'Text selection',
     'Drag & Drop',
@@ -40,7 +50,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     'Follow the action',
     'Read the gesture',
     'Keep your workflow',
-    'Get started',
+    'Use cases',
     'See examples',
     'Built for Playwright. Cursor assets included.',
   ]) {

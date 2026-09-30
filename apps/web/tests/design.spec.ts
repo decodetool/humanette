@@ -21,9 +21,13 @@ test('theme starts from system, then persists a two-state choice; navigation and
   const theme = (await page.getByRole('button', { name: 'Switch to light mode' }).boundingBox())!;
   expect(theme.x - github.x - github.width).toBeLessThanOrEqual(5);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('link', { name: 'Get started', exact: true }).click();
+  await expect(page).toHaveURL(/\/docs$/);
   await page.getByRole('button', { name: 'Copy Install', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveText('Copied');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('npm install humanette');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    'npm install humanette playwright\nnpx playwright install chromium',
+  );
   await page.getByRole('link', { name: 'Examples', exact: true }).click();
   await expect(page.getByRole('link', { name: 'Examples', exact: true })).toHaveAttribute(
     'aria-current',
