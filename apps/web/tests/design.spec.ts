@@ -68,11 +68,7 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await expect(page.locator('.token.keyword').first()).toBeVisible();
   await page.getByRole('button', { name: 'Copy Move and click example' }).click();
   const example = await page.evaluate(() => navigator.clipboard.readText());
-  expect(example).toContain("from 'humanette'");
-  expect(example).toContain("from 'playwright'");
-  expect(example).toContain('await browser.newPage()');
-  expect(example).toContain("await page.goto('https://your-app.example')");
-  expect(example).toContain('await browser.close()');
+  expect(example).toBe("await human.click(page.getByRole('button', { name: 'Click me' }));");
   await page.goto('/docs');
   await expect(page.getByRole('link', { name: 'Get started', exact: true })).toHaveAttribute(
     'href',

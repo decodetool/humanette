@@ -90,6 +90,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
 });
 
 test('examples autoplay, loop, and freeze offscreen without player controls', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 600 });
   await page.goto('/examples');
   const scene = page.getByTestId('example-click');
   await expect(scene).toHaveAttribute('data-running', 'true');
@@ -101,6 +102,95 @@ test('examples autoplay, loop, and freeze offscreen without player controls', as
   await page.waitForTimeout(150);
   await expect(scene).toHaveAttribute('data-playback-time', offscreen!);
 });
+
+test('example snippets contain only the relevant human actions', async ({ page }) => {
+  await page.goto('/examples');
+  for (const [title, code] of [
+    ['Move and click', "await human.click(page.getByRole('button', { name: 'Click me' }));"],
+    ['Text selection', "await human.selectText(page.getByText('these words', { exact: true }));"],
+    [
+      'Drag & Drop',
+      "await human.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
+    ],
+  ]) {
+    await expect(page.getByRole('region', { name: title, exact: true }).locator('pre')).toHaveText(
+      code,
+      { useInnerText: true },
+    );
+  }
+});
+
+for (const [scene, hover] of [
+  ['click', 'pointer'],
+  ['text', 'text'],
+  ['drag', 'grab'],
+] as const) {
+  test(`${scene} cursor changes at the target bounds before pressing and returns on exit`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.addInitScript(() => {
+      const scopes = new WeakMap<Element, ShadowRoot>();
+      (window as unknown as { exampleScopes: typeof scopes }).exampleScopes = scopes;
+      const attach = Element.prototype.attachShadow;
+      Element.prototype.attachShadow = function (options) {
+        const scope = attach.call(this, options);
+        scopes.set(this, scope);
+        return scope;
+      };
+    });
+    await page.goto('/examples');
+    const preview = page.getByTestId(`example-${scene}`);
+    await preview.scrollIntoViewIfNeeded();
+    await expect(preview.locator('[data-humanette]')).toHaveAttribute('data-cursor', 'default');
+    const recording = preview.evaluate(
+      (element, scene) =>
+        new Promise<Array<{ time: number; inside: boolean; cursor: string }>>((resolve) => {
+          const scopes = (window as unknown as { exampleScopes: WeakMap<Element, ShadowRoot> })
+            .exampleScopes;
+          const host = element.querySelector('[data-humanette]')!;
+          const target = element.querySelector(`[data-testid="example-${scene}-target"]`)!;
+          const samples: Array<{ time: number; inside: boolean; cursor: string }> = [];
+          const observer = new MutationObserver(() => {
+            const layer = scopes.get(host)!.lastElementChild!;
+            const svg = scopes.get(layer)?.querySelector('svg');
+            if (!svg) return;
+            const box = svg.getBoundingClientRect();
+            // Built-in cursor hotspots are (32,32) in their 64x64 viewboxes.
+            const x = box.left + box.width / 2,
+              y = box.top + box.height / 2;
+            const bounds = target.getBoundingClientRect();
+            const time = Number(element.getAttribute('data-playback-time'));
+            samples.push({
+              time,
+              inside: x >= bounds.left && x < bounds.right && y >= bounds.top && y < bounds.bottom,
+              cursor: host.getAttribute('data-cursor')!,
+            });
+            if (time > 4350) {
+              observer.disconnect();
+              resolve(samples);
+            }
+          });
+          observer.observe(host, { attributes: true });
+        }),
+      scene,
+    );
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const samples = await recording;
+    const approaching = samples.filter((sample) => sample.time > 0 && sample.time < 700);
+    expect(approaching.some((sample) => !sample.inside && sample.cursor === 'default')).toBe(true);
+    expect(approaching.some((sample) => sample.inside && sample.cursor === hover)).toBe(true);
+    expect(approaching.filter((sample) => sample.inside && sample.cursor !== hover)).toEqual([]);
+    expect(
+      samples.filter((sample) => sample.time > 4250).every((sample) => sample.cursor === 'default'),
+    ).toBe(true);
+    if (scene === 'drag') {
+      const dragging = samples.filter((sample) => sample.time > 1200 && sample.time < 2400);
+      expect(dragging.length).toBeGreaterThan(0);
+      expect(dragging.every((sample) => sample.cursor === 'grabbing')).toBe(true);
+    }
+  });
+}
 
 test('click demo darkens while pressed and keeps its original color after release', async ({
   page,

@@ -28,38 +28,35 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
     edges: [0, 280],
   });
   const initial = {
-    x: scene === 'text' ? geometry.right + 48 : scene === 'drag' ? 320 : 212,
+    x: scene === 'text' ? geometry.right + 48 : scene === 'drag' ? 392 : 212,
     y: 160,
   };
   const events: TimelineEvent[] =
     scene === 'click'
       ? [
+          { at: 0, type: 'cursor', cursor: 'auto' },
           { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
-          { at: 800, type: 'cursor', cursor: 'pointer' },
           { at: 1000, type: 'down' },
           { at: 1100, type: 'up' },
-          { at: 2400, type: 'cursor', cursor: 'default' },
           { at: 2400, type: 'move', ...initial, duration: 1000 },
         ]
       : scene === 'text'
         ? [
+            { at: 0, type: 'cursor', cursor: 'auto' },
             { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
-            { at: 800, type: 'cursor', cursor: 'text' },
             { at: 1000, type: 'down' },
             { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
             { at: 2640, type: 'up' },
-            { at: 3200, type: 'cursor', cursor: 'default' },
             { at: 3200, type: 'move', ...initial, duration: 1000 },
           ]
         : [
+            { at: 0, type: 'cursor', cursor: 'auto' },
             { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
-            { at: 800, type: 'cursor', cursor: 'grab' },
             { at: 1000, type: 'down' },
             { at: 1000, type: 'cursor', cursor: 'grabbing' },
             { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
             { at: 2640, type: 'up' },
-            { at: 2640, type: 'cursor', cursor: 'grab' },
-            { at: 3200, type: 'cursor', cursor: 'default' },
+            { at: 2640, type: 'cursor', cursor: 'auto' },
             { at: 3200, type: 'move', ...initial, duration: 1000 },
           ];
   const live = useRef({ events, geometry, initial });
@@ -198,13 +195,16 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
           <div
             data-testid="example-click-target"
             data-pressed={time >= 1000 && time < 1100}
-            className={`absolute left-5 top-[calc(50%-16px)] flex h-12 w-32 -translate-y-1/2 items-center justify-center rounded-md text-sm font-medium text-on-accent ${time >= 1000 && time < 1100 ? 'bg-[color-mix(in_srgb,var(--color-accent)_85%,black)]' : 'bg-accent'}`}
+            className={`absolute left-5 top-[calc(50%-16px)] flex h-12 w-32 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-sm font-medium text-on-accent ${time >= 1000 && time < 1100 ? 'bg-[color-mix(in_srgb,var(--color-accent)_85%,black)]' : 'bg-accent'}`}
           >
             {time >= 1100 ? 'Clicked' : 'Click me'}
           </div>
         )}
         {scene === 'text' && (
-          <div className="absolute left-5 top-[calc(50%-16px)] -translate-y-1/2 whitespace-nowrap text-[1em]">
+          <div
+            data-testid="example-text-target"
+            className="absolute left-5 top-[calc(50%-16px)] -translate-y-1/2 cursor-text whitespace-nowrap text-[1em]"
+          >
             Select{' '}
             <span className="relative inline-block">
               <span
@@ -226,8 +226,9 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
               Drop here
             </div>
             <div
+              data-testid="example-drag-target"
               style={{ left: cardX + cursorGutter }}
-              className="absolute top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg border border-line bg-success-surface text-sm font-medium whitespace-nowrap"
+              className="absolute top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-x-1/2 -translate-y-1/2 cursor-grab items-center justify-center rounded-lg border border-line bg-success-surface text-sm font-medium whitespace-nowrap"
             >
               {time >= 2640 && time < 3900 ? 'Delivered ✓' : 'Drag me'}
             </div>
