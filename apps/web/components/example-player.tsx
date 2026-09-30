@@ -196,7 +196,9 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       <div ref={root} data-testid="example-stage" className="relative -mx-5 h-28 overflow-hidden">
         {scene === 'click' && (
           <div
-            className={`absolute left-5 top-[calc(50%-16px)] flex h-12 w-32 -translate-y-1/2 items-center justify-center rounded-md text-sm font-medium ${time >= 1100 ? 'bg-success-surface text-success' : 'bg-accent text-on-accent'}`}
+            data-testid="example-click-target"
+            data-pressed={time >= 1000 && time < 1100}
+            className={`absolute left-5 top-[calc(50%-16px)] flex h-12 w-32 -translate-y-1/2 items-center justify-center rounded-md text-sm font-medium text-on-accent ${time >= 1000 && time < 1100 ? 'bg-[color-mix(in_srgb,var(--color-accent)_85%,black)]' : 'bg-accent'}`}
           >
             {time >= 1100 ? 'Clicked' : 'Click me'}
           </div>

@@ -32,22 +32,24 @@ export function SiteNav() {
             </Link>
           ))}
         </nav>
-        <a
-          href="https://github.com/decodetool/humanette"
-          className="icon-button"
-          aria-label="GitHub"
-          title="GitHub"
-        >
-          <Icon name="github" />
-        </a>
-        <button
-          className="icon-button"
-          aria-label={`Switch to ${next} mode`}
-          title={`Switch to ${next} mode`}
-          onClick={() => setTheme(next)}
-        >
-          <Icon name={resolved === 'dark' ? 'sun' : 'moon'} />
-        </button>
+        <div className="flex items-center gap-1">
+          <a
+            href="https://github.com/decodetool/humanette"
+            className="icon-button"
+            aria-label="GitHub"
+            title="GitHub"
+          >
+            <Icon name="github" />
+          </a>
+          <button
+            className="icon-button"
+            aria-label={`Switch to ${next} mode`}
+            title={`Switch to ${next} mode`}
+            onClick={() => setTheme(next)}
+          >
+            <Icon name={resolved === 'dark' ? 'sun' : 'moon'} />
+          </button>
+        </div>
       </div>
     </header>
   );

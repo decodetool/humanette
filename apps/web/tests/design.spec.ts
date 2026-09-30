@@ -17,6 +17,9 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await expect(page.getByRole('combobox', { name: 'Color theme' })).toHaveCount(0);
   const nav = page.getByRole('navigation', { name: 'Main', exact: true });
   await expect(nav.getByRole('link')).toHaveText(['Docs', 'Examples']);
+  const github = (await page.getByRole('link', { name: 'GitHub', exact: true }).boundingBox())!;
+  const theme = (await page.getByRole('button', { name: 'Switch to light mode' }).boundingBox())!;
+  expect(theme.x - github.x - github.width).toBeLessThanOrEqual(5);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.getByRole('button', { name: 'Copy Install', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveText('Copied');

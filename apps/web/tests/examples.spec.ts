@@ -76,6 +76,39 @@ test('examples autoplay, loop, and freeze offscreen without player controls', as
   await expect(scene).toHaveAttribute('data-playback-time', offscreen!);
 });
 
+test('click demo darkens while pressed and keeps its original color after release', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/examples');
+  const target = page.getByTestId('example-click-target');
+  const original = await target.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const colors = target.evaluate(
+    (element) =>
+      new Promise<string[]>((resolve) => {
+        let pressed = '';
+        const observer = new MutationObserver(() => {
+          const background = getComputedStyle(element).backgroundColor;
+          if (element.getAttribute('data-pressed') === 'true') pressed = background;
+          if (pressed && element.textContent === 'Clicked') {
+            observer.disconnect();
+            resolve([pressed, background]);
+          }
+        });
+        observer.observe(element, {
+          attributes: true,
+          childList: true,
+          characterData: true,
+          subtree: true,
+        });
+      }),
+  );
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const [pressed, released] = await colors;
+  expect(pressed).not.toBe(original);
+  expect(released).toBe(original);
+});
+
 test('reduced motion starts paused and text highlight follows the selection', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/examples');
