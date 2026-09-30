@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Examples } from '../components/examples';
+export const metadata: Metadata = { alternates: { canonical: '/' } };
 export default function Home() {
   return (
     <div className="shell max-w-4xl!">
@@ -8,7 +10,8 @@ export default function Home() {
           Screen Studio for browser automation
         </h1>
         <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-muted">
-          Add large cursors, natural mouse movement, and visible clicks to your Playwright scripts.
+          Add large cursors, natural mouse movement, and visible clicks to video recordings of
+          browser automation (Playwright only currently).
         </p>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-muted">
           Create product walkthroughs, or let coding agents show their work.

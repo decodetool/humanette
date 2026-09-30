@@ -10,4 +10,6 @@ Cursor source assets are docs/*.svg; do not bundle docs/mdn reference images. Up
 
 Before a PR: bun check, bun run test:e2e, bun run pack:check. Browser install: cd apps/web && bunx playwright install chromium. Preserve screenshots from failed checks, fix failures, and report limitations honestly. Do not publish npm, deploy production, or merge unless explicitly requested.
 
+Agent documentation: /llms.txt is the concise entry point; /docs.md and /llms-full.txt share a complete guide from apps/web/content/agent-guide.ts. HTML docs share API descriptions and code examples through apps/web/content/documentation.ts. Keep these synchronized when changing the API. Before changing installation guidance or publishing a release, verify npm's actual tarball exports (not just its version), then update releaseNotice and the local-tarball instructions. Do not advertise a Humanette skill install command until a skill exists.
+
 Read docs/architecture.md and docs/history/cursor-capture-investigation.md before changing capture-facing animation. A 60-fps file is not proof of 60 distinct captured frames.

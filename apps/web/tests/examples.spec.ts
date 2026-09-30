@@ -28,7 +28,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     page.getByRole('heading', { name: 'Screen Studio for browser automation', exact: true }),
   ).toBeVisible();
   const heroCopy = page.getByText(
-    'Add large cursors, natural mouse movement, and visible clicks to your Playwright scripts.',
+    'Add large cursors, natural mouse movement, and visible clicks to video recordings of browser automation (Playwright only currently).',
     { exact: true },
   );
   await expect(heroCopy).toHaveCSS('text-align', 'center');

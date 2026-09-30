@@ -52,7 +52,7 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await page.getByRole('button', { name: 'Copy Install', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveText('Copied');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    'npm install humanette playwright\nnpx playwright install chromium',
+    'npm install /absolute/path/to/humanette-1.1.0.tgz playwright\nnpx playwright install chromium',
   );
   await page.getByRole('link', { name: 'Examples', exact: true }).click();
   await expect(page.getByRole('link', { name: 'Examples', exact: true })).toHaveAttribute(
