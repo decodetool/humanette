@@ -28,13 +28,13 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     page.getByRole('heading', { name: 'Screen Studio for browser automation', exact: true }),
   ).toBeVisible();
   const heroCopy = page.getByText(
-    'Add large cursors, natural mouse movement, and visible clicks to video recordings of browser automation (Playwright only currently).',
+    'Humanette adds large cursors, natural mouse movement, and visible clicks to video captures made with Playwright.',
     { exact: true },
   );
   await expect(heroCopy).toHaveCSS('text-align', 'center');
   expect((await heroCopy.boundingBox())!.width).toBeGreaterThan(700);
   const useCases = page.getByText(
-    'Create product walkthroughs, or let coding agents show their work.',
+    'Use it to create product walkthroughs, or let coding agents show their work.',
     { exact: true },
   );
   const useCasesBox = (await useCases.boundingBox())!;
@@ -43,7 +43,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     .boundingBox())!;
   expect(getStartedBox.y).toBeGreaterThan(useCasesBox.y + useCasesBox.height);
   await expect(
-    page.getByText('Create product walkthroughs, or let coding agents show their work.', {
+    page.getByText('Use it to create product walkthroughs, or let coding agents show their work.', {
       exact: true,
     }),
   ).toBeVisible();
@@ -192,38 +192,81 @@ for (const [scene, hover] of [
   });
 }
 
-test('click demo darkens while pressed and keeps its original color after release', async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/examples');
-  const target = page.getByTestId('example-click-target');
-  const original = await target.evaluate((element) => getComputedStyle(element).backgroundColor);
-  const colors = target.evaluate(
-    (element) =>
-      new Promise<string[]>((resolve) => {
-        let pressed = '';
-        const observer = new MutationObserver(() => {
-          const background = getComputedStyle(element).backgroundColor;
-          if (element.getAttribute('data-pressed') === 'true') pressed = background;
-          if (pressed && element.textContent === 'Clicked') {
-            observer.disconnect();
-            resolve([pressed, background]);
-          }
-        });
-        observer.observe(element, {
-          attributes: true,
-          childList: true,
-          characterData: true,
-          subtree: true,
-        });
+for (const theme of ['light', 'dark'] as const) {
+  test(`click demo has a secondary fill with distinct hover and pressed states in ${theme} mode`, async ({
+    page,
+  }) => {
+    await page.addInitScript((value) => localStorage.setItem('humanette-theme', value), theme);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    const target = page.getByTestId('example-click-target');
+    await target.scrollIntoViewIfNeeded();
+    const original = await target.evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(original).not.toBe('rgba(0, 0, 0, 0)');
+    await expect(target).toHaveCSS('border-top-width', '1px');
+    await expect(target).toHaveCSS('border-top-style', 'solid');
+    await page.getByTestId('example-click').screenshot({
+      path: `test-results/click-secondary-${theme}.png`,
+    });
+    expect(
+      await page
+        .getByRole('link', { name: 'Get started', exact: true })
+        .evaluate((element) => getComputedStyle(element).backgroundColor),
+    ).not.toBe(original);
+    await target.hover();
+    const hovered = await target.evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(hovered).not.toBe(original);
+    expect(await target.evaluate((element) => getComputedStyle(element).borderTopColor)).not.toBe(
+      hovered,
+    );
+    await page.mouse.down();
+    expect(
+      await target.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return style.borderTopColor !== style.backgroundColor;
       }),
-  );
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  const [pressed, released] = await colors;
-  expect(pressed).not.toBe(original);
-  expect(released).toBe(original);
-});
+    ).toBe(true);
+    await page.mouse.up();
+    await page.getByTestId('example-click').screenshot({
+      path: `test-results/click-secondary-hover-${theme}.png`,
+    });
+    await page.mouse.move(0, 0);
+    await expect(target).toHaveCSS('background-color', original);
+    const colors = target.evaluate(
+      (element) =>
+        new Promise<string[]>((resolve) => {
+          let pressed = '';
+          let hover = '';
+          let released = '';
+          const observer = new MutationObserver(() => {
+            const background = getComputedStyle(element).backgroundColor;
+            if (element.getAttribute('data-pressed') === 'true') pressed = background;
+            else if (element.getAttribute('data-hovered') === 'true') hover = background;
+            if (pressed && element.textContent === 'Clicked') {
+              if (element.getAttribute('data-hovered') === 'true') released = background;
+              else {
+                observer.disconnect();
+                resolve([hover, pressed, released, background]);
+              }
+            }
+          });
+          observer.observe(element, {
+            attributes: true,
+            childList: true,
+            characterData: true,
+            subtree: true,
+          });
+        }),
+    );
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const [demoHover, pressed, released, exited] = await colors;
+    expect(demoHover).toBe(hovered);
+    expect(pressed).not.toBe(hovered);
+    expect(pressed).not.toBe(original);
+    expect(released).toBe(hovered);
+    expect(exited).toBe(original);
+  });
+}
 
 test('reduced motion starts paused and text highlight follows the selection', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

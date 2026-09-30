@@ -17,7 +17,7 @@ export function CodeBlock({
   code,
   label = 'code',
   language = 'typescript',
-  compact = false,
+  compact = !/[\r\n]/.test(code),
 }: {
   code: string;
   label?: string;

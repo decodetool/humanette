@@ -32,17 +32,17 @@ export function SiteNav() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <a
             href="https://github.com/decodetool/humanette"
-            className="icon-button nav-icon"
+            className="icon-button nav-icon w-[30px]"
             aria-label="GitHub"
             title="GitHub"
           >
             <Icon name="github" />
           </a>
           <button
-            className="icon-button nav-icon"
+            className="icon-button nav-icon w-[30px]"
             aria-label={`Switch to ${next} mode`}
             title={`Switch to ${next} mode`}
             onClick={() => setTheme(next)}

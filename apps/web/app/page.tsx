@@ -10,11 +10,11 @@ export default function Home() {
           Screen Studio for browser automation
         </h1>
         <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-muted">
-          Add large cursors, natural mouse movement, and visible clicks to video recordings of
-          browser automation (Playwright only currently).
+          Humanette adds large cursors, natural mouse movement, and visible clicks to video captures
+          made with Playwright.
         </p>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-muted">
-          Create product walkthroughs, or let coding agents show their work.
+          Use it to create product walkthroughs, or let coding agents show their work.
         </p>
         <Link href="/docs" className="primary mt-6 min-h-11 px-6 text-base">
           Get started

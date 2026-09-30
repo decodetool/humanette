@@ -1,5 +1,31 @@
 import { test, expect } from '@playwright/test';
 
+test('single-line snippets are compact with vertically centered copy controls', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/examples');
+    for (const name of ['Move and click', 'Text selection']) {
+      const copy = page.getByRole('button', { name: `Copy ${name} example`, exact: true });
+      const block = copy.locator('..');
+      await block.scrollIntoViewIfNeeded();
+      const box = (await block.boundingBox())!;
+      const button = (await copy.boundingBox())!;
+      expect(box.height).toBeLessThanOrEqual(44);
+      expect(Math.abs(button.y + button.height / 2 - (box.y + box.height / 2))).toBeLessThan(1);
+      await expect(block.locator('pre')).toHaveCSS('padding-top', '8px');
+      await expect(block.locator('pre')).toHaveCSS('padding-bottom', '8px');
+    }
+    const multiline = page
+      .getByRole('button', { name: 'Copy Drag & Drop example', exact: true })
+      .locator('..');
+    await expect(multiline.locator('pre')).toHaveCSS('padding-top', '20px');
+    await expect(multiline.locator('button')).toHaveCSS('top', '8px');
+  }
+});
+
 test('favicon keeps its size and aligns the cursor near the right edge without clipping', async ({
   page,
 }) => {
