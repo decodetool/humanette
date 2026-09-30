@@ -211,7 +211,10 @@ export function createHumanette(input: HumanetteOptions = {}) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const f = frameOverride ?? feedbackAt(pressEvents, now - epoch, config);
+    // A queued RAF timestamp can precede a newly delivered input event. Never
+    // sample before that event or its transition can look idle and stop RAF.
+    const feedbackTime = Math.max(now - epoch, pressEvents.at(-1)?.at ?? 0);
+    const f = frameOverride ?? feedbackAt(pressEvents, feedbackTime, config);
     const selectingText = pressed && (resolved === 'text' || resolved === 'vertical-text');
     const cursorOpacity = selectingText ? config.textSelectionOpacity : 1;
     host.dataset.cursorOpacity = String(cursorOpacity);

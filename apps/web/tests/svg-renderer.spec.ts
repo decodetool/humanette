@@ -183,6 +183,44 @@ test('scale, press feedback, trail and keyboard ordering preserve the SVG geomet
   await page.evaluate(() => window.testCursor.dispose());
 });
 
+test('press and release finish when frame timestamps precede the input event', async ({ page }) => {
+  await page.evaluate(async () => {
+    window.testCursor = window.Humanette.createHumanette({ scale: 4, motionBlur: 0 });
+    await window.testCursor.ready;
+    window.testCursor.setCursor('default');
+    window.testCursor.setPosition({ x: 200, y: 150 });
+  });
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.testShadows.at(-1)?.querySelector('svg')?.getAttribute('width')),
+    )
+    .toBe('256');
+  await page.evaluate(() => {
+    const request = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (callback) => request((time) => callback(time - 100));
+    window.testCursor.down();
+  });
+  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-phase', 'hold');
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Number(window.testShadows.at(-1)?.querySelector('svg')?.getAttribute('width')),
+      ),
+    )
+    .toBeCloseTo(256 * 0.94);
+  await page.evaluate(() => window.testCursor.up());
+  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-phase', 'up');
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.testShadows.at(-1)?.querySelector('svg')?.getAttribute('width')),
+    )
+    .toBe('256');
+  const frames = await page.evaluate(() => window.testFrames);
+  await page.waitForTimeout(250);
+  expect(await page.evaluate(() => window.testFrames)).toBe(frames);
+  await page.evaluate(() => window.testCursor.dispose());
+});
+
 test('canvas renderer remains explicitly selectable', async ({ page }) => {
   await page.evaluate(async () => {
     window.testCursor = window.Humanette.createHumanette({ renderer: 'canvas', scale: 4 });
