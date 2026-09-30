@@ -1,0 +1,28 @@
+apps/web/components/site-nav.tsx
+  s_408157d782cb56::t_88cb0599e466c6 38,45
+apps/web/next.config.ts
+  s_408157d782cb56::t_88cb0599e466c6 2-13
+apps/web/tests/theme.spec.ts
+  s_408157d782cb56::t_dd83f461a90811 1-4,6-12,31
+  s_408157d782cb56::t_88cb0599e466c6 5,13-25,29
+  s_408157d782cb56::t_afa57762467eba 26-28,30
+  s_408157d782cb56::t_5f4c77c8f70f66 32-34
+apps/web/app/globals.css
+  s_408157d782cb56::t_88cb0599e466c6 112-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a80eddafbebfa2776714d82d470e2c4893f0d4e6",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
