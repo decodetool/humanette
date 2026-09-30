@@ -1,2 +1,14 @@
 node_modules
 .DS_Store
+.worktrees/
+.next/
+.turbo/
+dist/
+out/
+test-results/
+playwright-report/
+*.tsbuildinfo
+*.tgz
+.vercel/
+.env*
+!.env.example

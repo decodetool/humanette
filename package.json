@@ -1,13 +1,26 @@
 {
-  "name": "humanette",
+  "name": "humanette-workspace",
+  "private": true,
+  "packageManager": "bun@1.3.14",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "version": "1.0.0",
   "description": "Humanette helps make browser automation videos easier to understand. Add it to your project and you'll get Screen Studio style large cursors and keyboard presses that look like a user using your product.",
-  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "turbo dev",
+    "example:playwright": "bun run --cwd packages/humanette build && bun run examples/record-demo.mjs",
+    "example:playwright:headful": "bun run --cwd packages/humanette build && bun run examples/record-demo.mjs --headful",
+    "build": "turbo build",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "check": "turbo typecheck test build",
+    "test:e2e": "bun run --cwd apps/web test:e2e",
+    "pack:check": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs"
   },
   "repository": {
     "type": "git",
@@ -16,7 +29,19 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "humanette": "workspace:*",
+    "playwright-core": "1.64.0-alpha-2026-09-28",
+    "prettier": "^3.6.0",
+    "turbo": "^2.8.0",
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "bugs": {
     "url": "https://github.com/decodetool/humanette/issues"
   },
