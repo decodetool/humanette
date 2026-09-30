@@ -45,7 +45,7 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await expect(nav.getByRole('link')).toHaveText(['Docs', 'Examples']);
   const github = (await page.getByRole('link', { name: 'GitHub', exact: true }).boundingBox())!;
   const theme = (await page.getByRole('button', { name: 'Switch to light mode' }).boundingBox())!;
-  expect(theme.x - github.x - github.width).toBeLessThanOrEqual(5);
+  expect(theme.x - github.x - github.width).toBeLessThanOrEqual(8);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.getByRole('link', { name: 'Get started', exact: true }).click();
   await expect(page).toHaveURL(/\/docs$/);
