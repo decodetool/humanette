@@ -2,10 +2,26 @@
 
 Natural cursor movement and legible click feedback for Playwright product demos. TypeScript and all 35 cursor SVGs included.
 
+## Ask your agent for a demo
+
 ```sh
-npm install humanette playwright
-npx playwright install chromium
+npx skills add decodetool/humanette --skill humanette
 ```
+
+Run in your project and choose your coding agent. In Claude Code, ask `/humanette record a demo of the new UX features in this PR`. In Codex, select the Humanette skill and describe the demo. The agent handles runtime and browser setup. Open sessions require a supported Playwright connection and an available recorder.
+
+For an example without an existing app, ask the skill to record its bundled local to-do demo: add “Buy groceries,” mark it complete, and save a video and reusable script.
+
+## Installation
+
+Requires Node.js 22+. Install Humanette and Playwright with your project's package manager, then install the matching browser:
+
+```sh
+npm install --save-dev humanette@^1.1.0 playwright
+npx --no-install playwright install chromium
+```
+
+Reuse compatible dependencies already present. For a one-off recording, install in a temporary execution workspace; for a reusable walkthrough, save the script and development dependencies in your app repository. Consuming the package requires no Humanette source checkout or build tools.
 
 ## Use your Playwright page
 

@@ -20,6 +20,7 @@
     "typecheck": "turbo typecheck",
     "check": "turbo typecheck test build",
     "test:e2e": "bun run --cwd apps/web test:e2e",
+    "test:skill": "node scripts/test-skill.mjs",
     "pack:check": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs"
   },
   "repository": {

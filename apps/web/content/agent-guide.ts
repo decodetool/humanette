@@ -1,23 +1,17 @@
 import { api, recording, setup } from './documentation';
+import {
+  skillInstall,
+  agentDemoPrompt,
+  productDemoPrompt,
+  skillInvocationNote,
+} from './onboarding';
 
 export const siteUrl = 'https://humanette.dev';
 export const releaseNotice =
-  'Release status checked September 30, 2026: npm humanette@1.0.0 contains no runtime. The Playwright API documented here is in the repository package, not that npm release. Until a runtime release is published, build and install the local package below. Check the published package contents before relying on a newer release.';
+  'Tarball checked October 5, 2026: npm humanette@1.0.0 contains no runtime—only package.json and README.md, with no exports map. The prepared 1.1.0 runtime must be published before npm setup works. The skill installs the published package and reports a missing release instead of building source.';
 
-export const setupPrompt = `Read https://humanette.dev/llms.txt and https://humanette.dev/docs.md.
-Add Humanette to this project and create a reproducible Playwright walkthrough.
-Ask me which app URL and user flow to demonstrate if they are not clear.
-Use this project's package manager and script runtime. Check the release status in the guide: if npm still lacks the runtime, build the official repository package and install its local tarball as documented.
-Use real Playwright input, stable locators, and assertions that verify the result. Use only a local or test environment and non-sensitive test data.
-Record the walkthrough to a local video, finalize it, and inspect it. Report the script, run command, video path, and what actually passed or failed. Do not claim an unrun check passed.`;
-
-export const sourceInstall = `git clone https://github.com/decodetool/humanette.git
-cd humanette
-bun install
-bun run --cwd packages/humanette build
-npm pack ./packages/humanette --ignore-scripts`;
 export const install =
-  'npm install /absolute/path/to/humanette-1.1.0.tgz playwright\nnpx playwright install chromium';
+  'npm install --save-dev humanette@^1.1.0 playwright\nnpx --no-install playwright install chromium';
 const fence = (language: string, code: string) => ['```' + language, code, '```'].join('\n');
 
 export const llmsIndex =
@@ -28,9 +22,13 @@ export const llmsIndex =
     releaseNotice,
     'Humanette is not an autonomous agent, video recorder, editor, or replacement for Playwright assertions. Keep browser setup, navigation, readiness checks, assertions, and recording in Playwright. Await human actions sequentially and await human.dispose() in finally. A visual website demo or a video alone is not proof that a feature passed its checks.',
     'Main actions: human.moveTo, human.click, human.drag, human.selectText, human.type, human.press, human.wait, human.configure, and human.dispose. Targets generally accept Playwright locators, CSS selectors, or main-viewport CSS coordinates; selectText requires a locator or selector. Keyboard badges are opt-in and show modifier chords only, not all typed characters. Humanette does not guarantee capture FPS.',
-    'For setup, give a coding agent the website link or the prompt in the guide. No dedicated Humanette skill installation is required; a skill is planned, not currently documented as available. Use the public package API, not humanette/internal (the website preview/workbench engine).',
+    'Install the Humanette skill: ' +
+      skillInstall +
+      '. Run in your project and choose your coding agent. ' +
+      skillInvocationNote +
+      ' The skill lives in skills/humanette in the source repository. Use the public package API, not humanette/internal (the website preview/workbench engine).',
     '## Documentation',
-    '- [Complete agent guide](https://humanette.dev/docs.md): Plain Markdown setup prompt, release status, installation, runnable script, API, recording workflow, and limits. Read this before implementing.\n- [Full-text alias](https://humanette.dev/llms-full.txt): The same complete guide in one plain-text response.\n- [Human-readable docs](https://humanette.dev/docs): Copyable setup prompt and manual instructions.\n- [Examples](https://humanette.dev/examples): Visual previews and focused action snippets; these animations do not run real input against a product.',
+    '- [Complete agent guide](https://humanette.dev/docs.md): Skill installation, demo prompts, release status, manual setup, API, recording workflow, and limits. Read this before implementing.\n- [Full-text alias](https://humanette.dev/llms-full.txt): The same complete guide in one plain-text response.\n- [Human-readable docs](https://humanette.dev/docs): Skill installation, short demo prompts, and the Playwright reference.\n- [Examples](https://humanette.dev/#examples): Visual previews and focused action snippets; these animations do not run real input against a product.',
     '## Optional',
     '- [Source and issues](https://github.com/decodetool/humanette): Repository, package source, and bug reports.\n- [npm package](https://www.npmjs.com/package/humanette): Check the available runtime release before installing.\n- [Pointer Lab](https://humanette.dev/workbench): Tune appearance and export configuration.\n- [Playwright video documentation](https://playwright.dev/docs/videos): Recording and video finalization.\n- [Decode](https://decode.dev): Humanette is made by Decode.',
   ].join('\n\n') + '\n';
@@ -40,14 +38,22 @@ export const agentGuide =
     '# Humanette: agent guide',
     '> Humanette adds readable cursor movement and click feedback to real Playwright actions. It helps people follow product walkthroughs, bug reproductions, and coding-agent test recordings.',
     'Canonical website: https://humanette.dev. HTML docs: https://humanette.dev/docs. Discovery index: https://humanette.dev/llms.txt. Source: https://github.com/decodetool/humanette.',
-    '## Start with a prompt',
-    'Paste this into a coding agent that can read links, edit your project, and run commands. No dedicated Humanette skill is required. A skill is planned; there is no skill installation command to use yet.',
-    fence('text', setupPrompt),
+    '## Install humanette skill',
+    'Run this in your project and choose your coding agent when prompted. The installer reads skills/humanette from the official repository. The agent handles runtime and browser setup when you request a demo.',
+    fence('sh', skillInstall),
+    skillInvocationNote,
+    '## Usage',
+    '### Ask an agent to demo a feature',
+    fence('text', agentDemoPrompt),
+    'Use the requested app and starting state. Humanette needs an actual Playwright Page in the same process as its actions. Reuse a supported browser connection; do not invent a CDP endpoint. Playwright cannot enable recordVideo on an existing context, so use an available screen recorder for an open page, or reproduce the starting state in a fresh recording context with the user’s agreement when session access is needed.',
+    '### Create a product demo',
+    fence('text', productDemoPrompt),
+    'For a standalone example without an existing app, the skill also includes scripts/record-todo.mjs, a self-contained local to-do app and real-input recording script. No account or production app is needed. Copy it into the chosen execution workspace after dependency setup, then run node record-todo.mjs with a durable output directory. It verifies the task was added and completed.',
+    '## Choose temporary or repository setup',
+    'One-off PR/bug recordings and video-only requests use a unique OS temporary workspace for scripts and missing dependencies; the app’s manifest, lockfile, and source stay unchanged. Product walkthroughs for a current app repository and requests to save/rerun a script use repository scripts and development dependencies, with the existing package manager and lockfile. Explicit output/script paths and instructions to leave the repo unchanged take precedence; ambiguous requests start temporary. Install missing Humanette, compatible Playwright, matching Chromium, and a required task-local Node runtime automatically. Reuse compatible installations instead of upgrading them. Save final videos outside disposable tools. Use the published humanette package. Do not search for source checkouts or build Humanette as a fallback; if no runtime release is available, report the missing publication. Saved scripts and lockfiles must not depend on temporary or personal paths.',
     '## Release status and installation',
     releaseNotice,
-    'The repository uses Bun 1.3.14. The runtime package declares Node.js >=22 and is ESM, with TypeScript declarations and bundled SVG assets. Use the project’s existing package manager; avoid creating a second lockfile. If a newer npm release contains the runtime and exports createHuman, install that release normally with Playwright. Otherwise build the official repository package:',
-    fence('sh', sourceInstall),
-    'npm pack prints the generated tarball filename. In the target app, install its absolute path (replace the example path and version below with the file you actually built). Install Chromium through the matching Playwright version:',
+    'The runtime package declares Node.js >=22 and is ESM, with TypeScript declarations and bundled SVG assets. Install the published humanette package in the chosen workspace with its package manager; avoid adding another lockfile. Reuse installed compatible dependencies. A one-off recording installs in its private temporary package; a saved demo adds development dependencies in the app repository. Bun is not required to consume Humanette. Install Chromium through the matching installed Playwright version:',
     fence('sh', install),
     'If Playwright is already installed, reuse a compatible version rather than adding a conflicting duplicate. The public import is createHuman from humanette. humanette/playwright is a compatibility alias; humanette/internal is for repository previews and is not the automation entry point. Never invent a CLI, skill installer, or API that is absent from the installed package.',
     '## Minimal real-input script',
@@ -72,5 +78,5 @@ export const agentGuide =
     'Targets are measured before movement and can move afterward; Humanette does not reproduce all locator.click actionability checks. selectText assumes ordinary left-to-right selectable text, including nested spans and wrapped lines. For inputs, use human.type with selectAll or keyboard shortcuts; specialized editors may need explicit coordinates or keyboard input.',
     'CSS cursor inference has limits for closed shadow roots, cross-origin frames, native controls, and custom cursor images. Busy cursor artwork is static. Browser CSP and permissions still apply. Bundled assets require no remote requests; Humanette itself does not upload recordings or send telemetry. Your app and recorder can have their own network behavior.',
     '## More resources',
-    '- [Focused examples](https://humanette.dev/examples)\n- [Pointer Lab](https://humanette.dev/workbench)\n- [Source and issues](https://github.com/decodetool/humanette)\n- [Playwright videos](https://playwright.dev/docs/videos)\n- [Playwright assertions](https://playwright.dev/docs/test-assertions)',
+    '- [Focused examples](https://humanette.dev/#examples)\n- [Pointer Lab](https://humanette.dev/workbench)\n- [Source and issues](https://github.com/decodetool/humanette)\n- [Playwright videos](https://playwright.dev/docs/videos)\n- [Playwright assertions](https://playwright.dev/docs/test-assertions)',
   ].join('\n\n') + '\n';

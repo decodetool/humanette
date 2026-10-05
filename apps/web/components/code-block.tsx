@@ -18,11 +18,13 @@ export function CodeBlock({
   label = 'code',
   language = 'typescript',
   compact = !/[\r\n]/.test(code),
+  wrap = language === 'text',
 }: {
   code: string;
   label?: string;
   language?: 'typescript' | 'bash' | 'text';
   compact?: boolean;
+  wrap?: boolean;
 }) {
   const [status, setStatus] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -58,7 +60,7 @@ export function CodeBlock({
       <Highlight theme={theme} code={code} language={language}>
         {({ tokens, getLineProps, getTokenProps }) => (
           <pre
-            className={`overflow-x-auto ${compact ? 'px-3 py-2 leading-6' : 'p-5 leading-7'} pr-14 font-mono text-xs sm:text-[13px] ${language === 'text' ? 'whitespace-pre-wrap break-words' : ''}`}
+            className={`overflow-x-auto ${compact ? 'px-3 py-2 leading-6' : 'p-5 leading-7'} pr-14 font-mono text-xs sm:text-[13px] ${wrap ? 'whitespace-pre-wrap break-words' : ''}`}
           >
             <code>
               {tokens.map((line, i) => (

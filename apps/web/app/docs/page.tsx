@@ -1,12 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CodeBlock } from '../../components/code-block';
-import { install, releaseNotice, setupPrompt, sourceInstall } from '../../content/agent-guide';
 import { setup, recording, api } from '../../content/documentation';
+import {
+  skillInstall,
+  agentDemoPrompt,
+  productDemoPrompt,
+  skillInvocationNote,
+} from '../../content/onboarding';
 export const metadata: Metadata = {
-  title: 'Docs',
+  title: 'Getting started',
   description:
-    'Set up Humanette with a coding-agent prompt or manual instructions. Learn the Playwright API, recording workflow, and limitations.',
+    'Install the Humanette skill, ask an agent to demo a feature, or create a repeatable product walkthrough. Includes the Playwright API and recording guide.',
   alternates: { canonical: '/docs', types: { 'text/markdown': '/docs.md' } },
 };
 export default function Docs() {
@@ -14,51 +19,33 @@ export default function Docs() {
     <div className="shell grid gap-12 pt-14 lg:grid-cols-[180px_minmax(0,1fr)]">
       <aside className="text-sm text-muted lg:sticky lg:top-8 lg:self-start">
         <nav aria-label="Documentation sections" className="flex flex-wrap gap-4 lg:flex-col">
-          <Link href="/docs">Get started</Link>
-          <a href="#agent-setup">Set up with an agent</a>
-          <a href="#manual-install">Manual installation</a>
+          <a href="#skill-install">Install the skill</a>
+          <a href="#usage">Usage</a>
           <a href="#api">API reference</a>
           <a href="#recording">Recording</a>
           <a href="#limits">Limitations</a>
         </nav>
       </aside>
       <article className="min-w-0 max-w-4xl">
-        <h1 className="text-4xl font-semibold tracking-tight">Get started</h1>
-        <p className="mt-4 text-base leading-7 text-muted">
-          Add natural cursor movement and visible clicks to your Playwright scripts. Use the
-          locators you already know. All cursor assets are bundled.
-        </p>
-        <section id="agent-setup" className="mt-8">
-          <h2 className="text-2xl font-semibold tracking-tight">Set up with your coding agent</h2>
-          <p className="my-5 text-sm leading-7 text-muted">
-            Copy this prompt into your coding agent. It will ask for your app and flow if needed,
-            then add a runnable walkthrough. No skill installation is required.
-          </p>
-          <CodeBlock label="Setup prompt" language="text" code={setupPrompt} />
+        <h1 className="text-4xl font-semibold tracking-tight">Getting started</h1>
+        <section id="skill-install" className="mt-8">
+          <h2 className="mb-5 text-2xl font-semibold tracking-tight">Install humanette skill</h2>
+          <CodeBlock label="humanette skill install" language="bash" code={skillInstall} wrap />
           <p className="mt-4 text-sm leading-7 text-muted">
-            Agent-readable docs:{' '}
-            <a href="/llms.txt" className="text-link">
-              llms.txt
-            </a>{' '}
-            and{' '}
-            <a href="/docs.md" className="text-link">
-              the full Markdown guide
-            </a>
-            .
+            Run in your project and choose your coding agent when prompted.
           </p>
         </section>
-        <section id="manual-install" className="mt-10">
-          <h2 className="text-2xl font-semibold tracking-tight">Manual installation</h2>
-          <p className="my-5 text-sm leading-7 text-muted">{releaseNotice}</p>
-          <p className="mb-5 text-sm leading-7 text-muted">
-            Build the official repository with Bun 1.3.14. The package supports Node.js 22 or newer.
-          </p>
-          <CodeBlock label="Build package" language="bash" code={sourceInstall} />
-          <p className="my-5 text-sm leading-7 text-muted">
-            In your app, install the tarball printed by <code>npm pack</code>. Replace the example
-            path and version with your generated file, and use your project’s package manager.
-          </p>
-          <CodeBlock label="Install" language="bash" code={install} />
+        <section id="usage" className="mt-10">
+          <h2 className="text-2xl font-semibold tracking-tight">Usage</h2>
+          <p className="mt-3 text-sm leading-7 text-muted">{skillInvocationNote}</p>
+          <h3 className="my-5 text-xl font-semibold tracking-tight">
+            Ask an agent to demo a feature
+          </h3>
+          <CodeBlock label="agent demo prompt" language="text" code={agentDemoPrompt} />
+          <p className="mt-4 text-sm leading-7 text-muted">Let your agent show what changed.</p>
+          <h3 className="my-5 text-xl font-semibold tracking-tight">Create a product demo</h3>
+          <CodeBlock label="product demo prompt" language="text" code={productDemoPrompt} />
+          <p className="mt-4 text-sm leading-7 text-muted">Record a walkthrough of your app.</p>
         </section>
         <section id="automation">
           <h2 className="mb-4 mt-10 text-2xl font-semibold tracking-tight">

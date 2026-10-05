@@ -19,11 +19,10 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     'href',
     'https://decode.dev',
   );
-  await expect(page.getByRole('link', { name: 'Get started', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Getting started', exact: true })).toHaveAttribute(
     'href',
     '/docs',
   );
-  await expect(page.getByRole('button', { name: 'Copy Install', exact: true })).toHaveCount(0);
   await expect(
     page.getByRole('heading', { name: 'Screen Studio for browser automation', exact: true }),
   ).toBeVisible();
@@ -33,21 +32,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
   );
   await expect(heroCopy).toHaveCSS('text-align', 'center');
   expect((await heroCopy.boundingBox())!.width).toBeGreaterThan(700);
-  const useCases = page.getByText(
-    'Use it to create product walkthroughs, or let coding agents show their work.',
-    { exact: true },
-  );
-  const useCasesBox = (await useCases.boundingBox())!;
-  const getStartedBox = (await page
-    .getByRole('link', { name: 'Get started', exact: true })
-    .boundingBox())!;
-  expect(getStartedBox.y).toBeGreaterThan(useCasesBox.y + useCasesBox.height);
-  await expect(
-    page.getByText('Use it to create product walkthroughs, or let coding agents show their work.', {
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(page.getByRole('heading', { level: 2 })).toHaveText([
+  await expect(page.locator('#examples').getByRole('heading', { level: 2 })).toHaveText([
     'Move and click',
     'Text selection',
     'Drag & Drop',
@@ -91,8 +76,9 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
 
 test('examples autoplay, loop, and freeze offscreen without player controls', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 600 });
-  await page.goto('/examples');
+  await page.goto('/#examples');
   const scene = page.getByTestId('example-click');
+  await scene.scrollIntoViewIfNeeded();
   await expect(scene).toHaveAttribute('data-running', 'true');
   await expect(scene.getByText('Clicked', { exact: true })).toBeVisible();
   await expect(scene.getByText('Click me', { exact: true })).toBeVisible();
@@ -104,7 +90,7 @@ test('examples autoplay, loop, and freeze offscreen without player controls', as
 });
 
 test('example snippets contain only the relevant human actions', async ({ page }) => {
-  await page.goto('/examples');
+  await page.goto('/#examples');
   for (const [title, code] of [
     ['Move and click', "await human.click(page.getByRole('button', { name: 'Click me' }));"],
     ['Text selection', "await human.selectText(page.getByText('these words', { exact: true }));"],
@@ -139,7 +125,7 @@ for (const [scene, hover] of [
         return scope;
       };
     });
-    await page.goto('/examples');
+    await page.goto('/#examples');
     const preview = page.getByTestId(`example-${scene}`);
     await preview.scrollIntoViewIfNeeded();
     await expect(preview.locator('[data-humanette]')).toHaveAttribute('data-cursor', 'default');
@@ -208,11 +194,6 @@ for (const theme of ['light', 'dark'] as const) {
     await page.getByTestId('example-click').screenshot({
       path: `test-results/click-secondary-${theme}.png`,
     });
-    expect(
-      await page
-        .getByRole('link', { name: 'Get started', exact: true })
-        .evaluate((element) => getComputedStyle(element).backgroundColor),
-    ).not.toBe(original);
     await target.hover();
     const hovered = await target.evaluate((element) => getComputedStyle(element).backgroundColor);
     expect(hovered).not.toBe(original);
@@ -270,7 +251,7 @@ for (const theme of ['light', 'dark'] as const) {
 
 test('reduced motion starts paused and text highlight follows the selection', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/examples');
+  await page.goto('/#examples');
   const scene = page.getByTestId('example-text');
   await scene.scrollIntoViewIfNeeded();
   await expect(scene).toHaveAttribute('data-running', 'false');

@@ -2,6 +2,20 @@
 
 A steady hand for browser automation. Natural, seeded pointer motion; bundled, CSS-aware SVG cursors; clear press/hold/release feedback; and an interactive Pointer Lab for finding your feel.
 
+## Ask your agent for a demo
+
+Install the skill in your project and choose your coding agent when prompted:
+
+```sh
+npx skills add decodetool/humanette --skill humanette
+```
+
+In Claude Code, ask `/humanette record a demo of the new UX features in this PR`. In Codex, select the Humanette skill and describe the demo. The agent handles package and browser setup. Open browser sessions need a supported Playwright connection and an available recorder.
+
+For a product demo, ask `/humanette create a product demo of a my to-do app`.
+
+The [skill](skills/humanette/SKILL.md) includes a runnable local example. The npm tarball checked October 5, 2026 is still the `1.0.0` placeholder with no runtime; publish the prepared `1.1.0` runtime before using the public installation workflow. The skill uses npm and reports a missing release rather than building source.
+
 ## Monorepo
 
 Turborepo + Bun workspaces. The website is Next.js, React, TypeScript, and Tailwind v4, ready for Vercel. The published humanette package is framework-independent.
@@ -10,6 +24,7 @@ Turborepo + Bun workspaces. The website is Next.js, React, TypeScript, and Tailw
 - packages/humanette: browser renderer, pure motion model, Playwright adapter, and embedded assets.
 - docs: existing cursor SVG source, recording learnings, architecture, and release instructions.
 - examples: deterministic real-input demo and the preserved Decode color-grid recipe.
+- skills/humanette: installable agent workflow and standalone to-do recording example.
 
 ## Run
 
@@ -21,9 +36,12 @@ bun example:playwright:headful # watch live in Chromium, without recording
 bun check                  # types, unit tests, production builds
 bun run test:e2e            # real browser integration
 bun run pack:check          # fresh npm consumer of the actual tarball
+bun run test:skill          # local Claude CLI: one-off and reusable recording workflows
 ```
 
 Node 22+ and Bun 1.3.14. Before browser tests, run bunx playwright install chromium from apps/web.
+
+The skill harness is an opt-in local check requiring an installed, authenticated `claude` CLI. It makes real model calls in disposable projects against a disposable npm registry serving the actual packed release, installs missing recording tools, verifies real input and a decoded video, and checks that a saved walkthrough works after a fresh dependency install. It keeps transcripts and recordings in `test-results/skill-harness/` and is not part of CI or `bun check`. Run one case with `bun run test:skill --case=one-off` or `--case=saved`. After publication, use `bun run test:skill --published` to test the public npm package instead. The local registry test does not prove a public release is available. Each case has a ten-minute timeout and a $10 model-call limit; override with `HUMANETTE_SKILL_TIMEOUT_MS` and `HUMANETTE_SKILL_BUDGET_USD`.
 
 `bun example:playwright` replaces `out/playwright-example.webm`, plus its
 `playwright-example.png` screenshot and `playwright-example.json` manifest.

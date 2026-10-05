@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Humanette'
+  short_description: 'Record browser demos with legible cursors'
+  default_prompt: 'Use $humanette to record a demo of the requested browser feature with a readable cursor.'

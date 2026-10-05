@@ -14,13 +14,13 @@ export default function Home() {
           made with Playwright.
         </p>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-muted">
-          Use it to create product walkthroughs, or let coding agents show their work.
+          Let coding agents show their work, or create repeatable product walkthroughs.
         </p>
         <Link href="/docs" className="primary mt-6 min-h-11 px-6 text-base">
-          Get started
+          Getting started
         </Link>
       </section>
-      <section className="mt-10">
+      <section id="examples" className="mt-12">
         <h1 className="text-3xl font-semibold tracking-tight">Examples</h1>
         <Examples />
       </section>

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { skillInstall } from '../content/onboarding';
 
 test('single-line snippets are compact with vertically centered copy controls', async ({
   page,
@@ -6,7 +7,7 @@ test('single-line snippets are compact with vertically centered copy controls', 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('/examples');
+    await page.goto('/#examples');
     for (const name of ['Move and click', 'Text selection']) {
       const copy = page.getByRole('button', { name: `Copy ${name} example`, exact: true });
       const block = copy.locator('..');
@@ -73,19 +74,14 @@ test('theme starts from system, then persists a two-state choice; navigation and
   const theme = (await page.getByRole('button', { name: 'Switch to light mode' }).boundingBox())!;
   expect(theme.x - github.x - github.width).toBeLessThanOrEqual(8);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('link', { name: 'Get started', exact: true }).click();
+  await nav.getByRole('link', { name: 'Docs', exact: true }).click();
   await expect(page).toHaveURL(/\/docs$/);
-  await page.getByRole('button', { name: 'Copy Install', exact: true }).click();
+  await page.getByRole('button', { name: 'Copy humanette skill install', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveText('Copied');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    'npm install /absolute/path/to/humanette-1.1.0.tgz playwright\nnpx playwright install chromium',
-  );
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(skillInstall);
   await page.getByRole('link', { name: 'Examples', exact: true }).click();
-  await expect(page.getByRole('link', { name: 'Examples', exact: true })).toHaveAttribute(
-    'aria-current',
-    'page',
-  );
-  await expect(page.getByRole('heading', { level: 2 })).toHaveText([
+  await expect(page).toHaveURL(/\/#examples$/);
+  await expect(page.locator('#examples').getByRole('heading', { level: 2 })).toHaveText([
     'Move and click',
     'Text selection',
     'Drag & Drop',
@@ -96,9 +92,9 @@ test('theme starts from system, then persists a two-state choice; navigation and
   const example = await page.evaluate(() => navigator.clipboard.readText());
   expect(example).toBe("await human.click(page.getByRole('button', { name: 'Click me' }));");
   await page.goto('/docs');
-  await expect(page.getByRole('link', { name: 'Get started', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Install the skill', exact: true })).toHaveAttribute(
     'href',
-    '/docs',
+    '#skill-install',
   );
   await expect(page.getByText('Add a cursor to a page')).toHaveCount(0);
 });
@@ -119,7 +115,7 @@ for (const theme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 900 });
-      for (const route of ['/', '/examples', '/docs', '/workbench']) {
+      for (const route of ['/', '/docs', '/workbench']) {
         await page.goto(route);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
         await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();

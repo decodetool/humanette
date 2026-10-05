@@ -20,12 +20,12 @@ export function SiteNav() {
         <nav aria-label="Main" className="flex items-center gap-4 text-sm sm:gap-6">
           {[
             ['/docs', 'Docs'],
-            ['/examples', 'Examples'],
+            ['/#examples', 'Examples'],
           ].map(([href, label]) => (
             <Link
               key={href}
               href={href}
-              aria-current={pathname.startsWith(href) ? 'page' : undefined}
+              aria-current={!href.includes('#') && pathname.startsWith(href) ? 'page' : undefined}
               className="nav-link"
             >
               {label}
