@@ -15,7 +15,6 @@ export function Examples() {
   const [speed, setSpeed] = useState<TypingSpeed>('default');
   return (
     <>
-      <p className="mt-4 text-sm text-muted">Visual previews with matching Playwright snippets.</p>
       <div className="mt-6 flex justify-center text-center">
         <DemoSoundToggle prominent />
       </div>
