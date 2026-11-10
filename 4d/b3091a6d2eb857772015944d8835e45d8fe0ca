@@ -1,0 +1,25 @@
+apps/web/components/example-player.tsx
+  s_43311e4fe4b86a::t_7dd42cc170117c 34,74,79
+  s_43311e4fe4b86a::t_a92828eecafe5d 52,199-202,214-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4db3091a6d2eb857772015944d8835e45d8fe0ca",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
