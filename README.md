@@ -1,6 +1,6 @@
 # Humanette
 
-A steady hand for browser automation. Natural, seeded pointer motion; bundled, CSS-aware SVG cursors; clear press/hold/release feedback; and an interactive Pointer Lab for finding your feel.
+A steady hand for browser automation. Natural, seeded pointer motion; bundled, CSS-aware SVG cursors; clear press/hold/release feedback; natural typing with live click/key sounds; and an interactive Pointer Lab for finding your feel.
 
 ## Ask your agent for a demo
 
@@ -15,6 +15,8 @@ In Claude Code, ask `/humanette record a demo of the new UX features in this PR`
 For a product demo, ask `/humanette create a product demo of a my to-do app`.
 
 The [skill](skills/humanette/SKILL.md) includes a runnable local example. The published `humanette@1.2.0` tarball was verified November 10, 2026: natural typing, sounds, recording, and capture fixes are owned by the package. It includes the root API, optional `humanette/recording` module, types, browser bundle, cursor assets, and license notices. The skill installs from npm; no Humanette source checkout or build tools are needed.
+
+The pending 1.2.1 patch shares those sound engines and the typing model with the website previews. The homepage includes a natural typing demo with Slow, Default, and Fast presets. Enable sound to hear click and key effects; audio starts only after that gesture. The Pointer Lab and live demo use the same packaged engines. Visual previews illustrate actions; the Playwright examples deliver real input.
 
 ## Monorepo
 
@@ -45,7 +47,7 @@ Node 22+ and Bun 1.3.14. Before browser tests, run bunx playwright install chrom
 
 The recording checks require Node 24.11+, matching full Chromium, and ffmpeg/ffprobe for independent media analysis. These analysis tools are not consumer recording dependencies. The skill harness also requires an installed, authenticated `claude` CLI. It makes real model calls in disposable projects against a disposable npm registry serving the actual packed release, installs missing recording tools, verifies real input, native AV1/Opus video, distinct visual FPS from decoded frame barcodes, and audible app tones, and checks that a saved walkthrough works after a fresh dependency install. It keeps transcripts and recordings in `test-results/skill-harness/` and is not part of CI or `bun check`. Run one case with `bun run test:skill --case=one-off` or `--case=saved`. Use `bun run test:skill --published` to test the public npm package instead. The local registry test does not prove a public release is available. Add `--published --case=saved --legacy` to verify an app on Playwright 1.58 keeps that dependency while the skill installs a separate current recording browser. Each case has a ten-minute timeout and a $10 model-call limit; override with `HUMANETTE_SKILL_TIMEOUT_MS` and `HUMANETTE_SKILL_BUDGET_USD`.
 
-`bun example:playwright` replaces `out/playwright-example.webm`, plus its
+`bun example:playwright` replaces `out/playwright-example.mp4`, plus its
 `playwright-example.png` screenshot and `playwright-example.json` manifest.
 Old timestamped takes are left untouched.
 
@@ -54,11 +56,7 @@ so you can compare live movement against the captured video. It waits briefly be
 starting and leaves the window open afterward; close the window to exit.
 Run `bun dev` in another terminal first.
 
-The repository’s existing Playwright examples/tests are pinned to `1.64.0-alpha-2026-09-28` for `recordVideo.fps: 120`. Skill consumers can use stable Playwright; native recording uses the separate chrome-capture backend.
-After installing/upgrading it, run `bunx playwright install chromium` from
-`apps/web` to install its matching browser. Requested output FPS is not a
-guarantee of 120 distinct source frames. Cursor input currently targets 60 updates
-per second independently of the encoded recording rate.
+The repository uses Playwright `1.64.0-alpha-2026-09-28`; skill consumers can use stable Playwright. The recording example uses the package’s native AV1/Opus capture with app audio, live sounds, and natural typing. It requires Node 24.11+ and full Chromium 153+. Requested FPS does not guarantee distinct captured frames. Cursor input targets 60 updates per second independently of the encoded recording rate.
 
 ## Use the package
 

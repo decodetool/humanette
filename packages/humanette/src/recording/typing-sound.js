@@ -1,4 +1,4 @@
-/*
+/*!
  * Cuelume's `type` cue, `press` theme, normal emphasis — extracted and adapted
  * from src/sounds/{press,layers,context}.ts and src/audio/{render,output}.ts.
  * https://github.com/danielwh2/cuelume/tree/2a1ba4fc1b67e8371c9f37e37a51e61353166335
@@ -30,10 +30,10 @@
 
 // Self-contained so Playwright can serialize this function into each frame.
 // Browser callers may also invoke it directly; importing the module is SSR-safe.
-export function installTypingSound({ volume = 0.18 } = {}) {
+export function installTypingSound({ volume = 0.18, global = true } = {}) {
   if (!Number.isFinite(volume) || volume < 0 || volume > 1)
     throw new RangeError('Typing volume must be 0–1.');
-  window.__humanetteTypingSound?.dispose();
+  if (global) window.__humanetteTypingSound?.dispose();
   let context,
     bus,
     disposed = false,
@@ -260,6 +260,11 @@ export function installTypingSound({ volume = 0.18 } = {}) {
     }
   }
   const api = {
+    async resume() {
+      if (disposed) throw new Error('Typing sound is disposed.');
+      bus ??= createBus();
+      if (context.state === 'suspended') await context.resume();
+    },
     press,
     release,
     play(role = 'printable') {
@@ -292,6 +297,6 @@ export function installTypingSound({ volume = 0.18 } = {}) {
       if (window.__humanetteTypingSound === api) delete window.__humanetteTypingSound;
     },
   };
-  window.__humanetteTypingSound = api;
+  if (global) window.__humanetteTypingSound = api;
   return api;
 }

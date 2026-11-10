@@ -83,6 +83,7 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await expect(page).toHaveURL(/\/#examples$/);
   await expect(page.locator('#examples').getByRole('heading', { level: 2 })).toHaveText([
     'Move and click',
+    'Natural typing',
     'Text selection',
     'Drag & Drop',
   ]);

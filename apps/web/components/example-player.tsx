@@ -1,15 +1,50 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createHumanette,
+  typingPlan,
+  type TypingSpeed,
   sampleTimeline,
   type Humanette,
   type TimelineEvent,
 } from 'humanette/internal';
-export type Scene = 'click' | 'text' | 'drag';
-const duration = 4600;
+import { useDemoAudio } from './demo-audio';
+export type Scene = 'click' | 'text' | 'drag' | 'typing';
+const typedText = 'Make something great.';
 const cursorGutter = 20;
-export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: number }) {
+export function ExamplePlayer({
+  scene,
+  scale = 4,
+  speed = 'default',
+}: {
+  scene: Scene;
+  scale?: number;
+  speed?: TypingSpeed;
+}) {
+  const { audio } = useDemoAudio();
+  const strikes = useMemo(() => {
+    let at = 1250;
+    return typingPlan(typedText, { speed, seed: 42 }).map((step, i) => {
+      at += step.waitBefore;
+      const start = at;
+      at += step.hold;
+      return { ...step, at: start, end: at, gesture: `home-typing-${i}` };
+    });
+  }, [speed]);
+  const duration = scene === 'typing' ? Math.max(4600, strikes.at(-1)!.end + 1800) : 4600;
+  const cues = useMemo(
+    () =>
+      scene === 'typing'
+        ? [
+            { at: 1000, kind: 'click' as const },
+            ...strikes.flatMap((step) => [
+              { at: step.at, kind: 'press' as const, step },
+              { at: step.end, kind: 'release' as const, step },
+            ]),
+          ].sort((a, b) => a.at - b.at)
+        : [{ at: 1000, kind: 'click' as const }],
+    [scene, strikes],
+  );
   const root = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
   const human = useRef<Humanette | null>(null);
@@ -32,33 +67,43 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
     y: 160,
   };
   const events: TimelineEvent[] =
-    scene === 'click'
+    scene === 'typing'
       ? [
           { at: 0, type: 'cursor', cursor: 'auto' },
           { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
           { at: 1000, type: 'down' },
           { at: 1100, type: 'up' },
-          { at: 2400, type: 'move', ...initial, duration: 1000 },
+          { at: 1150, type: 'cursor', cursor: 'text' },
+          { at: duration - 1100, type: 'cursor', cursor: 'auto' },
+          { at: duration - 1100, type: 'move', ...initial, duration: 800 },
         ]
-      : scene === 'text'
+      : scene === 'click'
         ? [
             { at: 0, type: 'cursor', cursor: 'auto' },
-            { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
+            { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
             { at: 1000, type: 'down' },
-            { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
-            { at: 2640, type: 'up' },
-            { at: 3200, type: 'move', ...initial, duration: 1000 },
+            { at: 1100, type: 'up' },
+            { at: 2400, type: 'move', ...initial, duration: 1000 },
           ]
-        : [
-            { at: 0, type: 'cursor', cursor: 'auto' },
-            { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
-            { at: 1000, type: 'down' },
-            { at: 1000, type: 'cursor', cursor: 'grabbing' },
-            { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
-            { at: 2640, type: 'up' },
-            { at: 2640, type: 'cursor', cursor: 'auto' },
-            { at: 3200, type: 'move', ...initial, duration: 1000 },
-          ];
+        : scene === 'text'
+          ? [
+              { at: 0, type: 'cursor', cursor: 'auto' },
+              { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
+              { at: 1000, type: 'down' },
+              { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
+              { at: 2640, type: 'up' },
+              { at: 3200, type: 'move', ...initial, duration: 1000 },
+            ]
+          : [
+              { at: 0, type: 'cursor', cursor: 'auto' },
+              { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
+              { at: 1000, type: 'down' },
+              { at: 1000, type: 'cursor', cursor: 'grabbing' },
+              { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
+              { at: 2640, type: 'up' },
+              { at: 2640, type: 'cursor', cursor: 'auto' },
+              { at: 3200, type: 'move', ...initial, duration: 1000 },
+            ];
   const live = useRef({ events, geometry, initial });
   live.current = { events, geometry, initial };
   function draw(at: number) {
@@ -150,6 +195,9 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
     if (ready) draw(clock.current);
   }, [scale, geometry, ready]);
   useEffect(() => {
+    if (scene === 'typing') draw(0);
+  }, [scene, speed]);
+  useEffect(() => {
     if (!playing || !visible || !ready) return;
     // Refresh after font/style edits and before each take, not on every frame.
     measure.current();
@@ -160,13 +208,29 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       const delta = last === undefined ? 0 : Math.max(0, now - last);
       last = now;
       const next = clock.current + delta;
-      if (next >= duration) measure.current();
+      function soundBetween(from: number, to: number) {
+        for (const cue of cues) {
+          if (cue.at <= from || cue.at > to) continue;
+          if (cue.kind === 'click') audio.current?.click();
+          else if (cue.kind === 'press')
+            audio.current?.keyDown(cue.step.text === ' ' ? 'space' : 'printable', cue.step.gesture);
+          else audio.current?.keyUp(cue.step.gesture);
+        }
+      }
+      if (next >= duration) {
+        soundBetween(clock.current, duration);
+        measure.current();
+        soundBetween(-1, next % duration);
+      } else soundBetween(clock.current, next);
       draw(next % duration);
       frame = requestAnimationFrame(tick);
     }
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [playing, visible, ready]);
+    return () => {
+      cancelAnimationFrame(frame);
+      if (scene === 'typing') for (const step of strikes) audio.current?.keyUp(step.gesture);
+    };
+  }, [playing, visible, ready, duration, cues, audio, strikes, scene]);
   const state = sampleTimeline(events, time, undefined, initial);
   const width = geometry.right - geometry.left;
   const offset = Math.max(0, Math.min(width, state.x - geometry.left));
@@ -191,6 +255,24 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       data-running={playing && visible && ready}
     >
       <div ref={root} data-testid="example-stage" className="relative -mx-5 h-28 overflow-hidden">
+        {scene === 'typing' && (
+          <div
+            className="field absolute left-5 top-[calc(50%-16px)] flex h-12 w-72 -translate-y-1/2 cursor-text items-center text-base"
+            aria-label="Demo title"
+            data-testid="example-typing-target"
+          >
+            <span>
+              {strikes
+                .filter((step) => step.at <= time)
+                .map((step) => step.text)
+                .join('')}
+            </span>
+            {time >= 1000 && time < duration - 1100 && (
+              <span aria-hidden className="ml-px h-5 border-l border-ink" />
+            )}
+            {time < 1000 && <span className="text-muted">Demo title</span>}
+          </div>
+        )}
         {scene === 'click' && (
           <div
             data-testid="example-click-target"

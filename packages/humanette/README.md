@@ -59,6 +59,10 @@ Targets accept Playwright Locator objects, CSS selector strings, or { x, y } in 
 
 Pass an AbortSignal to cancel supported actions. Held mouse input is released even when a drag is cancelled. The overlay is reinstalled after navigation on the next action. Humanette respects CSP and browser permissions.
 
+## Website previews (1.2.1)
+
+The repository’s homepage, Pointer Lab, and live demo share the package renderer and procedural click/Type-Press sound engines. The homepage typing preview uses the same seeded `typingPlan` and Slow/Default/Fast presets as real Playwright typing. Sounds are opt-in in browser previews; no audio assets are downloaded. Preview helpers are browser-safe exports of `humanette/internal`, reserved for this repository. Use `createHuman` and `humanette/recording` for product walkthroughs.
+
 ## Natural typing
 
 Typing is natural by default, with seeded variation and word/sentence pauses. Speeds are slow (3×), default (6×), and fast (8×) relative to the original measured timing profile. Numeric pace from 0.25 to 8 overrides a preset. Wall-clock speed is approximate because browser input and minimum key holds take time.

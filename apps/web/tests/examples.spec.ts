@@ -27,13 +27,14 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     page.getByRole('heading', { name: 'Screen Studio for browser automation', exact: true }),
   ).toBeVisible();
   const heroCopy = page.getByText(
-    'Humanette adds large cursors, natural mouse movement, and visible clicks to video captures made with Playwright.',
+    'Humanette adds large cursors, natural movement and typing, and live click and keyboard sounds to video captures made with Playwright.',
     { exact: true },
   );
   await expect(heroCopy).toHaveCSS('text-align', 'center');
   expect((await heroCopy.boundingBox())!.width).toBeGreaterThan(700);
   await expect(page.locator('#examples').getByRole('heading', { level: 2 })).toHaveText([
     'Move and click',
+    'Natural typing',
     'Text selection',
     'Drag & Drop',
   ]);

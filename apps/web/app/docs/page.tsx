@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CodeBlock } from '../../components/code-block';
-import { setup, recording, typingSpeedNote, api } from '../../content/documentation';
+import { setup, recording, typingSpeedNote, demoNote, api } from '../../content/documentation';
 import {
   skillInstall,
   agentDemoPrompt,
@@ -101,6 +101,7 @@ export default function Docs() {
           </p>
           <CodeBlock code={recording} />
           <p className="mt-5 text-sm leading-7 text-muted">{typingSpeedNote}</p>
+          <p className="mt-5 text-sm leading-7 text-muted">{demoNote}</p>
           <p className="mt-5 text-sm leading-7 text-muted">
             Recording starts after the page is ready and finalizes when stop completes. The archive
             preset requests 2560 × 1600 at 60 fps. Inspect the result: encoded FPS and an audio

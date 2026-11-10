@@ -34,6 +34,7 @@ try {
   const human = await createHuman(page, { scale: 4, seed: 42 });
   const recording = await startRecording(page, preset); // App audio + live click/key sounds
   try {
+    await human.type(page.getByLabel('Title'), 'Make something great.');
     await human.click(page.getByRole('button', { name: 'Save' }));
     await human.wait(900);
   } finally {
@@ -89,3 +90,6 @@ export const api = [
     'Remove the cursor overlay and its listeners. Await any running action before cleanup. Your Playwright page stays open.',
   ],
 ];
+
+export const demoNote =
+  'The homepage has click, natural typing, selection, and drag previews, using the package renderer, seeded typing timing, and the same procedural click and Type/Press sound engines as native recording. Audio is synthesized with Web Audio; no sound files are bundled or downloaded. Enable sound to hear the previews; they start muted. Slow, Default, and Fast change typing cadence without speeding up individual sounds. These are visual previews; the accompanying Playwright snippets perform real input. For live effects in your own Playwright session without recording, call installInteractionSounds(page) from humanette/recording and dispose the returned controller afterward. createHuman alone does not enable audio.';

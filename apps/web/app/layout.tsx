@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ThemeProvider } from '../components/theme-provider';
 import { SiteNav } from '../components/site-nav';
+import { DemoAudioProvider } from '../components/demo-audio';
 import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://humanette.dev'),
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     template: '%s · Humanette',
   },
   description:
-    'Make your Playwright demos easier to follow with natural movement, large cursors, and visible clicks. TypeScript and cursor assets included.',
+    'Make your Playwright demos easier to follow with natural movement, large cursors, natural typing, and live click and keyboard sounds.',
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,20 +25,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider>
-          <a href="#main" className="skip-link">
-            Skip to content
-          </a>
-          <SiteNav />
-          <main id="main">{children}</main>
-          <footer className="shell mt-16 py-8 text-center text-base text-muted">
-            Made with ❤️ by{' '}
-            <a
-              href="https://decode.dev"
-              className="font-medium text-ink underline underline-offset-4 transition-colors hover:text-accent"
-            >
-              Decode
+          <DemoAudioProvider>
+            <a href="#main" className="skip-link">
+              Skip to content
             </a>
-          </footer>
+            <SiteNav />
+            <main id="main">{children}</main>
+            <footer className="shell mt-16 py-8 text-center text-base text-muted">
+              Made with ❤️ by{' '}
+              <a
+                href="https://decode.dev"
+                className="font-medium text-ink underline underline-offset-4 transition-colors hover:text-accent"
+              >
+                Decode
+              </a>
+            </footer>
+          </DemoAudioProvider>
         </ThemeProvider>
       </body>
     </html>

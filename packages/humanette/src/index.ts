@@ -584,3 +584,6 @@ export function createHumanette(input: HumanetteOptions = {}) {
   };
 }
 export type Humanette = ReturnType<typeof createHumanette>;
+
+export { createPreviewAudio, type PreviewAudio, type KeySoundRole } from './preview-audio.js';
+export { typingPlan, typingSpeeds, type TypingSpeed, type TypingStep } from './typing.js';

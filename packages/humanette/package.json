@@ -1,6 +1,6 @@
 {
   "name": "humanette",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
   "type": "module",
   "main": "./dist/playwright.js",

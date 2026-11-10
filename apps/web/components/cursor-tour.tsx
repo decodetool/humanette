@@ -1,8 +1,10 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { createHumanette, cursors, cursorGroups } from 'humanette/internal';
+import { DemoSoundToggle, useDemoAudio } from './demo-audio';
 import { MotionReference } from './motion-reference';
 export function CursorTour() {
+  const { audio, enabled } = useDemoAudio();
   const root = useRef<HTMLDivElement>(null),
     [hotspots, setHotspots] = useState(true),
     [scale, setScale] = useState(2.5),
@@ -26,6 +28,9 @@ export function CursorTour() {
     const h = createHumanette({ follow: true, scale });
     return () => h.dispose();
   }, [live, scale]);
+  useEffect(() => {
+    if (enabled && root.current) return audio.current?.bind(root.current);
+  }, [enabled, audio]);
   return (
     <div ref={root}>
       <div id="try-it" className="mb-5 flex flex-wrap items-center gap-4">
@@ -36,6 +41,7 @@ export function CursorTour() {
         >
           {live ? 'Custom cursor on' : 'Enable custom cursor'}
         </button>
+        <DemoSoundToggle />
         <label className="flex items-center gap-2 text-xs">
           Scale{' '}
           <input

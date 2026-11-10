@@ -7,6 +7,7 @@ export default defineConfig({
     baseURL: 'http://localhost:3410',
     viewport: { width: 1280, height: 900 },
     deviceScaleFactor: 2,
+    screenshot: 'only-on-failure',
   },
   webServer: {
     command: 'bun run start',

@@ -1,4 +1,4 @@
-import { api, recording, setup, typingSpeedNote } from './documentation';
+import { api, recording, setup, typingSpeedNote, demoNote } from './documentation';
 import {
   skillInstall,
   agentDemoPrompt,
@@ -17,7 +17,7 @@ const fence = (language: string, code: string) => ['```' + language, code, '```'
 export const llmsIndex =
   [
     '# Humanette',
-    '> Humanette is a TypeScript/JavaScript library that adds large cursors, natural mouse movement, and visible click feedback to real Playwright browser input. Use it for product walkthroughs and recordings of coding agents testing features.',
+    '> Humanette is a TypeScript/JavaScript library that adds large cursors, natural mouse movement and typing, visible click feedback, and optional live click/key sounds to real Playwright browser input. Use it for product walkthroughs and recordings of coding agents testing features.',
     'Website: https://humanette.dev. Source: https://github.com/decodetool/humanette. Package name: humanette. Public API: import { createHuman } from "humanette", then await createHuman(page, { scale: 4 }) using an existing Playwright Page.',
     releaseNotice,
     'Humanette delivers real Playwright input, with optional native capture through humanette/recording. It is not an autonomous agent, video editor, or replacement for assertions. Keep navigation, readiness checks, and assertions in Playwright. Await human actions sequentially and await human.dispose() in finally. A visual website demo or a video alone is not proof that a feature passed its checks.',
@@ -36,7 +36,7 @@ export const llmsIndex =
 export const agentGuide =
   [
     '# Humanette: agent guide',
-    '> Humanette adds readable cursor movement and click feedback to real Playwright actions. It helps people follow product walkthroughs, bug reproductions, and coding-agent test recordings.',
+    '> Humanette adds readable cursor movement, natural typing, click feedback, and optional live sounds to real Playwright actions. It helps people follow product walkthroughs, bug reproductions, and coding-agent test recordings.',
     'Canonical website: https://humanette.dev. HTML docs: https://humanette.dev/docs. Discovery index: https://humanette.dev/llms.txt. Source: https://github.com/decodetool/humanette.',
     '## Install humanette skill',
     'Run this in your project and choose your coding agent when prompted. The installer reads skills/humanette from the official repository. The agent handles runtime and browser setup when you request a demo.',
@@ -71,6 +71,7 @@ export const agentGuide =
     'The optional humanette/recording module owns native capture, live sounds, and capture stabilization. It uses the optional chrome-capture@0.1.2 dependency, full Chrome 153+, and Node 24.11+. Install the recording dependencies above; scripts only import package APIs. Save it as record-demo.mjs and run node record-demo.mjs. It starts after app readiness and writes out/demo.mp4 with AV1 video and Opus tab audio; no FFmpeg, extension, virtual audio driver, or permission picker is needed.',
     fence('ts', recording),
     typingSpeedNote,
+    demoNote,
     'Await recording.stop before closing the browser. The helper enables app audio and injects quiet live click/typing sounds, including direct text insertion and shortcuts. Set sounds: false for app audio alone or audio: false, sounds: false for silence. These are recording options. createHuman includes varied real key holds and word/sentence pauses directly. Explicit per-call delay opts into fixed timing. Text remains exact. Typing uses the extracted Cuelume Type/Press cue with its MIT notice preserved; sound envelopes stay independent of typing cadence and rapid keystrokes are not throttled. Sounds and their audio contexts are cleaned up at stop. No automatic narration or music mixing is included. Inspect actual motion and audio: encoded dimensions, audio-track presence, and requested FPS alone cannot prove source resolution, audible sound, or distinct captured frames. Default presets request 60fps; 120fps needs suitable hardware and headed Chrome. AV1/Opus compatibility may require a separate H.264/AAC export.',
     '## Verification and safety',
     'Use non-sensitive test data and a local or test app. Ask for missing URL, credentials, or flow requirements; do not guess destructive production actions. Keep videos local unless the user requests sharing. Report the exact script/run command and actual assertion results. Do not replace user interactions with DOM mutation, fake events, or an animation and call that a passing E2E test.',

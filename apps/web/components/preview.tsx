@@ -1,4 +1,5 @@
 'use client';
+import { DemoSoundToggle, useDemoAudio } from './demo-audio';
 import { useEffect, useRef, useState } from 'react';
 import {
   createHumanette,
@@ -26,6 +27,7 @@ export function Preview({
   scenario = 'click',
   compact = false,
 }: PreviewProps) {
+  const { audio } = useDemoAudio();
   const root = useRef<HTMLDivElement>(null),
     text = useRef<HTMLSpanElement>(null),
     human = useRef<Humanette | null>(null),
@@ -137,7 +139,18 @@ export function Preview({
     setError('');
     setPlaying(true);
     try {
-      await human.current?.play(mapped(), { rate, initial: initial(), onFrame: update });
+      let previous = -1;
+      await human.current?.play(mapped(), {
+        rate,
+        initial: initial(),
+        onFrame(t) {
+          for (const event of live.current.events)
+            if (event.type === 'down' && event.at > previous && event.at <= t)
+              audio.current?.click();
+          previous = t;
+          update(t);
+        },
+      });
     } catch (e) {
       if (!(e instanceof DOMException && e.name === 'AbortError')) setError(String(e));
     } finally {
@@ -241,6 +254,7 @@ export function Preview({
         <span className="font-mono text-[10px] text-muted">
           {(current / 1000).toFixed(1)} / {(duration / 1000).toFixed(1)}s
         </span>
+        <DemoSoundToggle />
         {!compact && (
           <select
             aria-label="Playback speed"
