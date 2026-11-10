@@ -14,7 +14,7 @@ In Claude Code, ask `/humanette record a demo of the new UX features in this PR`
 
 For a product demo, ask `/humanette create a product demo of a my to-do app`.
 
-The [skill](skills/humanette/SKILL.md) includes a runnable local example. This branch prepares `humanette@1.2.0`, moving natural typing, sounds, recording, and capture fixes into the package. npm’s actual latest tarball was rechecked November 10, 2026 as `1.1.0`; it has the cursor runtime but lacks `humanette/recording`. Release 1.2.0 before using this branch’s skill with public npm. The skill installs from npm; no Humanette source checkout or build tools are needed.
+The [skill](skills/humanette/SKILL.md) includes a runnable local example. The published `humanette@1.2.0` tarball was verified November 10, 2026: natural typing, sounds, recording, and capture fixes are owned by the package. It includes the root API, optional `humanette/recording` module, types, browser bundle, cursor assets, and license notices. The skill installs from npm; no Humanette source checkout or build tools are needed.
 
 ## Monorepo
 

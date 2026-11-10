@@ -22,7 +22,7 @@ No environment secrets are required for the site. No deployment was created by t
 
 ## npm release
 
-This branch prepares humanette@1.2.0 with natural typing, optional humanette/recording, live interaction sounds, and capture stabilization. The skill consumes these package APIs and no longer ships a runtime copy. humanette@1.1.0 was published October 5, 2026 and its actual tarball rechecked November 10, 2026: the package root exports createHuman, and the archive includes the browser bundle, declarations, 35 cursor SVGs, and license notices. The root and website packages are private. Only packages/humanette is publishable.
+humanette@1.2.0 was published November 10, 2026. Its actual registry tarball was downloaded and integrity-verified: root natural-typing and humanette/recording exports, declarations, browser bundle, 35 cursor SVGs, and upstream notices are present; runtime bundles match the reviewed source build. The skill consumes these package APIs without copying runtime code. The root and website are private; only packages/humanette is publishable.
 
 1. Confirm asset provenance/redistribution permissions and visually review hotspots. The SVGs pre-exist this PR in docs/; this code does not independently establish their authorship.
 2. Run bun check, bun run test:e2e, bun run test:recording, bun run pack:check, and bun run test:package. Then run bun run test:skill to test the skill in disposable projects through the prepared tarball registry. Inspect the packed file list; it must contain declarations, the classic browser bundle, assets, and license notices, but no website, auth state, or local paths.

@@ -8,7 +8,7 @@ import {
 
 export const siteUrl = 'https://humanette.dev';
 export const releaseNotice =
-  'Release pending: this guide targets humanette@1.2.0 with natural typing and humanette/recording. npm’s actual latest tarball, rechecked November 10, 2026, is 1.1.0: its root createHuman runtime, browser bundle, types, 35 cursor SVGs, and notices are present, but humanette/recording is absent. Maintainers can test the prepared 1.2.0 tarball before publication. Normal users need the published 1.2.0 release; report a missing release rather than building source.';
+  'Published tarball rechecked November 10, 2026: npm humanette@1.2.0 includes createHuman with natural typing and typingSpeeds at the package root, the optional humanette/recording module, browser bundle, TypeScript declarations, all 35 cursor SVGs, and license notices. Its runtime bundles match the reviewed release. Install from npm; no Humanette source checkout or build is required.';
 
 export const install =
   'npm install --save-dev humanette@^1.2.0 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
