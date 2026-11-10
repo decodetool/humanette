@@ -6,6 +6,7 @@
       "name": "humanette-workspace",
       "devDependencies": {
         "@types/node": "^22.0.0",
+        "chrome-capture": "0.1.2",
         "esbuild": "^0.25.0",
         "humanette": "workspace:*",
         "playwright-core": "1.64.0-alpha-2026-09-28",
@@ -36,14 +37,17 @@
     },
     "packages/humanette": {
       "name": "humanette",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "devDependencies": {
+        "chrome-capture": "0.1.2",
         "playwright-core": "1.64.0-alpha-2026-09-28",
       },
       "peerDependencies": {
+        "chrome-capture": "0.1.2",
         "playwright-core": ">=1.58.0 || 1.64.0-alpha-2026-09-28",
       },
       "optionalPeers": [
+        "chrome-capture",
         "playwright-core",
       ],
     },
@@ -246,6 +250,8 @@
     "baseline-browser-mapping": ["baseline-browser-mapping@2.11.26", "", { "bin": { "baseline-browser-mapping": "dist/cli.cjs" } }, "sha512-GLQdD3y6UF8iVuMJl5fHgE4jdn/ua7n+toKfLgNlg3BqQtOZjpy68T8Tup8/wGWZCDlm7KMg7tPb4MPn7oN0TQ=="],
 
     "caniuse-lite": ["caniuse-lite@1.0.30001812", "", {}, "sha512-qN+QNNBr93TCmFrmte0bBCjSDMuRvt78VlHT99qIGPszm4QsqCX8lnyWUFkHi8B7ZBAPq8SH+UqyXNy/odMdng=="],
+
+    "chrome-capture": ["chrome-capture@0.1.2", "", { "bin": { "chrome-capture": "dist/cli.js" } }, "sha512-Xc5/q1MqfbfLlEBRPG06Wvc0emqOaK4fPDr5NOGJOmpAP/RiV5FI2I8odl1qasjcdgMPBfajngUsyt/o0UN6Hg=="],
 
     "client-only": ["client-only@0.0.1", "", {}, "sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA=="],
 

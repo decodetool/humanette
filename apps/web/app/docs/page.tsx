@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CodeBlock } from '../../components/code-block';
-import { setup, recording, api } from '../../content/documentation';
+import { setup, recording, typingSpeedNote, api } from '../../content/documentation';
 import {
   skillInstall,
   agentDemoPrompt,
@@ -94,15 +94,18 @@ export default function Docs() {
         <section id="recording" className="mt-12">
           <h2 className="text-2xl font-semibold tracking-tight">Record with Playwright</h2>
           <p className="my-5 text-sm leading-7 text-muted">
-            Playwright records the page, including Humanette’s cursor. This example saves to one
-            fixed filename. Recording starts when the page is created, so navigation and loading are
-            included; trim that lead-in for a finished product video.
+            The skill records high-resolution MP4 video with app audio and live click and typing
+            sounds. It handles setup automatically. Saved scripts import the same runtime from{' '}
+            <code>humanette/recording</code>. Use Node 24.11+, chrome-capture@0.1.2, and full Chrome
+            153+.
           </p>
           <CodeBlock code={recording} />
+          <p className="mt-5 text-sm leading-7 text-muted">{typingSpeedNote}</p>
           <p className="mt-5 text-sm leading-7 text-muted">
-            The video above is explicitly 1280 × 800. A device scale factor of 2 does not make that
-            video Retina resolution. Rehearse your script, avoid long pauses, and inspect the actual
-            output before increasing resolution or frame rate.
+            Recording starts after the page is ready and finalizes when stop completes. The archive
+            preset requests 2560 × 1600 at 60 fps. Inspect the result: encoded FPS and an audio
+            track alone do not prove smooth motion or audible sound. The native MP4 uses AV1/Opus;
+            some destinations may need a separate H.264/AAC export.
           </p>
           <p className="mt-3 text-sm leading-7 text-muted">
             In this repository, run <code>bun dev</code>, then <code>bun example:playwright</code>.
@@ -113,7 +116,7 @@ export default function Docs() {
         <section id="limits" className="mt-12 border-t border-line pt-8">
           <h2 className="text-2xl font-semibold tracking-tight">Limitations</h2>
           <p className="mt-4 text-sm leading-7 text-muted">
-            Humanette is not a recorder and does not guarantee capture FPS. Input delivery and
+            Humanette’s optional recording module does not guarantee capture FPS. Input delivery and
             distinct captured frames depend on browser workload and the recorder. A high-FPS file
             can still contain repeated frames.
           </p>

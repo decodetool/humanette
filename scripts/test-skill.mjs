@@ -20,16 +20,28 @@ import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { verifyNativeRecording } from './verify-native-recording.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const options = process.argv.slice(2);
 const selected = options.find((arg) => arg.startsWith('--case='))?.slice(7);
+const legacy = options.includes('--legacy');
+assert.ok(!legacy || selected === 'saved', '--legacy requires --case=saved');
 assert.ok(
   !selected || ['one-off', 'saved'].includes(selected),
   'Use --case=one-off or --case=saved',
 );
 const timeoutMs = Number(process.env.HUMANETTE_SKILL_TIMEOUT_MS ?? 600_000);
 const budget = process.env.HUMANETTE_SKILL_BUDGET_USD ?? '10';
+for (const binary of ['ffmpeg', 'ffprobe']) {
+  try {
+    execFileSync(binary, ['-version'], { stdio: 'ignore' });
+  } catch {
+    throw new Error(
+      `The local harness needs ${binary} for independent media analysis; consumer recording does not require it.`,
+    );
+  }
+}
 const claude = execFileSync('which', ['claude'], { encoding: 'utf8' }).trim();
 const cliVersion = execFileSync(claude, ['--version'], { encoding: 'utf8' }).trim();
 const suite = await mkdtemp(join(tmpdir(), 'humanette-agent-test-'));
@@ -175,14 +187,17 @@ async function inside(path, folder) {
 
 const app = `<!doctype html><html lang="en"><meta charset="utf-8"><title>Tasks</title>
 <style>body{background:#e9f0e8;color:#203824;font:22px system-ui;margin:100px auto;max-width:640px}h1{font-size:52px}label{display:block;margin:20px 0}input,button{font:inherit;padding:14px}button,label:has(input[type=checkbox]){cursor:pointer}input[type=checkbox]{width:24px;height:24px}input:checked+span{text-decoration:line-through}li{list-style:none;background:white;padding:8px 20px;margin:12px 0}ul{padding:0}</style>
-<h1>My to-do app</h1><form><label for="task">New task</label><input id="task" required><button>Add task</button></form><ul></ul>
+<canvas id="barcode" width="432" height="32" style="position:fixed;top:0;left:0;pointer-events:none"></canvas><h1>My to-do app</h1><form><label for="task">New task</label><input id="task" required><button>Add task</button></form><ul></ul>
 <script>
+let frame=0;const canvas=document.querySelector('#barcode'),ctx=canvas.getContext('2d');function tick(){frame++;for(let b=0;b<18;b++){ctx.fillStyle=(b===0||(b>1&&((frame>>(17-b))&1)))?'white':'black';ctx.fillRect(b*24,0,24,32)}requestAnimationFrame(tick)}tick();
+function chime(hz){const ac=new AudioContext(),o=ac.createOscillator(),g=ac.createGain();o.frequency.value=hz;g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.5);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.5);o.onended=()=>ac.close()}
 const send=(url,data)=>fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});
-async function render(){const tasks=await(await fetch('/api/tasks')).json();document.querySelector('ul').replaceChildren(...tasks.map(task=>{const li=document.createElement('li');const label=document.createElement('label');const box=document.createElement('input');box.type='checkbox';box.checked=task.done;const text=document.createElement('span');text.textContent=task.title;box.addEventListener('change',async event=>{await send('/api/complete',{id:task.id,trusted:event.isTrusted});await render()});label.append(box,text);li.append(label);return li}))}
-document.querySelector('form').addEventListener('submit',async event=>{event.preventDefault();await send('/api/add',{title:document.querySelector('#task').value,trusted:event.isTrusted});document.querySelector('#task').value='';await render()});
-document.addEventListener('pointerdown',event=>send('/api/input',{type:'pointerdown',trusted:event.isTrusted}));
-document.addEventListener('keydown',event=>send('/api/input',{type:'keydown',trusted:event.isTrusted}));render();
-document.addEventListener('input',event=>send('/api/input',{type:'input',trusted:event.isTrusted}));
+async function render(){const tasks=await(await fetch('/api/tasks')).json();document.querySelector('ul').replaceChildren(...tasks.map(task=>{const li=document.createElement('li');const label=document.createElement('label');const box=document.createElement('input');box.type='checkbox';box.checked=task.done;const text=document.createElement('span');text.textContent=task.title;box.addEventListener('change',async event=>{chime(660);await send('/api/complete',{id:task.id,trusted:event.isTrusted});await render()});label.append(box,text);li.append(label);return li}))}
+document.querySelector('form').addEventListener('submit',async event=>{event.preventDefault();chime(440);await send('/api/add',{title:document.querySelector('#task').value,trusted:event.isTrusted});document.querySelector('#task').value='';await render()});
+document.addEventListener('pointerdown',event=>send('/api/input',{type:'pointerdown',trusted:event.isTrusted,at:performance.now()}));
+document.addEventListener('keydown',event=>send('/api/input',{type:'keydown',trusted:event.isTrusted,at:performance.now()}));render();
+document.addEventListener('keyup',event=>send('/api/input',{type:'keyup',trusted:event.isTrusted,at:performance.now()}));
+document.addEventListener('input',event=>send('/api/input',{type:'input',trusted:event.isTrusted,inputType:event.inputType??null,at:performance.now()}));
 </script></html>`;
 
 try {
@@ -195,7 +210,13 @@ try {
     await writeFile(
       join(project, 'package.json'),
       JSON.stringify(
-        { name: 'todo-fixture', private: true, type: 'module', scripts: {} },
+        {
+          name: 'todo-fixture',
+          private: true,
+          type: 'module',
+          scripts: {},
+          ...(legacy ? { devDependencies: { 'playwright-core': '1.58.0' } } : {}),
+        },
         null,
         2,
       ) + '\n',
@@ -213,7 +234,7 @@ try {
     const server = createServer(async (req, res) => {
       try {
         if (req.url === '/__recording' && recording) {
-          res.setHeader('content-type', 'video/webm');
+          res.setHeader('content-type', 'video/mp4');
           res.end(await readFile(recording));
           return;
         }
@@ -307,7 +328,7 @@ try {
           '--max-budget-usd',
           budget,
           '--append-system-prompt',
-          `This is an authorized local demo test. Use the supplied local app and install packages using the configured npm registry. Scope task writes to ${caseDir} and ${output}; package caches may use ${suite}. Do not install global packages, modify shell profiles, use sudo, publish, deploy, access credentials, or send messages. Retain task workspaces for independent inspection; the test runner handles cleanup.`,
+          `This is an authorized local demo test. Use the supplied local app and install packages using the configured npm registry. Scope task writes to ${caseDir} and ${output}; npm caches may use ${suite}. The browser cache is fixed at ${env.PLAYWRIGHT_BROWSERS_PATH}: keep PLAYWRIGHT_BROWSERS_PATH unchanged in every command, including install, recording and media checks. Do not install global packages, modify shell profiles, use sudo, publish, deploy, access credentials, or send messages. Retain task workspaces for independent inspection; the test runner handles cleanup.`,
           prompt,
         ],
         { cwd: project, env, log: join(output, 'claude.jsonl') },
@@ -358,6 +379,18 @@ try {
         inputs.some((input) => ['input', 'keydown'].includes(input.type) && input.trusted),
         'No trusted text input reached the app',
       );
+      assert.ok(
+        inputs.filter((input) => input.type === 'keydown' && input.trusted).length >= 10,
+        'Natural typing must produce actual key presses, not fixed-rate insertText only',
+      );
+      const typed = inputs.filter(
+        (input) => input.type === 'input' && input.inputType === 'insertText' && input.trusted,
+      );
+      const gaps = typed.slice(1).map((event, i) => event.at - typed[i].at);
+      assert.ok(
+        new Set(gaps.map((gap) => Math.round(gap / 5))).size >= 4,
+        'Actual typing cadence is too uniform',
+      );
       if (name === 'one-off') {
         assert.deepEqual(
           await snapshot(project),
@@ -376,6 +409,17 @@ try {
         );
       } else {
         const manifest = JSON.parse(await readFile(join(project, 'package.json'), 'utf8'));
+        if (legacy) {
+          assert.equal(
+            manifest.devDependencies['playwright-core'],
+            '1.58.0',
+            'Existing Playwright must be preserved',
+          );
+          assert.ok(
+            manifest.devDependencies['humanette-browser'],
+            'Old app needs a separate recording browser',
+          );
+        }
         assert.ok(manifest.scripts.demo, 'Saved demo is missing npm run demo');
         assert.ok(
           !manifest.devDependencies?.humanette?.startsWith('file:'),
@@ -383,10 +427,11 @@ try {
         );
         assert.ok(
           manifest.devDependencies?.humanette &&
+            manifest.devDependencies?.['chrome-capture'] &&
             (manifest.devDependencies?.playwright ||
               manifest.devDependencies?.['@playwright/test'] ||
               manifest.devDependencies?.['playwright-core']),
-          'Missing repository development dependencies',
+          'Missing repository recording development dependencies',
         );
         const script = resolve(project, report.script);
         assert.ok(await inside(script, project), 'Reusable script must be saved in the app repo');
@@ -408,8 +453,31 @@ try {
           );
         }
       }
+      const media = verifyNativeRecording(recording, { barcode: true, appTones: [440, 660] });
+      await writeFile(join(output, 'native-media.json'), JSON.stringify(media, null, 2));
       const require = createRequire(join(resolve(report.dependencyRoot), 'package.json'));
-      const moduleName = ['playwright', '@playwright/test', 'playwright-core'].find((name) => {
+      const installedManifest = require('humanette/package.json');
+      assert.ok(
+        installedManifest.exports['./recording'],
+        'Installed package lacks its recording API',
+      );
+      if (name === 'saved') {
+        const source = await readFile(resolve(project, report.script), 'utf8');
+        assert.ok(
+          source.includes('humanette/recording'),
+          'Saved flow must use the package recorder',
+        );
+        assert.ok(
+          !source.includes('withNaturalTyping'),
+          'Typing belongs in createHuman, not a copied wrapper',
+        );
+      }
+      const moduleName = [
+        'humanette-browser',
+        'playwright',
+        '@playwright/test',
+        'playwright-core',
+      ].find((name) => {
         try {
           require.resolve(name);
           return true;
@@ -425,7 +493,7 @@ try {
         executablePath.startsWith(caseDir + sep),
         'Fresh matching browser was not installed in the requested cache',
       );
-      const browser = await chromium.launch({ executablePath });
+      const browser = await chromium.launch({ executablePath, channel: 'chromium' });
       try {
         const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
         // Inline the small clip so seeks don't depend on HTTP Range support.
@@ -461,11 +529,11 @@ try {
             height: video.videoHeight,
             distinctSamples: new Set(hashes).size,
           };
-        }, `data:video/webm;base64,${videoData}`);
+        }, `data:video/mp4;base64,${videoData}`);
         await page.screenshot({ path: join(output, 'recording-frame.png') });
         await writeFile(
           join(output, 'verification.json'),
-          JSON.stringify({ decoded, tasks, inputs, report }, null, 2),
+          JSON.stringify({ decoded, media, tasks, inputs, report }, null, 2),
         );
         assert.ok(
           decoded.duration >= 1 && decoded.width > 0 && decoded.distinctSamples >= 3,
@@ -496,9 +564,26 @@ try {
           tasks.some((task) => task.title === 'Buy groceries' && task.done),
           'Saved command failed after removing temporary setup and reinstalling dependencies',
         );
+        const rerunDir = join(output, 'rerun');
+        async function findVideos(dir) {
+          const files = [];
+          for (const entry of await readdir(dir, { withFileTypes: true })) {
+            const path = join(dir, entry.name);
+            if (entry.isDirectory()) files.push(...(await findVideos(path)));
+            else if (entry.name.endsWith('.mp4')) files.push(path);
+          }
+          return files;
+        }
+        const rerunVideos = await findVideos(rerunDir);
+        assert.ok(rerunVideos.length, 'Rerun produced no finalized MP4');
+        const rerunMedia = verifyNativeRecording(rerunVideos[0], {
+          barcode: true,
+          appTones: [440, 660],
+        });
+        await writeFile(join(output, 'rerun-media.json'), JSON.stringify(rerunMedia, null, 2));
       }
       console.log(
-        `${name}: PASS — real input, finalized/decoded video, dependency placement${name === 'saved' ? ', fresh-install rerun' : ', unchanged app repo'}.`,
+        `${name}: PASS — real input, decoded high-frame-rate AV1/Opus with app tones, dependency placement${name === 'saved' ? ', fresh-install rerun' : ', unchanged app repo'}.`,
       );
     } catch (error) {
       console.error(`${name}: FAIL. Preserved workspace: ${caseDir}. Artifacts: ${output}`);

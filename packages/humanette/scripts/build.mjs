@@ -36,6 +36,7 @@ await build({
     join(pkg, 'src/index.ts'),
     join(pkg, 'src/motion.ts'),
     join(pkg, 'src/playwright.ts'),
+    join(pkg, 'src/recording.ts'),
   ],
   outdir: join(pkg, 'dist'),
   bundle: true,
@@ -43,7 +44,7 @@ await build({
   platform: 'neutral',
   target: 'es2022',
   sourcemap: true,
-  external: ['node:*'],
+  external: ['node:*', 'chrome-capture', 'humanette-browser'],
   plugins: [plugin],
 });
 await build({

@@ -21,7 +21,9 @@
     "check": "turbo typecheck test build",
     "test:e2e": "bun run --cwd apps/web test:e2e",
     "test:skill": "node scripts/test-skill.mjs",
-    "pack:check": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs"
+    "test:recording": "node --test --test-concurrency=1 scripts/tests/*.test.mjs",
+    "pack:check": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs",
+    "test:package": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs --record"
   },
   "repository": {
     "type": "git",
@@ -33,6 +35,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "chrome-capture": "0.1.2",
     "esbuild": "^0.25.0",
     "humanette": "workspace:*",
     "playwright-core": "1.64.0-alpha-2026-09-28",

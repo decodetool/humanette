@@ -8,6 +8,9 @@ import {
   type FeedbackOptions,
 } from './motion.js';
 import type { Humanette, HumanetteOptions } from './index.js';
+import { typingPlan, type TypingOptions } from './typing.js';
+export { typingSpeeds, typingPlan } from './typing.js';
+export type { TypingOptions, TypingSpeed, TypingPlanOptions, TypingStep } from './typing.js';
 type Surface = typeof window & {
   Humanette: { createHumanette(options: object): Humanette };
   __humanette?: Humanette;
@@ -19,6 +22,12 @@ export interface AutomationOptions extends Partial<FeedbackOptions> {
   settle?: number;
   fps?: number;
   keyboard?: boolean;
+  typing?: TypingOptions;
+}
+export interface TypeOptions extends TypingOptions {
+  delay?: number;
+  selectAll?: boolean;
+  signal?: AbortSignal;
 }
 export interface ActionOptions {
   duration?: number;
@@ -42,9 +51,11 @@ const sleep = (ms: number, signal?: AbortSignal) =>
   });
 /** Real Playwright mouse/keyboard input. Visual playback and real input stay distinct. */
 export async function createHuman(page: Page, config: AutomationOptions = {}) {
-  const { seed = 42, settle = 120, fps = 60, ...appearance } = config;
+  const { seed = 42, settle = 120, fps = 60, typing = {}, ...appearance } = config;
   if (!Number.isFinite(fps) || fps < 1 || fps > 240 || !Number.isFinite(settle) || settle < 0)
     throw new RangeError('Use fps 1–240 and a nonnegative settle time.');
+  typingPlan('', { ...typing, seed });
+  let typingSequence = 0;
   let position: Point = { x: 0, y: 0 },
     disposed = false,
     busy = false;
@@ -166,20 +177,45 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
         }
       }),
     /** Type through real keyboard input; selectAll replaces editor contents without a leading newline. */
-    type: (
-      target: Target,
-      text: string,
-      opts: { delay?: number; selectAll?: boolean; signal?: AbortSignal } = {},
-    ) =>
+    type: (target: Target, text: string, opts: TypeOptions = {}) =>
       action(async () => {
+        if (typeof text !== 'string') throw new TypeError('Typing text must be a string.');
+        if (opts.delay !== undefined && (!Number.isFinite(opts.delay) || opts.delay < 0))
+          throw new RangeError('Delay must be nonnegative.');
+        const plan =
+          opts.delay === undefined
+            ? typingPlan(text, {
+                seed: seed + typingSequence++,
+                speed: opts.speed ?? typing.speed,
+                pace: opts.pace ?? (opts.speed === undefined ? typing.pace : undefined),
+              })
+            : null;
         await move(target, { signal: opts.signal });
         await sleep(settle, opts.signal);
         await page.mouse.click(position.x, position.y);
         if (opts.selectAll) await page.keyboard.press('ControlOrMeta+A');
+        if (plan) {
+          for (const step of plan) {
+            await sleep(step.waitBefore, opts.signal);
+            opts.signal?.throwIfAborted();
+            if (/^[\x20-\x7e]$/.test(step.text)) {
+              await page.keyboard.down(step.text);
+              try {
+                await sleep(step.hold, opts.signal);
+              } finally {
+                await page.keyboard.up(step.text);
+              }
+            } else {
+              await page.keyboard.insertText(step.text);
+              await sleep(step.hold, opts.signal);
+            }
+          }
+          return;
+        }
         for (const char of text) {
           opts.signal?.throwIfAborted();
           await page.keyboard.insertText(char);
-          await sleep(opts.delay ?? 45, opts.signal);
+          await sleep(opts.delay!, opts.signal);
         }
       }),
     press: (key: string) =>

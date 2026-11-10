@@ -11,7 +11,7 @@
 
 createHumanette paints a cursor, press feedback, and optionally modifier chords. play/seek are presentation only. They never simulate product state through DOM mutation or dispatchEvent.
 
-createHuman(page) delivers real input through Playwright. It centers locators, scrolls them into view, samples motion against elapsed time, awaits delivery, adds a small aim pause, and releases held input on failures. It rejects parallel actions. It does not implement a recorder.
+createHuman(page) delivers real input through Playwright, including seeded natural typing with slow/default/fast presets (3×/6×/8×). It centers locators, scrolls them into view, samples motion against elapsed time, awaits delivery, adds a small aim pause, and releases held input on failures. It rejects parallel actions. Recording lives in the optional humanette/recording subpath, with typed APIs for launch, capture, and live sounds. The root input API has no recording dependency. The skill only orchestrates package APIs and supplies an example app flow.
 
 The package root exports the Playwright API. The old humanette/playwright import remains a compatibility alias; humanette/internal is reserved for the site's renderer and workbench. Future automation adapters can use their own subpaths without changing the current Playwright-first documentation.
 
@@ -22,6 +22,8 @@ selectText(locator) measures visible text runs (including nested spans and wrapp
 ## Preserved learnings
 
 The stable, DPR-aware full-surface canvas came from the agent-browser investigation in docs/history/cursor-capture-investigation.md. Small moving DOM overlays caused capture sampler stalls after large canvas repaints. More requested input steps and blur did not repair missing source frames.
+
+Native recording reproduced a related text-only transition: after cursor arrival, actual input continued while captured text froze for about 267ms and then jumped seven letters. The package recorder now keeps a transparent full-viewport capture surface invalidating during trusted interaction, stopping 350ms after the last event and removing all hooks/surfaces on stop. This is recording-only and owned by the package; the shared cursor renderer is unchanged. `scripts/tests/typing-capture.test.mjs` decodes an input counter from the native MP4 to catch skipped bursts, and separately checks unchanged pixels, cross-origin iframe input, navigation, and idle/lifecycle cleanup. Encoded FPS alone would not catch this failure.
 
 The current renderer defaults to inline SVG for bundled cursor artwork. It preserves the source SVG paths and filters, sets the SVG viewport to its actual display size, and translates it using the scaled hotspot. Separate closed shadow roots isolate the cursor and motion-trail filter IDs. Feedback remains on the DPR-aware canvas behind the artwork; an optional small canvas keeps keyboard badges above it. The host clips to its root/viewport, preserving the original canvas bounds. Arbitrary custom theme assets still load as inert images; they are never inserted as live markup. Both createHuman and the internal renderer accept `renderer: 'canvas'` to retain the previous capture path for comparisons or regressions.
 

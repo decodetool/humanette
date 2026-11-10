@@ -19,43 +19,38 @@ try {
 } finally {
   await browser.close();
 }`;
+export const typingSpeedNote =
+  "Natural typing is built into createHuman. Set typing: { speed: 'slow' } (3×), 'default' (6×, used when omitted), or 'fast' (8×), or pass speed to human.type for one action. Numeric pace (0.25–8) overrides the preset. Only real typing timing changes; pointer movement, presentation holds, and individual sounds stay at normal speed. Explicit delay selects fixed timing. Record at the chosen speed rather than time-compressing video or audio.";
+
 export const recording = `import { chromium } from 'playwright';
 import { createHuman } from 'humanette';
+import { launchForPreset, startRecording } from 'humanette/recording';
 
-const browser = await chromium.launch();
+const { browser, context, preset } = await launchForPreset(chromium, 'archive');
 try {
-  const context = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
-    deviceScaleFactor: 2,
-    recordVideo: {
-      dir: 'out',
-      size: { width: 1280, height: 800 },
-    },
-  });
   const page = await context.newPage();
-  const video = page.video()!;
+  await page.goto('http://localhost:3000');
+  await page.getByRole('button', { name: 'Save' }).waitFor();
+  const human = await createHuman(page, { scale: 4, seed: 42 });
+  const recording = await startRecording(page, preset); // App audio + live click/key sounds
   try {
-    await page.goto('http://localhost:3000');
-    await page.getByRole('button', { name: 'Save' }).waitFor();
-    const human = await createHuman(page, { scale: 4, seed: 42 });
+    await human.click(page.getByRole('button', { name: 'Save' }));
+    await human.wait(900);
+  } finally {
     try {
-      await human.click(page.getByRole('button', { name: 'Save' }));
-      await human.wait(600); // Brief hold on the result
+      const stats = await recording.stop('out/demo.mp4');
+      console.log(stats); // Actual dimensions, audio track, warnings, finalization time
     } finally {
       await human.dispose();
     }
-  } finally {
-    await context.close(); // Finalize the video before saving
   }
-  await video.saveAs('out/demo.webm');
-  await video.delete(); // Remove Playwright’s generated filename
 } finally {
   await browser.close();
 }`;
 export const api = [
   [
     'createHuman(page, options?)',
-    'Attach to your existing Playwright page. Options include scale (cursor size), seed (repeatable paths), settle (aim pause, 120 ms by default), and fps (input sampling target, not recording FPS).',
+    'Attach to your existing Playwright page. Options include scale (cursor size), seed (repeatable paths and typing), typing (speed or numeric pace), settle (aim pause, 120 ms by default), and fps (input sampling target, not recording FPS).',
   ],
   [
     'human.click(target, { duration?, signal? })',
@@ -74,8 +69,8 @@ export const api = [
     'Move to the source, hold the mouse, drag to the destination, then release. Sources and destinations may be locators, selectors, or coordinates. The mouse is released even when the drag is cancelled.',
   ],
   [
-    'human.type(target, text, { delay?, selectAll?, signal? })',
-    'Click the target and insert text through Playwright keyboard input. Set selectAll to replace existing contents. Delay is per character in milliseconds.',
+    'human.type(target, text, { speed?, pace?, delay?, selectAll?, signal? })',
+    'Click the target and type with varied real key holds and word/sentence pauses. Speeds are slow (3×), default (6×), and fast (8×). Numeric pace overrides the preset. Set selectAll to replace contents; explicit delay selects fixed per-character timing in milliseconds. Unicode graphemes stay together and literal newlines do not submit forms.',
   ],
   [
     'human.press(key)',

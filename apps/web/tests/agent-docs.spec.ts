@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { api, setup, recording } from '../content/documentation';
+import { releaseNotice } from '../content/agent-guide';
 import { skillInstall, agentDemoPrompt, productDemoPrompt } from '../content/onboarding';
 
 test('agent entry point and full guide are plain, complete, and linked without JavaScript', async ({
@@ -11,7 +12,7 @@ test('agent entry point and full guide are plain, complete, and linked without J
   const summary = await index.text();
   expect(summary).toMatch(/^# Humanette\n\n> /);
   expect(summary).toContain('createHuman');
-  expect(summary).toContain('npm humanette@1.0.0 contains no runtime');
+  expect(summary).toContain(releaseNotice);
   expect(summary).toContain('https://humanette.dev/docs.md');
   expect(summary).not.toContain('<html');
   expect(summary.length).toBeLessThan(5000);
@@ -33,7 +34,12 @@ test('agent entry point and full guide are plain, complete, and linked without J
     ...api.flat(),
   ])
     expect(guide).toContain(content);
-  for (const detail of ['Node.js >=22', 'modifier chords', 'humanette@^1.1.0', 'not a recorder']) {
+  for (const detail of [
+    'Node.js >=22',
+    'modifier chords',
+    'humanette@^1.2.0',
+    'humanette/recording',
+  ]) {
     expect(summary + guide).toContain(detail);
   }
   expect(guide).toContain(skillInstall);

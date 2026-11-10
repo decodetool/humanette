@@ -1,50 +1,55 @@
 # Dependency setup
 
-Use the temporary or repository workspace chosen in SKILL.md. Install what is missing and retry the failed setup step after fixing its cause. Stop only for an actual restriction such as unavailable downloads, unsupported OS, or required administrative access; report the exact blocker and the work already completed.
+Use the temporary or repository workspace chosen in SKILL.md. Handle missing packages and browser downloads automatically; stop only for a concrete restriction, such as unavailable downloads or required administrative access. Preserve the app's package manager, lockfile, and compatible dependencies.
 
-## Inspect and reuse
+## Runtime and packages
 
-Check package.json, packageManager, the active workspace's lockfile, installed package versions, and available runtimes. In a monorepo, use the workspace that owns the demo and its existing lockfile. Don't create another package manager's lockfile or upgrade unrelated dependencies.
+The optional package recorder needs Node.js **24.11+** (the core Humanette package itself needs 22+). Reuse a suitable runtime. If missing or too old, download an official Node distribution for the detected OS/architecture into the task's tools directory, verify its checksum against the official release, and scope its bin directory to task commands. Do not replace system Node or change shell profiles. Saved demos must disclose Node 24.11+ in their rerun instructions.
 
-- Reuse a working Humanette root import exporting `createHuman`.
-- Reuse `playwright`, `@playwright/test`, or `playwright-core` when compatible with Humanette's actual peer dependency range. Adapt the generated script's import to the package that is directly available; an installed test runner does not mean a transitive `playwright` import resolves from every directory.
-- If the declared dependencies are missing from node_modules, restore them with the existing package manager first. If no compatible Playwright is present, install `playwright` in the chosen workspace. Use a stable compatible version for a new setup; no prerelease is required to make a demo.
-- Repository mode: add only missing packages as development dependencies, preserve the existing compatible versions, and add a descriptive rerun command. Temporary mode: make a private ESM package in a unique scratch directory and install packages there. An external app server may continue running from the original repo.
-- Prefer a JavaScript `.mjs` demo with Node.js 22+ to adding a TypeScript runner solely for the recording. Reuse an existing TS runner when it is already part of the project.
+Use the published `humanette@^1.2.0` package: the root exports `createHuman` with natural typing, and `humanette/recording` exports the recorder. Release status: npm’s actual latest tarball was rechecked November 10, 2026 as 1.1.0, which lacks `humanette/recording`; this branch prepares 1.2.0. Until 1.2.0 is published, normal npm installation must report that release blocker. Maintainer harnesses can test the prepared tarball through a disposable registry. Use `chrome-capture@0.1.2` for the native recorder. Reuse `playwright`, `@playwright/test`, or `playwright-core` compatible with Humanette; adapt script imports to the directly available package.
 
-## Install the published package
-
-Use the published `humanette` npm package, with a runtime release of 1.1.0 or newer. Reuse an already installed compatible runtime. With npm, install only missing packages in the chosen workspace:
+Install only missing packages. For a new npm workspace:
 
 ```sh
-# Saved repository demo:
-npm install --save-dev humanette@^1.1.0 playwright
-# One-off: run in the private temporary execution package instead:
-npm install humanette@^1.1.0 playwright
+# Saved repo: development dependencies, using its existing package manager.
+npm install --save-dev humanette@^1.2.0 playwright chrome-capture@0.1.2
+# One-off: ordinary dependencies in a private temporary ESM package instead.
+npm install humanette@^1.2.0 playwright chrome-capture@0.1.2
 ```
 
-For other package managers, use their equivalent local installation command. Preserve compatible versions already in the project. Verify `import { createHuman } from 'humanette'` succeeds before recording.
+Restore declared dependencies before adding duplicates. New setups can use stable Playwright. Preserve a project's existing compatible Playwright even when its browser is too old for recording. Never clone/build Humanette, inspect sibling source checkouts, or substitute a local build. If npm has no usable runtime release, report the publication blocker. A user-supplied development artifact is the sole exception; saved demos must keep it at a durable repo-relative path.
 
-If no runtime release is available, report that the package must be published and stop setup. Do not clone/build Humanette, search sibling repositories or the user's home directory for a checkout, or install a local build as a substitute. A package artifact explicitly supplied by the user for development/testing is the only exception; for saved demos, copy that artifact to a durable repository-relative location first. A missing release does not require asking the user to choose between source builds.
+Import runtime APIs from `humanette` and `humanette/recording`. No recorder, sound, or typing helpers are copied from the skill. Only copy `scripts/record-todo.mjs` when using the standalone example. Saved scripts must resolve their declared repository dependencies, with no paths into temporary tools or the installed skill.
 
-## Missing runtime
+## Install a compatible recording browser
 
-Humanette needs Node.js 22+. Reuse a suitable installed runtime. If Node/npm is missing, download an official Node distribution for the detected OS/architecture into the task's tools directory; verify its checksum against the official release and scope its bin directory to task commands. Do not replace system Node or change shell startup files. Disclose the Node requirement with a saved rerun command. Bun is not needed to consume Humanette; use it only if it is the app's existing package manager.
-
-## Install and verify the matching browser
-
-Use the CLI belonging to the actual installed Playwright version, from the execution workspace. With npm and an installed `playwright` or `@playwright/test`:
+Use the installed Playwright CLI, never an unpinned CLI fetched by npx:
 
 ```sh
 npx --no-install playwright install chromium
 ```
 
-For a `playwright-core` installation, use its `playwright-core` CLI instead. For Bun/pnpm/yarn projects, use their local CLI execution convention; do not let an unpinned npx invocation silently install a newer Playwright. Install Chromium automatically if its matching binary is absent, then launch and close a fresh headless browser to verify the native libraries and executable work. Do not close the user's attached browser during this smoke check.
+Use `playwright-core`'s CLI when that is the directly installed package. If `PLAYWRIGHT_BROWSERS_PATH` is set, use that exact directory for every browser install, launch, and media check. Do not replace it with another cache, even one inside the task workspace. If it is unset, use Playwright's normal cache. Do not remove shared browser caches. The native recorder requires **full Chrome/Chromium 153+**, including its new headless mode. Do not install only `--only-shell` or launch `chromium-headless-shell`.
 
-Use the normal Playwright browser cache unless the task environment sets PLAYWRIGHT_BROWSERS_PATH. Honor that variable for both installation and running, and never remove an existing shared browser cache during cleanup. A download alone is not proof of a usable browser.
+Launch through `launchForPreset(chromium, preset)`. It selects full Chromium, removes Playwright's default `--mute-audio`, enables app autoplay in this demo browser, sets native device scale, and checks Chrome's version. `startRecording` sizes the real window contents for contexts created by this helper using `Browser.setContentsSize`; no platform-specific border offsets are needed.
 
-On Linux, a browser launch may require native libraries. If the environment already permits OS-package installation without additional privileges (for example, an authorized disposable root container), use the matching CLI's `install-deps chromium` or `install --with-deps chromium` and retry. Do not silently sudo or change the user's host OS when admin access has not been authorized. State the concrete missing dependency if host permissions prevent setup.
+If an existing Playwright ships Chrome older than 153, install a separate recording browser alias in the chosen execution workspace, without upgrading the app's Playwright:
 
-FFmpeg is not required for Playwright's WebM recordings. Install an encoder only when the requested output format or available inspection workflow needs one; do not add unrelated tooling just in case.
+```sh
+npm install --save-dev humanette-browser@npm:playwright-core@1.65.0
+node node_modules/humanette-browser/cli.js install chromium
+```
 
-Finally, run the real demo. In repository mode, verify the saved command works from the repository with its declared dependencies, independently of the temporary execution workspace. In temporary mode, retain final videos/screenshots outside scratch and ensure the original repo's manifest, lockfile, and sources were not changed.
+Use ordinary dependencies for a temporary workspace. Resolve the alias's CLI via its installed `package.json` if the package manager hoists it. The helper automatically prefers this alias. This dependency and its installation command belong with a saved demo so it remains rerunnable.
+
+An attached user's browser is different: inspect its actual version/connection; do not resize, close, or silently replace it. A browser older than 153 must be relaunched to record natively. An existing session launched muted may not produce audible app audio. Explain these concrete limitations and preserve the requested authenticated starting state.
+
+## Smoke check and recovery
+
+Verify `createHuman` and `typingSpeeds` from `humanette`, plus `launchForPreset` and `startRecording` from `humanette/recording`, then launch a fresh browser, then perform a short native start/stop recording to prove the API works. A download or version string alone is insufficient. Run the real demo afterward, verify actual app state, and inspect the finalized media. `stats.audio` confirms a track exists, not that sound is audible.
+
+No FFmpeg, extension, virtual audio device, or recording permission picker is required for native capture. On Linux, missing native browser libraries may still prevent launch. Use the matching Playwright `install-deps` only in an environment already authorized for OS-package installation; do not silently sudo or modify the user's host. Report concrete missing libraries if blocked.
+
+The output is AV1 video and Opus audio in MP4. If the user specifically needs H.264/AAC, padding, voiceover, or editing, perform that as a separate export step; install any missing converter in the task workspace rather than the host. Do not silently deliver a muted or low-FPS fallback as equivalent.
+
+Finally, check the saved command after removing temporary tools and restoring declared dependencies. For a one-off, retain final media and failed-check artifacts outside scratch, and verify the app's manifest, lockfile, and source were not changed.
