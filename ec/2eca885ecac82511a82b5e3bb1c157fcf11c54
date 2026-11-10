@@ -1,0 +1,30 @@
+README.md
+  s_43311e4fe4b86a::t_120ff598f3bd56 17
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_5161b48a653452 11
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_9e828f6ba6080c 25
+skills/humanette/references/setup.md
+  s_43311e4fe4b86a::t_9f006aac746bb1 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ec2eca885ecac82511a82b5e3bb1c157fcf11c54",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
