@@ -31,7 +31,7 @@ export function ExamplePlayer({
       return { ...step, at: start, end: at, gesture: `home-typing-${i}` };
     });
   }, [speed]);
-  const duration = scene === 'typing' ? Math.max(4600, strikes.at(-1)!.end + 1800) : 4600;
+  const duration = scene === 'typing' ? Math.max(4800, strikes.at(-1)!.end + 1800) : 4600;
   const cues = useMemo(
     () =>
       scene === 'typing'
@@ -49,6 +49,7 @@ export function ExamplePlayer({
   const label = useRef<HTMLSpanElement>(null);
   const human = useRef<Humanette | null>(null);
   const clock = useRef(0);
+  const startDelay = useRef(scene === 'typing' ? 600 : 0);
   const measure = useRef<() => void>(() => {});
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -70,12 +71,12 @@ export function ExamplePlayer({
     scene === 'typing'
       ? [
           { at: 0, type: 'cursor', cursor: 'auto' },
-          { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
+          { at: 0, type: 'move', x: 64, y: 160, duration: 900 },
           { at: 1000, type: 'down' },
           { at: 1100, type: 'up' },
           { at: 1150, type: 'cursor', cursor: 'text' },
           { at: duration - 1100, type: 'cursor', cursor: 'auto' },
-          { at: duration - 1100, type: 'move', ...initial, duration: 800 },
+          { at: duration - 1100, type: 'move', ...initial, duration: 900 },
         ]
       : scene === 'click'
         ? [
@@ -195,7 +196,10 @@ export function ExamplePlayer({
     if (ready) draw(clock.current);
   }, [scale, geometry, ready]);
   useEffect(() => {
-    if (scene === 'typing') draw(0);
+    if (scene === 'typing') {
+      startDelay.current = 600;
+      draw(0);
+    }
   }, [scene, speed]);
   useEffect(() => {
     if (!playing || !visible || !ready) return;
@@ -207,7 +211,10 @@ export function ExamplePlayer({
       // Integrate RAF time, not frame count; freeze while hidden or paused.
       const delta = last === undefined ? 0 : Math.max(0, now - last);
       last = now;
-      const next = clock.current + delta;
+      // Stagger the typing preview while keeping its visuals and sounds on one clock.
+      const delay = Math.min(delta, startDelay.current);
+      startDelay.current -= delay;
+      const next = clock.current + delta - delay;
       function soundBetween(from: number, to: number) {
         for (const cue of cues) {
           if (cue.at <= from || cue.at > to) continue;
