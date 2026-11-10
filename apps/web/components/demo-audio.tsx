@@ -49,12 +49,23 @@ export function useDemoAudio() {
   if (!value) throw new Error('Demo audio provider is missing.');
   return value;
 }
-export function DemoSoundToggle() {
+export function DemoSoundToggle({ prominent = false }: { prominent?: boolean }) {
   const { enabled, toggle, error } = useDemoAudio();
   return (
     <div>
-      <button type="button" className="secondary text-sm" aria-pressed={enabled} onClick={toggle}>
-        {enabled ? 'Sound on' : 'Enable sound'}
+      <button
+        type="button"
+        className={`secondary ${prominent ? 'min-h-11 px-6 text-base' : 'text-sm'}`}
+        aria-pressed={enabled}
+        onClick={toggle}
+      >
+        {prominent
+          ? enabled
+            ? 'Clicking and typing sounds on'
+            : 'Enable clicking and typing sounds'
+          : enabled
+            ? 'Sound on'
+            : 'Enable sound'}
       </button>
       {error && (
         <p role="alert" className="mt-2 text-sm text-danger">

@@ -55,11 +55,12 @@ test('homepage typing uses natural presets and audible package sounds only after
   const typing = page.getByTestId('example-typing');
   await typing.scrollIntoViewIfNeeded();
   await expect(typing).toHaveAttribute('data-running', 'false');
-  await page.getByRole('button', { name: 'Enable sound', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Sound on', exact: true })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  await page
+    .getByRole('button', { name: 'Enable clicking and typing sounds', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Clicking and typing sounds on', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
   expect(await page.evaluate(() => window.audioAudit.contexts.map((c) => c.state))).toEqual([
     'running',
     'running',
@@ -80,7 +81,7 @@ test('homepage typing uses natural presets and audible package sounds only after
     await typing.scrollIntoViewIfNeeded();
     await expect(target).toHaveText('Make something great.');
   }
-  await page.getByRole('button', { name: 'Sound on', exact: true }).click();
+  await page.getByRole('button', { name: 'Clicking and typing sounds on', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.audioAudit.contexts.map((c) => c.state)))
     .toEqual(['closed', 'closed']);

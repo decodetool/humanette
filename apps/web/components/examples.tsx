@@ -15,11 +15,9 @@ export function Examples() {
   const [speed, setSpeed] = useState<TypingSpeed>('default');
   return (
     <>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          Visual previews with matching Playwright snippets. Enable sound for click and key effects.
-        </p>
-        <DemoSoundToggle />
+      <p className="mt-4 text-sm text-muted">Visual previews with matching Playwright snippets.</p>
+      <div className="mt-6 flex justify-center text-center">
+        <DemoSoundToggle prominent />
       </div>
       <div className="mt-8 space-y-10">
         {(
