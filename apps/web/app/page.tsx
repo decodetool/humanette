@@ -10,11 +10,11 @@ export default function Home() {
           Screen Studio for browser automation
         </h1>
         <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-muted">
-          Bigcursor adds large cursors, natural movement and typing, and live click and keyboard
-          sounds to video captures made with Playwright.
+          Bigcursor makes automated browser use easier to follow. It adds a large, naturally
+          moving cursor and displays keystrokes so you can see what inputs were used.
         </p>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-muted">
-          Let coding agents show their work, or create repeatable product walkthroughs.
+          Agents use it to record themselves demoing a feature or showing how they tested an app.
         </p>
         <Link href="/docs" className="primary mt-6 min-h-11 px-6 text-base">
           Getting started
