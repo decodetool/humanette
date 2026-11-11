@@ -20,8 +20,8 @@ export default function Home() {
           Getting started
         </Link>
       </section>
-      <section id="examples" className="mt-12">
-        <h1 className="text-3xl font-semibold tracking-tight">Examples</h1>
+      <section id="examples" className="mt-20 sm:mt-24">
+        <h1 className="text-center text-4xl font-semibold tracking-tight sm:text-5xl">Examples</h1>
         <Examples />
       </section>
     </div>
