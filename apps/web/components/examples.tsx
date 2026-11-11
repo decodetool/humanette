@@ -1,16 +1,16 @@
 'use client';
 import { useState } from 'react';
-import { type TypingSpeed } from 'humanette/internal';
+import { type TypingSpeed } from 'bigcursor/internal';
 import { DemoSoundToggle } from './demo-audio';
 import { CodeBlock } from './code-block';
 import { ExamplePlayer, type Scene } from './example-player';
 const actions: Record<Scene, string> = {
-  click: "await human.click(page.getByRole('button', { name: 'Click me' }));",
-  text: "await human.selectText(page.getByText('these words', { exact: true }));",
-  typing: "await human.type(page.getByLabel('Demo title'), 'Make something great.');",
+  click: "await cursor.click(page.getByRole('button', { name: 'Click me' }));",
+  text: "await cursor.selectText(page.getByText('these words', { exact: true }));",
+  typing: "await cursor.type(page.getByLabel('Demo title'), 'Make something great.');",
   dimming:
-    "await human.configure({ autoHideTimeout: 500 });\nawait human.moveTo(page.getByText('Pause here', { exact: true }));\nawait human.wait(1400);",
-  drag: "await human.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
+    "await cursor.configure({ autoHideTimeout: 500 });\nawait cursor.moveTo(page.getByText('Pause here', { exact: true }));\nawait cursor.wait(1400);",
+  drag: "await cursor.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
 };
 export function Examples() {
   const scale = 4;
@@ -53,7 +53,7 @@ export function Examples() {
                 label={`${title} example`}
                 code={
                   scene === 'typing' && speed !== 'default'
-                    ? `await human.type(page.getByLabel('Demo title'), 'Make something great.', { speed: '${speed}' });`
+                    ? `await cursor.type(page.getByLabel('Demo title'), 'Make something great.', { speed: '${speed}' });`
                     : actions[scene]
                 }
               />

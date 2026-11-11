@@ -10,7 +10,7 @@ test('Play demo tolerates a frame timestamp just before playback started', async
     window.requestAnimationFrame = (callback) => request((time) => callback(time - 100));
   });
   await page.goto('/workbench');
-  await expect(page.locator('[data-humanette]')).toHaveCount(1);
+  await expect(page.locator('[data-bigcursor]')).toHaveCount(1);
   await page.evaluate(
     () =>
       new Promise<void>((resolve) => {

@@ -31,8 +31,8 @@ assert.ok(
   !selected || ['one-off', 'saved'].includes(selected),
   'Use --case=one-off or --case=saved',
 );
-const timeoutMs = Number(process.env.HUMANETTE_SKILL_TIMEOUT_MS ?? 600_000);
-const budget = process.env.HUMANETTE_SKILL_BUDGET_USD ?? '10';
+const timeoutMs = Number(process.env.BIGCURSOR_SKILL_TIMEOUT_MS ?? 600_000);
+const budget = process.env.BIGCURSOR_SKILL_BUDGET_USD ?? '10';
 for (const binary of ['ffmpeg', 'ffprobe']) {
   try {
     execFileSync(binary, ['-version'], { stdio: 'ignore' });
@@ -44,7 +44,7 @@ for (const binary of ['ffmpeg', 'ffprobe']) {
 }
 const claude = execFileSync('which', ['claude'], { encoding: 'utf8' }).trim();
 const cliVersion = execFileSync(claude, ['--version'], { encoding: 'utf8' }).trim();
-const suite = await mkdtemp(join(tmpdir(), 'humanette-agent-test-'));
+const suite = await mkdtemp(join(tmpdir(), 'bigcursor-agent-test-'));
 const results = resolve(
   root,
   'test-results/skill-harness',
@@ -106,25 +106,25 @@ const published = options.includes('--published');
 let registryUrl = 'https://registry.npmjs.org';
 let registry;
 if (!published) {
-  await run('bun', ['run', '--cwd', 'packages/humanette', 'build'], { cwd: root });
+  await run('bun', ['run', '--cwd', 'packages/bigcursor', 'build'], { cwd: root });
   const packed = JSON.parse(
     await run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', suite], {
-      cwd: join(root, 'packages/humanette'),
+      cwd: join(root, 'packages/bigcursor'),
     }),
   )[0];
   const manifest = JSON.parse(
-    await readFile(join(root, 'packages/humanette/package.json'), 'utf8'),
+    await readFile(join(root, 'packages/bigcursor/package.json'), 'utf8'),
   );
   const tarball = await readFile(join(suite, packed.filename));
   registry = createServer((req, res) => {
-    if (req.url === `/humanette/-/${packed.filename}`) {
+    if (req.url === `/bigcursor/-/${packed.filename}`) {
       res.setHeader('content-type', 'application/octet-stream');
       res.end(tarball);
-    } else if (req.url === '/humanette' || req.url === `/humanette/${manifest.version}`) {
+    } else if (req.url === '/bigcursor' || req.url === `/bigcursor/${manifest.version}`) {
       const version = {
         ...manifest,
         dist: {
-          tarball: `${registryUrl}/humanette/-/${packed.filename}`,
+          tarball: `${registryUrl}/bigcursor/-/${packed.filename}`,
           integrity: packed.integrity,
           shasum: packed.shasum,
         },
@@ -132,9 +132,9 @@ if (!published) {
       res.setHeader('content-type', 'application/json');
       res.end(
         JSON.stringify(
-          req.url === '/humanette'
+          req.url === '/bigcursor'
             ? {
-                name: 'humanette',
+                name: 'bigcursor',
                 'dist-tags': { latest: manifest.version },
                 versions: { [manifest.version]: version },
               }
@@ -155,7 +155,7 @@ console.log(
     : 'Testing a disposable npm registry serving the packed release; not proof of publication.',
 );
 
-// The consuming agent needs Node/npm, not Humanette's maintainer build tools.
+// The consuming agent needs Node/npm, not Bigcursor's maintainer build tools.
 const bin = join(suite, 'bin');
 await mkdir(bin);
 for (const name of ['node', 'npm', 'npx']) {
@@ -224,7 +224,7 @@ try {
     await writeFile(join(project, 'index.html'), app);
     await writeFile(join(project, '.gitignore'), 'node_modules/\n*.tgz\n');
     execFileSync('git', ['init', '-q'], { cwd: project });
-    await cp(join(root, 'skills/humanette'), join(project, '.claude/skills/humanette'), {
+    await cp(join(root, 'skills/bigcursor'), join(project, '.claude/skills/bigcursor'), {
       recursive: true,
     });
     const before = await snapshot(project);
@@ -292,8 +292,8 @@ try {
     };
     const request =
       name === 'one-off'
-        ? `/humanette record a demo of the new UX features in this PR. I only need the video.`
-        : `/humanette create a product demo of my to-do app. Save a reusable script in this repository and add an npm run demo command.`;
+        ? `/bigcursor record a demo of the new UX features in this PR. I only need the video.`
+        : `/bigcursor create a product demo of my to-do app. Save a reusable script in this repository and add an npm run demo command.`;
     const prompt = `${request}\nThe app is running at ${url}. Show adding "Buy groceries" and marking it complete. Save the finalized video under ${output}. The app's source is index.html.${name === 'saved' ? ' Let the saved command accept DEMO_URL and DEMO_OUT environment variables; the test will provide the app address and output directory when rerunning it.' : ''} Return the final video path, saved script path (null for video-only), and directory from which your demonstration resolves its dependencies.`;
     await writeFile(join(output, 'prompt.txt'), prompt);
     console.log(
@@ -356,13 +356,13 @@ try {
         JSON.stringify({ tasks, inputs, report }, null, 2),
       );
       assert.ok(
-        events.some((event) => event.type === 'system' && event.skills?.includes('humanette')) ||
+        events.some((event) => event.type === 'system' && event.skills?.includes('bigcursor')) ||
           events.some((event) =>
             event.message?.content?.some(
-              (part) => part.name === 'Skill' && part.input?.skill === 'humanette',
+              (part) => part.name === 'Skill' && part.input?.skill === 'bigcursor',
             ),
           ),
-        'Humanette skill was not discovered/invoked',
+        'Bigcursor skill was not discovered/invoked',
       );
       recording = resolve(project, report.video);
       assert.ok(await inside(recording, output), 'Final video must be outside disposable tools');
@@ -416,17 +416,17 @@ try {
             'Existing Playwright must be preserved',
           );
           assert.ok(
-            manifest.devDependencies['humanette-browser'],
+            manifest.devDependencies['bigcursor-browser'],
             'Old app needs a separate recording browser',
           );
         }
         assert.ok(manifest.scripts.demo, 'Saved demo is missing npm run demo');
         assert.ok(
-          !manifest.devDependencies?.humanette?.startsWith('file:'),
-          'Humanette must be a registry dependency',
+          !manifest.devDependencies?.bigcursor?.startsWith('file:'),
+          'Bigcursor must be a registry dependency',
         );
         assert.ok(
-          manifest.devDependencies?.humanette &&
+          manifest.devDependencies?.bigcursor &&
             manifest.devDependencies?.['chrome-capture'] &&
             (manifest.devDependencies?.playwright ||
               manifest.devDependencies?.['@playwright/test'] ||
@@ -442,8 +442,8 @@ try {
         );
         const saved = await readFile(script, 'utf8');
         assert.ok(
-          saved.includes('createHuman'),
-          'Saved script does not use the real Humanette API',
+          saved.includes('createCursor'),
+          'Saved script does not use the real Bigcursor API',
         );
         for (const file of ['package.json', 'package-lock.json', relative(project, script)]) {
           const text = await readFile(join(project, file), 'utf8');
@@ -456,7 +456,7 @@ try {
       const media = verifyNativeRecording(recording, { barcode: true, appTones: [440, 660] });
       await writeFile(join(output, 'native-media.json'), JSON.stringify(media, null, 2));
       const require = createRequire(join(resolve(report.dependencyRoot), 'package.json'));
-      const installedManifest = require('humanette/package.json');
+      const installedManifest = require('bigcursor/package.json');
       assert.ok(
         installedManifest.exports['./recording'],
         'Installed package lacks its recording API',
@@ -464,16 +464,16 @@ try {
       if (name === 'saved') {
         const source = await readFile(resolve(project, report.script), 'utf8');
         assert.ok(
-          source.includes('humanette/recording'),
+          source.includes('bigcursor/recording'),
           'Saved flow must use the package recorder',
         );
         assert.ok(
           !source.includes('withNaturalTyping'),
-          'Typing belongs in createHuman, not a copied wrapper',
+          'Typing belongs in createCursor, not a copied wrapper',
         );
       }
       const moduleName = [
-        'humanette-browser',
+        'bigcursor-browser',
         'playwright',
         '@playwright/test',
         'playwright-core',

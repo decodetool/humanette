@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { chromium } from 'playwright-core';
-import { createHuman } from '../../packages/humanette/dist/playwright.js';
-import { typingPlan, typingSpeeds } from '../../packages/humanette/dist/playwright.js';
-import { installInteractionSounds } from '../../packages/humanette/dist/recording.js';
-import { installTypingSound } from '../../packages/humanette/src/recording/typing-sound.js';
+import { createCursor } from '../../packages/bigcursor/dist/playwright.js';
+import { typingPlan, typingSpeeds } from '../../packages/bigcursor/dist/playwright.js';
+import { installInteractionSounds } from '../../packages/bigcursor/dist/recording.js';
+import { installTypingSound } from '../../packages/bigcursor/src/recording/typing-sound.js';
 
 test('seeded plans preserve graphemes and pause at language boundaries', () => {
   const text = 'Hello, world. Next line\nDone 👩‍💻!';
@@ -77,7 +77,7 @@ test('rapid keys keep natural sound envelopes and overlapping voices without dro
         envelopes.push(decay);
         return target.call(this, value, time, decay);
       };
-      const sound = window.__humanetteTypingSound;
+      const sound = window.__bigcursorTypingSound;
       try {
         sound.press('printable', 'one');
         clock += 60;
@@ -138,10 +138,10 @@ test(
         );
       });
       const sounds = await installInteractionSounds(page, { clicks: false });
-      const human = await createHuman(page);
+      const cursor = await createCursor(page);
       try {
         const text = 'One, two.\nNext 👩‍💻!';
-        await human.type('textarea', text);
+        await cursor.type('textarea', text);
         assert.equal(await page.locator('textarea').inputValue(), text);
         assert.equal(
           await page.evaluate(() => submissions),
@@ -165,7 +165,7 @@ test(
         assert.equal(audio.errors, 0);
         assert.ok(audio.played >= 10 && audio.released >= 10, 'Press and release must sound');
 
-        await human.type('textarea', 'fixed', { delay: 1, selectAll: true });
+        await cursor.type('textarea', 'fixed', { delay: 1, selectAll: true });
         assert.equal(
           await page.locator('textarea').inputValue(),
           'fixed',
@@ -175,9 +175,9 @@ test(
           keys.length = 0;
         });
         const controller = new AbortController();
-        const typing = human.type('textarea', 'abcde', { signal: controller.signal });
-        await assert.rejects(human.wait(0), /parallel input/);
-        await assert.rejects(human.dispose(), /running action|parallel input/);
+        const typing = cursor.type('textarea', 'abcde', { signal: controller.signal });
+        await assert.rejects(cursor.wait(0), /parallel input/);
+        await assert.rejects(cursor.dispose(), /running action|parallel input/);
         await page.waitForFunction(() => keys.some((k) => k.type === 'down'));
         controller.abort();
         await assert.rejects(typing, { name: 'AbortError' });
@@ -188,13 +188,13 @@ test(
           'Abort must release held keyboard input',
         );
       } finally {
-        await human.dispose();
-        await human.dispose();
+        await cursor.dispose();
+        await cursor.dispose();
         await sounds.dispose();
       }
       assert.equal(
         await page.evaluate(() =>
-          Boolean(window.__humanetteTypingSound || window.__humanetteInteractionSounds),
+          Boolean(window.__bigcursorTypingSound || window.__bigcursorInteractionSounds),
         ),
         false,
       );

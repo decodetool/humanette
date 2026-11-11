@@ -33,7 +33,7 @@
 export function installTypingSound({ volume = 0.18, global = true } = {}) {
   if (!Number.isFinite(volume) || volume < 0 || volume > 1)
     throw new RangeError('Typing volume must be 0–1.');
-  if (global) window.__humanetteTypingSound?.dispose();
+  if (global) window.__bigcursorTypingSound?.dispose();
   let context,
     bus,
     disposed = false,
@@ -294,9 +294,9 @@ export function installTypingSound({ volume = 0.18, global = true } = {}) {
       nodes.clear();
       if (context) void context.close();
       bus = undefined;
-      if (window.__humanetteTypingSound === api) delete window.__humanetteTypingSound;
+      if (window.__bigcursorTypingSound === api) delete window.__bigcursorTypingSound;
     },
   };
-  if (global) window.__humanetteTypingSound = api;
+  if (global) window.__bigcursorTypingSound = api;
   return api;
 }

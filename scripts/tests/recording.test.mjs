@@ -4,20 +4,20 @@ import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright-core';
-import { createHuman } from '../../packages/humanette/dist/playwright.js';
+import { createCursor } from '../../packages/bigcursor/dist/playwright.js';
 import {
   PRESETS,
   launchForPreset,
   startRecording,
-} from '../../packages/humanette/dist/recording.js';
-import { installInteractionSounds } from '../../packages/humanette/dist/recording.js';
+} from '../../packages/bigcursor/dist/recording.js';
+import { installInteractionSounds } from '../../packages/bigcursor/dist/recording.js';
 import { verifyNativeRecording } from '../verify-native-recording.mjs';
 
 await mkdir('test-results', { recursive: true });
 const output = await mkdtemp(join(process.cwd(), 'test-results/native-recorder-'));
 const fixture =
   '<body style="background:#123;color:white"><button>Save</button><input aria-label="Task"><input aria-label="Secret" type="password"><input type="checkbox" aria-label="Complete"><iframe srcdoc="<button>Child</button>"></iframe></body>';
-const stats = (page) => page.evaluate(() => window.__humanetteInteractionSounds.stats());
+const stats = (page) => page.evaluate(() => window.__bigcursorInteractionSounds.stats());
 
 test(
   'native presets capture exact real dimensions and audible app + live input sounds',
@@ -29,9 +29,9 @@ test(
         const page = await context.newPage();
         await page.setContent(fixture);
         const recording = await startRecording(page, preset);
-        const human = await createHuman(page);
+        const cursor = await createCursor(page);
         try {
-          await human.type(page.getByLabel('Task'), 'abc', { delay: 45 });
+          await cursor.type(page.getByLabel('Task'), 'abc', { delay: 45 });
           const before = await stats(page);
           assert.equal(before.keys, 3, 'insertText must sound each character once');
           await page.getByLabel('Task').pressSequentially('d');
@@ -71,7 +71,7 @@ test(
           );
           await page.frameLocator('iframe').getByRole('button').click();
           assert.equal(
-            (await page.frames()[1].evaluate(() => window.__humanetteInteractionSounds.stats()))
+            (await page.frames()[1].evaluate(() => window.__bigcursorInteractionSounds.stats()))
               .clicks,
             1,
           );
@@ -97,12 +97,12 @@ test(
           const media = verifyNativeRecording(file, { ...preset.frame, appTones: [440] });
           await writeFile(join(output, `${name}.json`), JSON.stringify({ result, media }, null, 2));
           assert.equal(
-            await page.evaluate(() => Boolean(window.__humanetteInteractionSounds)),
+            await page.evaluate(() => Boolean(window.__bigcursorInteractionSounds)),
             false,
           );
-          assert.equal(await page.evaluate(() => Boolean(window.__humanetteCaptureRefresh)), false);
+          assert.equal(await page.evaluate(() => Boolean(window.__bigcursorCaptureRefresh)), false);
           assert.equal(
-            await page.frames()[1].evaluate(() => Boolean(window.__humanetteInteractionSounds)),
+            await page.frames()[1].evaluate(() => Boolean(window.__bigcursorInteractionSounds)),
             false,
           );
           assert.equal(
@@ -111,7 +111,7 @@ test(
             'sound injection must not change app state',
           );
         } finally {
-          await human.dispose();
+          await cursor.dispose();
         }
       } catch (error) {
         for (const page of context.pages())
@@ -141,7 +141,7 @@ test(
       assert.equal((await stats(page)).clicks, 0);
       assert.equal((await stats(page)).keys, 1);
       await page.goto(`data:text/html,${encodeURIComponent(fixture)}`);
-      await page.waitForFunction(() => window.__humanetteInteractionSounds);
+      await page.waitForFunction(() => window.__bigcursorInteractionSounds);
       await page.getByLabel('Task').pressSequentially('b');
       assert.equal((await stats(page)).keys, 1, 'sound hooks must survive navigation');
       await sounds.dispose();
@@ -159,8 +159,8 @@ test(
       assert.ok(result.warning?.includes('unverified'));
       assert.equal(result.sourceSize, null);
       assert.deepEqual(await cdp.send('Browser.getWindowForTarget'), before);
-      assert.equal(await page.evaluate(() => Boolean(window.__humanetteInteractionSounds)), false);
-      assert.equal(await page.evaluate(() => Boolean(window.__humanetteCaptureRefresh)), false);
+      assert.equal(await page.evaluate(() => Boolean(window.__bigcursorInteractionSounds)), false);
+      assert.equal(await page.evaluate(() => Boolean(window.__bigcursorCaptureRefresh)), false);
       await cdp.detach();
     } finally {
       await browser.close();
@@ -185,13 +185,13 @@ test(
         '<body style="margin:0;background:#16130f"><canvas width="1280" height="800"></canvas></body>',
       );
       await page.addScriptTag({
-        path: new URL('../../packages/humanette/dist/humanette.global.js', import.meta.url)
+        path: new URL('../../packages/bigcursor/dist/bigcursor.global.js', import.meta.url)
           .pathname,
       });
       const path = join(output, 'cursor-after-repaint.mp4');
       const recording = await startRecording(page, preset, { audio: false, sounds: false });
       await page.evaluate(async () => {
-        const cursor = Humanette.createHumanette({ scale: 4, motionBlur: 0 });
+        const cursor = BigCursor.createCursorRenderer({ scale: 4, motionBlur: 0 });
         await cursor.ready;
         cursor.setCursor('default');
         const scene = document.querySelector('canvas').getContext('2d'),
@@ -342,7 +342,7 @@ test(
       const mediaResult = await mediaRecording.stop(mediaFile);
       assert.equal(mediaResult.interactionSounds, undefined);
       verifyNativeRecording(mediaFile, { appTones: [880] });
-      assert.equal(await page.evaluate(() => Boolean(window.__humanetteInteractionSounds)), false);
+      assert.equal(await page.evaluate(() => Boolean(window.__bigcursorInteractionSounds)), false);
     } catch (error) {
       for (const page of context.pages())
         await page.screenshot({ path: join(output, 'audio-failed.png') }).catch(() => {});
@@ -364,22 +364,22 @@ test(
       await page.setContent(
         '<body style="margin:0;background:#123"><input aria-label="Title" style="position:absolute;left:0;top:100px;box-sizing:border-box;width:600px;height:100px;padding:20px;border:0;background:#123;color:white"></body>',
       );
-      const human = await createHuman(page, {
+      const cursor = await createCursor(page, {
         motionBlur: 0,
         autoHideTimeout: 500,
         hiddenOpacity: 0.5,
       });
       const recording = await startRecording(page, preset, { sounds: false, audio: false });
       try {
-        await human.click(page.getByLabel('Title'));
+        await cursor.click(page.getByLabel('Title'));
         await page.waitForTimeout(150);
         await page.keyboard.type('Hello', { delay: 80 });
         await page.waitForTimeout(900);
-        await human.configure({ hiddenOpacity: 0.25 });
+        await cursor.configure({ hiddenOpacity: 0.25 });
         await page.waitForTimeout(400);
-        await human.configure({ hiddenOpacity: 0 });
+        await cursor.configure({ hiddenOpacity: 0 });
         await page.waitForFunction(
-          () => document.querySelector('[data-humanette]').dataset.cursorOpacity === '0',
+          () => document.querySelector('[data-bigcursor]').dataset.cursorOpacity === '0',
         );
         await page.waitForTimeout(300);
         const file = join(output, 'idle-cursor.mp4');
@@ -422,7 +422,7 @@ test(
         assert.ok(custom > dimmed, 'Custom 0.25 idle dimming missing from native video');
         assert.ok(result.last < 40, 'Hidden cursor still obstructs the field in native video');
       } finally {
-        await human.dispose();
+        await cursor.dispose();
         await recording.stop(join(output, 'idle-cursor.mp4'));
       }
     } catch (error) {

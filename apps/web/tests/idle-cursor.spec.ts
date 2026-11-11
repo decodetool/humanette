@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createHuman } from 'humanette';
+import { createCursor } from 'bigcursor';
 
 declare global {
   interface Window {
@@ -26,31 +26,31 @@ for (const renderer of ['svg', 'canvas'] as const) {
       const attach = Element.prototype.attachShadow;
       Element.prototype.attachShadow = function (options) {
         const shadow = attach.call(this, options);
-        if (this.tagName === 'HUMANETTE-POINTER') window.idleShadow = shadow;
+        if (this.tagName === 'BIGCURSOR-POINTER') window.idleShadow = shadow;
         return shadow;
       };
     });
-    const human = await createHuman(page, {
+    const cursor = await createCursor(page, {
       renderer,
       motionBlur: 0,
       autoHideTimeout: 500,
       hiddenOpacity: 0.5,
     });
-    const cursor = page.locator('[data-humanette]');
+    const overlay = page.locator('[data-bigcursor]');
     try {
-      await human.click(page.getByLabel('Title'));
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
+      await cursor.click(page.getByLabel('Title'));
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
       await page.keyboard.insertText('h');
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.3', { timeout: 200 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.3', { timeout: 200 });
       await page.keyboard.type('ello', { delay: 240 });
       await expect(page.getByLabel('Title')).toHaveValue('hello');
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.5');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.5');
       await page.waitForTimeout(400); // Let the final typing-state deadline settle.
       const restingFrames = await page.evaluate(() => window.idleFrames);
       await page.waitForTimeout(200);
       expect(await page.evaluate(() => window.idleFrames)).toBe(restingFrames);
-      await human.configure({ hiddenOpacity: 0 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0');
+      await cursor.configure({ hiddenOpacity: 0 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0');
       expect(
         await page.evaluate(() => {
           const canvas = window.idleShadow.querySelector('canvas')!;
@@ -68,45 +68,45 @@ for (const renderer of ['svg', 'canvas'] as const) {
       const idleFrames = await page.evaluate(() => window.idleFrames);
       await page.waitForTimeout(200);
       expect(await page.evaluate(() => window.idleFrames)).toBe(idleFrames);
-      await human.configure({ hiddenOpacity: 0.5 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.5');
+      await cursor.configure({ hiddenOpacity: 0.5 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.5');
       await page.mouse.down(); // Same position: preserve the text-selection opacity while held.
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.3');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.3');
       await page.waitForTimeout(1200);
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.3');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.3');
       await page.mouse.up();
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.5');
-      await human.moveTo(page.getByRole('button'), { duration: 100 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
-      await human.hideCursor();
-      await human.moveTo(page.getByLabel('Title'), { duration: 100 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0');
-      await human.showCursor();
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.5');
-      await human.configure({ autoHideTimeout: 0 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.5');
+      await cursor.moveTo(page.getByRole('button'), { duration: 100 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
+      await cursor.hideCursor();
+      await cursor.moveTo(page.getByLabel('Title'), { duration: 100 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0');
+      await cursor.showCursor();
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.5');
+      await cursor.configure({ autoHideTimeout: 0 });
       await page.waitForTimeout(1200);
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
-      await human.configure({ autoHideTimeout: 100, hiddenOpacity: 0.2 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.2');
-      await human.configure({ autoHideTimeout: 0, dimmedOpacity: 0.2 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
+      await cursor.configure({ autoHideTimeout: 100, hiddenOpacity: 0.2 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.2');
+      await cursor.configure({ autoHideTimeout: 0, dimmedOpacity: 0.2 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
       await page.keyboard.insertText('!');
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.2');
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.2');
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
       await page.keyboard.press('ArrowLeft');
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.2', { timeout: 200 });
-      await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
-      await human.configure({ autoHideTimeout: 500 });
-      await human.moveTo(page.getByLabel('Title'), { duration: 100 });
-      await human.dispose();
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.2', { timeout: 200 });
+      await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
+      await cursor.configure({ autoHideTimeout: 500 });
+      await cursor.moveTo(page.getByLabel('Title'), { duration: 100 });
+      await cursor.dispose();
       const disposedFrames = await page.evaluate(() => window.idleFrames);
       await page.waitForTimeout(1200);
       expect(await page.evaluate(() => window.idleFrames)).toBe(disposedFrames);
-      await expect(cursor).toHaveCount(0);
+      await expect(overlay).toHaveCount(0);
     } finally {
       await page.mouse.up();
-      await human.dispose();
+      await cursor.dispose();
     }
   });
 }
@@ -118,39 +118,42 @@ test('homepage demos keep their cursor visible; the dedicated dimming example op
   const scene = page.getByTestId('example-typing');
   await scene.scrollIntoViewIfNeeded();
   await expect(scene.getByTestId('example-typing-target')).toHaveText('Make something great.');
-  await expect(scene.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
+  await expect(scene.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '1');
   const dimming = page.getByTestId('example-dimming');
   await dimming.scrollIntoViewIfNeeded();
-  await expect(dimming.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0');
-  await expect(dimming.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
+  await expect(dimming.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '0');
+  await expect(dimming.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '1');
 });
 
 test('idle configuration survives navigation and updates a paused visual timeline', async ({
   page,
 }) => {
   await page.goto('about:blank');
-  const human = await createHuman(page);
+  const cursor = await createCursor(page);
   try {
-    await human.configure({ dimmedOpacity: 0.2, hiddenOpacity: 0.75 });
-    await human.hideCursor();
+    await cursor.configure({ dimmedOpacity: 0.2, hiddenOpacity: 0.75 });
+    await cursor.hideCursor();
     await page.goto('data:text/html,<input aria-label="Title">');
-    await human.click(page.getByLabel('Title'));
-    const cursor = page.locator('[data-humanette]');
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '0');
+    await cursor.click(page.getByLabel('Title'));
+    const overlay = page.locator('[data-bigcursor]');
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '0');
     await page.keyboard.insertText('Still works');
     await expect(page.getByLabel('Title')).toHaveValue('Still works');
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '0');
-    await human.showCursor();
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '0');
+    await cursor.showCursor();
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
     await page.waitForTimeout(1200);
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
     await page.keyboard.press('ArrowLeft');
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.2', { timeout: 200 });
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '1');
-    await human.configure({ autoHideTimeout: 100 });
-    await expect(cursor).toHaveAttribute('data-cursor-opacity', '0.75');
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.2', { timeout: 200 });
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '1');
+    await cursor.configure({ autoHideTimeout: 100 });
+    await expect(overlay).toHaveAttribute('data-cursor-opacity', '0.75');
     await page.evaluate(async () => {
-      const cursor = window.Humanette.createHumanette({ hiddenOpacity: 0, autoHideTimeout: 500 });
+      const cursor = window.BigCursor.createCursorRenderer({
+        hiddenOpacity: 0,
+        autoHideTimeout: 500,
+      });
       await cursor.ready;
       cursor.seek([{ at: 0, type: 'move', x: 200, y: 100, duration: 100 }], 2000);
       await new Promise(requestAnimationFrame);
@@ -162,6 +165,6 @@ test('idle configuration survives navigation and updates a paused visual timelin
       cursor.dispose();
     });
   } finally {
-    await human.dispose();
+    await cursor.dispose();
   }
 });

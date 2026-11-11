@@ -1,4 +1,4 @@
-// Native recording implementation owned by humanette/recording.
+// Native recording implementation owned by bigcursor/recording.
 // Native Chrome 153+ AV1/Opus MP4 capture: no JPEG pipe, ffmpeg, extension, or audio driver.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
@@ -21,7 +21,7 @@ export async function installCaptureRefresh(page) {
   async function install(frame) {
     if (disposed) return;
     await frame.evaluate((token) => {
-      const key = '__humanetteCaptureRefresh';
+      const key = '__bigcursorCaptureRefresh';
       window[key]?.dispose();
       const main = window === window.top;
       const canvas = main ? document.createElement('canvas') : null;
@@ -108,7 +108,7 @@ export async function installCaptureRefresh(page) {
       page.frames().map((frame) =>
         frame
           .evaluate((token) => {
-            const refresh = window.__humanetteCaptureRefresh;
+            const refresh = window.__bigcursorCaptureRefresh;
             if (refresh?.token === token) refresh.dispose();
           }, token)
           .catch(() => {}),
@@ -123,7 +123,7 @@ export async function installCaptureRefresh(page) {
     throw error;
   }
   return {
-    stats: () => page.evaluate(() => window.__humanetteCaptureRefresh?.stats()),
+    stats: () => page.evaluate(() => window.__bigcursorCaptureRefresh?.stats()),
     dispose,
   };
 }
@@ -160,7 +160,7 @@ export async function launchForPreset(
   // This optional browser-only alias lets an older app keep its existing Playwright.
   if (!launch.executablePath) {
     try {
-      chromium = (await import('humanette-browser')).chromium;
+      chromium = (await import('bigcursor-browser')).chromium;
     } catch (error) {
       if (error.code !== 'ERR_MODULE_NOT_FOUND') throw error;
     }
@@ -203,7 +203,7 @@ export async function startRecording(page, name = 'archive', overrides = {}) {
   const { audio = true, sounds = true, captureRefresh = true, ...appearance } = overrides;
   const [major, minor] = process.versions.node.split('.').map(Number);
   if (major < 24 || (major === 24 && minor < 11))
-    throw new Error('Humanette recording requires Node.js 24.11 or newer.');
+    throw new Error('Bigcursor recording requires Node.js 24.11 or newer.');
   const { startRecording: capture } = await import('chrome-capture').catch((error) => {
     if (error.code === 'ERR_MODULE_NOT_FOUND')
       throw new Error(

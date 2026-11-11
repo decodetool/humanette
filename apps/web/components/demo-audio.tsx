@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { createPreviewAudio, type PreviewAudio } from 'humanette/internal';
+import { createPreviewAudio, type PreviewAudio } from 'bigcursor/internal';
 const Context = createContext<{
   audio: React.RefObject<PreviewAudio | null>;
   enabled: boolean;

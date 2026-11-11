@@ -1,7 +1,7 @@
 // Deterministic real-input demo. Start bun dev first; no LLM calls during the take.
 import { chromium } from 'playwright-core';
-import { createHuman } from 'humanette';
-import { launchForPreset, startRecording, installInteractionSounds } from 'humanette/recording';
+import { createCursor } from 'bigcursor';
+import { launchForPreset, startRecording, installInteractionSounds } from 'bigcursor/recording';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 const args = process.argv.slice(2);
@@ -25,7 +25,7 @@ try {
   const page = await context.newPage();
   await page.goto('http://localhost:3410/examples/live');
   await page.getByRole('button', { name: 'Save changes', exact: true }).waitFor();
-  const human = await createHuman(page, { seed: 42, scale: 4 });
+  const cursor = await createCursor(page, { seed: 42, scale: 4 });
   const sounds = headful ? await installInteractionSounds(page) : null;
   const recording = headful ? null : await startRecording(page, preset);
   try {
@@ -34,23 +34,23 @@ try {
       console.log(
         'Running live without recording. The window stays open afterward; close it to exit.',
       );
-      await human.wait(1200);
+      await cursor.wait(1200);
     }
-    await human.click('#save', { duration: 1200 });
-    await human.type('#name', 'A human touch', { selectAll: true, duration: 1200 });
+    await cursor.click('#save', { duration: 1200 });
+    await cursor.type('#name', 'A cursor touch', { selectAll: true, duration: 1200 });
     const r = await page.locator('#select-text').evaluate((el) => {
       const range = document.createRange();
       range.selectNodeContents(el);
       const r = range.getBoundingClientRect();
       return { x: r.x, y: r.y, w: r.width, h: r.height };
     });
-    await human.drag(
+    await cursor.drag(
       { x: r.x + 1, y: r.y + r.h / 2 },
       { x: r.x + r.w - 1, y: r.y + r.h / 2 },
       { duration: 1100 },
     );
-    await human.drag('#card', '#drop', { duration: 1100 });
-    await human.wait(700);
+    await cursor.drag('#card', '#drop', { duration: 1100 });
+    await cursor.wait(700);
     const result = await page.evaluate(() => ({
       saved: document.querySelector('#save').textContent,
       name: document.querySelector('#name').value,
@@ -59,7 +59,7 @@ try {
     }));
     if (
       result.saved !== 'Changes saved' ||
-      result.name !== 'A human touch' ||
+      result.name !== 'A cursor touch' ||
       result.delivered !== 'Delivered'
     )
       throw Error('Postflight failed: ' + JSON.stringify(result));
@@ -91,7 +91,7 @@ try {
       if (recording) await recording.stop(videoPath);
     } finally {
       await sounds?.dispose();
-      await human.dispose();
+      await cursor.dispose();
     }
   }
   await context.close();

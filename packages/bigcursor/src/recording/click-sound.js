@@ -2,7 +2,7 @@
 export function installClickSound({ volume = 0.18, global = true } = {}) {
   if (!Number.isFinite(volume) || volume < 0 || volume > 1)
     throw new RangeError('Sound volume must be 0–1.');
-  if (global) window.__humanetteClickSound?.dispose();
+  if (global) window.__bigcursorClickSound?.dispose();
   let context,
     disposed = false;
   const sources = new Set();
@@ -67,9 +67,9 @@ export function installClickSound({ volume = 0.18, global = true } = {}) {
       }
       sources.clear();
       if (context) void context.close();
-      if (window.__humanetteClickSound === api) delete window.__humanetteClickSound;
+      if (window.__bigcursorClickSound === api) delete window.__bigcursorClickSound;
     },
   };
-  if (global) window.__humanetteClickSound = api;
+  if (global) window.__bigcursorClickSound = api;
   return api;
 }

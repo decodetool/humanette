@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright';
-import { createHuman } from 'humanette';
-import { launchForPreset, startRecording } from 'humanette/recording';
+import { createCursor } from 'bigcursor';
+import { launchForPreset, startRecording } from 'bigcursor/recording';
 
 const output = resolve(process.argv[2] ?? 'out');
 await mkdir(output, { recursive: true });
@@ -58,25 +58,25 @@ try {
       </script></body></html>`);
     await page.evaluate(() => document.fonts.ready);
     recording = await startRecording(page, preset);
-    const human = await createHuman(page, { scale: 4, seed: 42 });
+    const cursor = await createCursor(page, { scale: 4, seed: 42 });
     try {
-      await human.wait(500);
-      await human.type(page.getByLabel('New task'), 'Buy groceries');
-      await human.click(page.getByRole('button', { name: 'Add task' }));
+      await cursor.wait(500);
+      await cursor.type(page.getByLabel('New task'), 'Buy groceries');
+      await cursor.click(page.getByRole('button', { name: 'Add task' }));
       const task = page.getByRole('checkbox', { name: 'Buy groceries' });
       await task.waitFor();
       assert.equal(await task.isChecked(), false);
-      await human.wait(500);
-      await human.click(task);
+      await cursor.wait(500);
+      await cursor.click(task);
       assert.equal(await task.isChecked(), true, 'The task should be complete');
-      await human.wait(900);
+      await cursor.wait(900);
       await page.screenshot({ path: resolve(output, 'todo-demo.png') });
     } finally {
       try {
         const stats = await recording.stop(resolve(output, 'todo-demo.mp4'));
         console.log(JSON.stringify(stats));
       } finally {
-        await human.dispose();
+        await cursor.dispose();
       }
     }
   } finally {

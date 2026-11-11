@@ -4,7 +4,7 @@ import { chromium, webkit } from 'playwright-core';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 
 const bundle = await readFile(
-  new URL('../packages/humanette/dist/humanette.global.js', import.meta.url),
+  new URL('../packages/bigcursor/dist/bigcursor.global.js', import.meta.url),
   'utf8',
 );
 await mkdir('test-results/renderer-comparison', { recursive: true });
@@ -44,7 +44,7 @@ for (const [engine, browserType] of [
     }
     const before = session ? await session.send('Performance.getMetrics') : null;
     const sample = await page.evaluate(async (renderer) => {
-      const cursor = window.Humanette.createHumanette({ renderer, scale: 4, motionBlur: 0 });
+      const cursor = window.BigCursor.createCursorRenderer({ renderer, scale: 4, motionBlur: 0 });
       await cursor.ready;
       cursor.setCursor('default');
       const scene = document.querySelector('#scene').getContext('2d');

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createHuman } from 'humanette';
+import { createCursor } from 'bigcursor';
 test('site and live renderer work at desktop and mobile widths', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -24,37 +24,37 @@ test('real adapter clicks, types, selects and drags; CSS comparisons restore nat
   page,
 }) => {
   await page.goto('/examples/live');
-  const human = await createHuman(page, { scale: 2.5 });
+  const cursor = await createCursor(page, { scale: 2.5 });
   try {
-    await human.click('#save');
+    await cursor.click('#save');
     await expect(page.locator('#save')).toHaveText('Changes saved');
-    await human.type('#name', 'Start', { selectAll: true, delay: 1 });
+    await cursor.type('#name', 'Start', { selectAll: true, delay: 1 });
     await expect(page.locator('#name')).toHaveValue('Start');
-    await human.selectText(page.locator('#select-text'), { duration: 400 });
+    await cursor.selectText(page.locator('#select-text'), { duration: 400 });
     expect(await page.evaluate(() => getSelection()?.toString())).toBe('Make every move matter.');
-    await human.drag('#card', '#drop', { duration: 500 });
+    await cursor.drag('#card', '#drop', { duration: 500 });
     await expect(page.locator('#card')).toHaveText('Delivered');
-    await human.moveTo('[data-testid=cursor-pointer] td:first-of-type');
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor', 'pointer');
-    await human.moveTo('[data-testid=cursor-pointer] [data-humanette-native]');
-    await expect(page.locator('[data-humanette]')).toHaveCSS('visibility', 'hidden');
-    await human.moveTo('[data-testid=cursor-text] td:first-of-type');
-    await expect(page.locator('[data-humanette]')).toHaveCSS('visibility', 'visible');
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor', 'text');
+    await cursor.moveTo('[data-testid=cursor-pointer] td:first-of-type');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor', 'pointer');
+    await cursor.moveTo('[data-testid=cursor-pointer] [data-bigcursor-native]');
+    await expect(page.locator('[data-bigcursor]')).toHaveCSS('visibility', 'hidden');
+    await cursor.moveTo('[data-testid=cursor-text] td:first-of-type');
+    await expect(page.locator('[data-bigcursor]')).toHaveCSS('visibility', 'visible');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor', 'text');
     await page.screenshot({ path: 'test-results/cursor-gallery.png' });
   } finally {
-    await human.dispose();
+    await cursor.dispose();
   }
-  await expect(page.locator('[data-humanette]')).toHaveCount(0);
+  await expect(page.locator('[data-bigcursor]')).toHaveCount(0);
 });
 test('disposing preserves an application cursor change while hovered', async ({ page }) => {
   await page.goto('/examples/live');
-  const human = await createHuman(page);
-  await human.moveTo('#save');
+  const cursor = await createCursor(page);
+  await cursor.moveTo('#save');
   await page.locator('#save').evaluate((element) => {
     element.style.cursor = 'wait';
   });
-  await human.dispose();
+  await cursor.dispose();
   await expect(page.locator('#save')).toHaveCSS('cursor', 'wait');
 });
 test('workbench presets export usable package configuration', async ({ page }) => {
@@ -63,10 +63,10 @@ test('workbench presets export usable package configuration', async ({ page }) =
   const pending = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export preset' }).click();
   const download = await pending;
-  expect(download.suggestedFilename()).toBe('humanette-preset.json');
+  expect(download.suggestedFilename()).toBe('bigcursor-preset.json');
   await page.getByRole('button', { name: 'Drag & drop', exact: true }).click();
   await page.getByRole('button', { name: 'Play demo' }).click();
-  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-phase', 'hold', {
+  await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-phase', 'hold', {
     timeout: 5000,
   });
   await page.screenshot({ path: 'test-results/workbench.png' });

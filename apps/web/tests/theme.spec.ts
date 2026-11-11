@@ -4,7 +4,7 @@ test('theme toggles in both directions on the development origin', async ({ page
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
-  await page.goto(process.env.HUMANETTE_TEST_URL ?? '/');
+  await page.goto(process.env.BIGCURSOR_TEST_URL ?? '/');
   await page.getByRole('button', { name: 'Switch to dark mode' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.getByRole('button', { name: 'Switch to light mode' }).click();

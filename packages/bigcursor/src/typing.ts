@@ -2,7 +2,7 @@
  * Timing profile, inverse-CDF sampling and seeded RNG adapted from human-input:
  * https://github.com/heydryft/human-input/tree/39975cd057329dabfe5dc0f0ca09d6659773ed886
  * src/profile.ts and src/random.ts. No recorded corpus or mouse engine included.
- * Humanette additions: word/clause/sentence pauses, word-level pace, literal
+ * Bigcursor additions: word/clause/sentence pauses, word-level pace, literal
  * Unicode insertion, cancellation, fixed-delay opt-out, and serialized actions.
  *
  * MIT License

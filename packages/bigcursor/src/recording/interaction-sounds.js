@@ -26,7 +26,7 @@ export async function installInteractionSounds(
       page
         .frames()
         .map((frame) =>
-          frame.evaluate(() => window.__humanetteInteractionSounds?.dispose()).catch(() => {}),
+          frame.evaluate(() => window.__bigcursorInteractionSounds?.dispose()).catch(() => {}),
         ),
     );
   }
@@ -44,7 +44,7 @@ export async function installInteractionSounds(
           page
             .frames()
             .map((frame) =>
-              frame.evaluate(() => window.__humanetteInteractionSounds?.stats()).catch(() => null),
+              frame.evaluate(() => window.__bigcursorInteractionSounds?.stats()).catch(() => null),
             ),
         )
       ).filter(Boolean);

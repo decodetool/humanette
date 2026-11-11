@@ -1,9 +1,9 @@
 ---
-name: humanette
-description: Record an agent demonstrating a browser feature, or create a repeatable Playwright product walkthrough, with Humanette's readable cursors and click feedback. Use when asked for a browser demo, tutorial, or product video with Humanette.
+name: bigcursor
+description: Record an agent demonstrating a browser feature, or create a repeatable Playwright product walkthrough, with Bigcursor's readable cursors and click feedback. Use when asked for a browser demo, tutorial, or product video with Bigcursor.
 ---
 
-# Humanette
+# Bigcursor
 
 Turn the user's requested browser flow into a local video with legible cursor movement and real application interactions. Prioritize recording the agent demonstrating the feature. Handle missing dependencies yourself as part of the demo.
 
@@ -22,46 +22,46 @@ In temporary mode, scripts must resolve packages from the temporary workspace. C
 ## Choose the browser and starting state
 
 - Use the user's named app, open board, and starting state. Inspect the page before choosing targets. Ask only for missing information that prevents the demonstration.
-- Humanette requires a real Playwright `Page` in the same JavaScript process as the actions. Reuse an available page/session, or attach through a browser tool's supported Playwright/CDP connection. A screenshot or opaque browser-tool handle is not a Playwright page. Do not invent a connection endpoint or inject a decorative cursor while continuing to click through another tool.
+- Bigcursor requires a real Playwright `Page` in the same JavaScript process as the actions. Reuse an available page/session, or attach through a browser tool's supported Playwright/CDP connection. A screenshot or opaque browser-tool handle is not a Playwright page. Do not invent a connection endpoint or inject a decorative cursor while continuing to click through another tool.
 - On an existing page, `startRecording(page, preset)` can attach to the page's current session if its Chrome supports native recording (153+). It preserves the existing window and DPR; check `stats.warning`. An existing muted browser cannot be unmuted by removing a launch flag retroactively. If no recorder or supported connection is available, explain the limitation and obtain the missing connection or use a fresh recording context that can reproduce the requested starting state. Do not silently replace an open authenticated board with a new empty session.
 - For a standalone example with no app specified, use the bundled [local to-do demo](scripts/record-todo.mjs). Copy only the example script into the chosen execution workspace so it resolves that workspace's dependencies. It needs no account, server, or production app. Do not substitute it for the user's real app.
 
 ## Install the runtime for the user
 
-Follow [dependency setup](references/setup.md) before running the flow. Inspect the chosen workspace, reuse compatible packages, install missing Humanette/Playwright and the matching Chromium automatically, and prove they work with an import and browser-launch smoke check. Do not stop at telling the user to run install commands. Install the published package; do not search for or build Humanette source. Keep missing runtimes task-local, and preserve the project's existing Playwright; add the browser-only alias described in setup when its Chromium is too old.
+Follow [dependency setup](references/setup.md) before running the flow. Inspect the chosen workspace, reuse compatible packages, install missing Bigcursor/Playwright and the matching Chromium automatically, and prove they work with an import and browser-launch smoke check. Do not stop at telling the user to run install commands. Install the published package; do not search for or build Bigcursor source. Keep missing runtimes task-local, and preserve the project's existing Playwright; add the browser-only alias described in setup when its Chromium is too old.
 
 Preserve an existing `PLAYWRIGHT_BROWSERS_PATH` unchanged for installation, recording, and verification; do not substitute a different cache directory.
 
 ## Perform and record the flow
 
 ```js
-import { createHuman } from 'humanette';
+import { createCursor } from 'bigcursor';
 
-const human = await createHuman(page, { scale: 4, seed: 42, typing: { speed: 'default' } });
+const cursor = await createCursor(page, { scale: 4, seed: 42, typing: { speed: 'default' } });
 try {
-  await human.click(page.getByRole('button', { name: 'Add' }));
-  await human.type(page.getByLabel('Task'), 'Buy groceries');
+  await cursor.click(page.getByRole('button', { name: 'Add' }));
+  await cursor.type(page.getByLabel('Task'), 'Buy groceries');
   // Use the actual app's locators and verify its resulting state.
 } finally {
-  await human.dispose();
+  await cursor.dispose();
 }
 ```
 
-- Keep browser setup, navigation, readiness checks, assertions, and recording in Playwright. Use `createHuman` from `humanette`; `humanette/internal` only paints previews and does not operate the app.
-- Route demonstrated pointer actions through `human.moveTo`, `human.click`, `human.drag`, and `human.selectText`. `human.type` clicks and types; `human.press` sends shortcuts. Targets accept native locators, selectors, or main-viewport CSS coordinates; text selection needs a locator or selector. Canvas tools such as a rectangle tool often need a real drag at inspected coordinates.
-- Natural typing is built into `createHuman`. Choose `typing: { speed: 'slow' | 'default' | 'fast' }` at creation, or per-call `human.type(..., { speed: 'fast' })`. Slow is 3×, default is 6×, fast is 8× relative to the original typing profile; numeric `pace` (0.25–8) overrides a preset. Only real typing timing changes; pointer movement, presentation holds, and individual sounds keep their normal speed. Explicit `delay` opts into fixed per-character timing. Runtime behavior belongs in the installed package; generated scripts contain the app flow and assertions. Do not time-compress the finished video/audio to change typing speed.
-- Await each action sequentially. Await the running action before `human.dispose()` in `finally`. Do not use parallel actions on the same cursor. Use Playwright waits/assertions for readiness, and `human.wait(ms)` only for short presentation holds.
+- Keep browser setup, navigation, readiness checks, assertions, and recording in Playwright. Use `createCursor` from `bigcursor`; `bigcursor/internal` only paints previews and does not operate the app.
+- Route demonstrated pointer actions through `cursor.moveTo`, `cursor.click`, `cursor.drag`, and `cursor.selectText`. `cursor.type` clicks and types; `cursor.press` sends shortcuts. Targets accept native locators, selectors, or main-viewport CSS coordinates; text selection needs a locator or selector. Canvas tools such as a rectangle tool often need a real drag at inspected coordinates.
+- Natural typing is built into `createCursor`. Choose `typing: { speed: 'slow' | 'default' | 'fast' }` at creation, or per-call `cursor.type(..., { speed: 'fast' })`. Slow is 3×, default is 6×, fast is 8× relative to the original typing profile; numeric `pace` (0.25–8) overrides a preset. Only real typing timing changes; pointer movement, presentation holds, and individual sounds keep their normal speed. Explicit `delay` opts into fixed per-character timing. Runtime behavior belongs in the installed package; generated scripts contain the app flow and assertions. Do not time-compress the finished video/audio to change typing speed.
+- Await each action sequentially. Await the running action before `cursor.dispose()` in `finally`. Do not use parallel actions on the same cursor. Use Playwright waits/assertions for readiness, and `cursor.wait(ms)` only for short presentation holds.
 - Keyboard badges are opt-in with `keyboard: true` and currently show modifier chords only, not ordinary typed characters or every keypress. Do not promise full keyboard visualization.
-- Import `launchForPreset` and `startRecording` from `humanette/recording` for native high-resolution AV1/Opus MP4 with tab audio. The package owns the recorder, interaction sounds, natural typing, and capture stabilization; no runtime helpers need copying from the skill. Pick a preset from where the video is going: `youtube`, `x`, `vertical` (TikTok/Reels/Shorts), or `archive` (PRs, docs, local review, or unspecified). For "everywhere", record one take per preset. See [recording quality](references/recording-quality.md) for presets, live sounds, audio controls, and format limitations.
+- Import `launchForPreset` and `startRecording` from `bigcursor/recording` for native high-resolution AV1/Opus MP4 with tab audio. The package owns the recorder, interaction sounds, natural typing, and capture stabilization; no runtime helpers need copying from the skill. Pick a preset from where the video is going: `youtube`, `x`, `vertical` (TikTok/Reels/Shorts), or `archive` (PRs, docs, local review, or unspecified). For "everywhere", record one take per preset. See [recording quality](references/recording-quality.md) for presets, live sounds, audio controls, and format limitations.
 
 ```js
-import { launchForPreset, startRecording } from 'humanette/recording';
+import { launchForPreset, startRecording } from 'bigcursor/recording';
 const { browser, context, preset } = await launchForPreset(chromium, 'youtube');
 const page = await context.newPage();
 await page.goto(url); // wait until the first screen is fully loaded
 const recording = await startRecording(page, preset);
 try {
-  // ...human actions and assertions...
+  // ...cursor actions and assertions...
 } finally {
   const stats = await recording.stop(resolve(outDir, 'feature-youtube.mp4'));
   // Inspect stats.warning; preserve the video even if an app assertion failed.

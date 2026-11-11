@@ -1,5 +1,5 @@
 {
-  "name": "humanette-workspace",
+  "name": "bigcursor-workspace",
   "private": true,
   "packageManager": "bun@1.3.14",
   "workspaces": [
@@ -7,14 +7,14 @@
     "packages/*"
   ],
   "version": "1.0.0",
-  "description": "Humanette helps make browser automation videos easier to understand. Add it to your project and you'll get Screen Studio style large cursors and keyboard presses that look like a user using your product.",
+  "description": "Bigcursor helps make browser automation videos easier to understand. Add it to your project and you'll get Screen Studio style large cursors and keyboard presses that look like a user using your product.",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
     "dev": "turbo dev",
-    "example:playwright": "bun run --cwd packages/humanette build && node examples/record-demo.mjs",
-    "example:playwright:headful": "bun run --cwd packages/humanette build && node examples/record-demo.mjs --headful",
+    "example:playwright": "bun run --cwd packages/bigcursor build && node examples/record-demo.mjs",
+    "example:playwright:headful": "bun run --cwd packages/bigcursor build && node examples/record-demo.mjs --headful",
     "build": "turbo build",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
@@ -22,12 +22,12 @@
     "test:e2e": "bun run --cwd apps/web test:e2e",
     "test:skill": "node scripts/test-skill.mjs",
     "test:recording": "node --test --test-concurrency=1 scripts/tests/*.test.mjs",
-    "pack:check": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs",
-    "test:package": "bun run --cwd packages/humanette build && node scripts/pack-check.mjs --record"
+    "pack:check": "bun run --cwd packages/bigcursor build && node scripts/pack-check.mjs",
+    "test:package": "bun run --cwd packages/bigcursor build && node scripts/pack-check.mjs --record"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seflless/humanette.git"
+    "url": "git+https://github.com/seflless/bigcursor.git"
   },
   "keywords": [],
   "author": "",
@@ -37,7 +37,7 @@
     "@types/node": "^22.0.0",
     "chrome-capture": "0.1.2",
     "esbuild": "^0.25.0",
-    "humanette": "workspace:*",
+    "bigcursor": "workspace:*",
     "playwright-core": "1.64.0-alpha-2026-09-28",
     "prettier": "^3.6.0",
     "turbo": "^2.8.0",
@@ -47,7 +47,7 @@
     "node": ">=22"
   },
   "bugs": {
-    "url": "https://github.com/seflless/humanette/issues"
+    "url": "https://github.com/seflless/bigcursor/issues"
   },
-  "homepage": "https://github.com/seflless/humanette#readme"
+  "homepage": "https://github.com/seflless/bigcursor#readme"
 }

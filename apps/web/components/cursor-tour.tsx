@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createHumanette, cursors, cursorGroups } from 'humanette/internal';
+import { createCursorRenderer, cursors, cursorGroups } from 'bigcursor/internal';
 import { DemoSoundToggle, useDemoAudio } from './demo-audio';
 import { MotionReference } from './motion-reference';
 export function CursorTour() {
@@ -25,7 +25,7 @@ export function CursorTour() {
   const drag = useRef<{ start: number; offset: number; max: number } | null>(null);
   useEffect(() => {
     if (!live) return;
-    const h = createHumanette({ follow: true, scale });
+    const h = createCursorRenderer({ follow: true, scale });
     return () => h.dispose();
   }, [live, scale]);
   useEffect(() => {
@@ -263,7 +263,7 @@ export function CursorTour() {
                     </td>
                     <td className="p-4">
                       <span
-                        data-humanette-native
+                        data-bigcursor-native
                         style={{ cursor: type }}
                         className="inline-block rounded border border-line bg-surface px-3 py-2 font-mono text-[10px]"
                       >

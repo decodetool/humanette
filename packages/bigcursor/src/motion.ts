@@ -95,7 +95,7 @@ export function cursorIdleOpacity(
   return progress === 1 ? targetOpacity : 1 - progress * (1 - targetOpacity);
 }
 /** A seeded curve with cubic ease-out: fast departure, deliberate arrival. */
-export function humanPoint(from: Point, to: Point, progress: number, seed = 42): Point {
+export function naturalPoint(from: Point, to: Point, progress: number, seed = 42): Point {
   assertPoint(from);
   assertPoint(to);
   if (!Number.isSafeInteger(seed) || seed < 0 || !Number.isFinite(progress))
@@ -237,7 +237,7 @@ export function sampleTimeline(
   for (const e of events) {
     if (e.at > time) break;
     if (e.type === 'move') {
-      point = humanPoint(point, e, (time - e.at) / e.duration, e.seed);
+      point = naturalPoint(point, e, (time - e.at) / e.duration, e.seed);
       lastActivity = Math.min(time, e.at + e.duration);
       typingUntil = 0;
     } else if (e.type === 'cursor') cursor = e.cursor;

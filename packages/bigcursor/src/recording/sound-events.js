@@ -6,12 +6,12 @@ export function bindSoundEvents({
   clicks = true,
   keyboard = true,
   root = document,
-  typeSound = window.__humanetteTypingSound,
-  clickSound = window.__humanetteClickSound,
+  typeSound = window.__bigcursorTypingSound,
+  clickSound = window.__bigcursorClickSound,
   global = true,
   ownsSounds = true,
 } = {}) {
-  const key = '__humanetteInteractionSounds';
+  const key = '__bigcursorInteractionSounds';
   if (global) window[key]?.dispose();
   let disposed = false;
   const counts = { clicks: 0, keys: 0, errors: 0 };

@@ -1,23 +1,23 @@
 import { fileURLToPath } from 'node:url';
 import type { Page, Locator } from 'playwright-core';
 import {
-  humanPoint,
+  naturalPoint,
   moveDuration,
   assertPoint,
   type Point,
   type FeedbackOptions,
 } from './motion.js';
-import type { Humanette, HumanetteOptions } from './index.js';
+import type { CursorRenderer, CursorRendererOptions } from './index.js';
 import { typingPlan, type TypingOptions } from './typing.js';
 export { typingSpeeds, typingPlan } from './typing.js';
 export type { TypingOptions, TypingSpeed, TypingPlanOptions, TypingStep } from './typing.js';
 type Surface = typeof window & {
-  Humanette: { createHumanette(options: object): Humanette };
-  __humanette?: Humanette;
+  BigCursor: { createCursorRenderer(options: object): CursorRenderer };
+  __bigcursor?: CursorRenderer;
 };
 export type Target = Point | Locator | string;
-export interface AutomationOptions extends Partial<FeedbackOptions> {
-  renderer?: HumanetteOptions['renderer'];
+export interface CursorOptions extends Partial<FeedbackOptions> {
+  renderer?: CursorRendererOptions['renderer'];
   seed?: number;
   settle?: number;
   fps?: number;
@@ -50,7 +50,7 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     signal?.addEventListener('abort', abort, { once: true });
   });
 /** Real Playwright mouse/keyboard input. Visual playback and real input stay distinct. */
-export async function createHuman(page: Page, config: AutomationOptions = {}) {
+export async function createCursor(page: Page, config: CursorOptions = {}) {
   const { seed = 42, settle = 120, fps = 60, typing = {}, ...appearance } = config;
   if (!Number.isFinite(fps) || fps < 1 || fps > 240 || !Number.isFinite(settle) || settle < 0)
     throw new RangeError('Use fps 1–240 and a nonnegative settle time.');
@@ -61,17 +61,17 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
     busy = false,
     cursorHidden = false;
   async function install() {
-    if (disposed) throw new Error('Humanette automation is disposed.');
-    if (!(await page.evaluate(() => Boolean((window as Surface).__humanette)))) {
+    if (disposed) throw new Error('Bigcursor automation is disposed.');
+    if (!(await page.evaluate(() => Boolean((window as Surface).__bigcursor)))) {
       await page.addScriptTag({
-        path: fileURLToPath(new URL('./humanette.global.js', import.meta.url)),
+        path: fileURLToPath(new URL('./bigcursor.global.js', import.meta.url)),
       });
       await page.evaluate(
         async ({ appearance, cursorHidden }) => {
           const w = window as Surface;
-          w.__humanette = w.Humanette.createHumanette({ ...appearance, follow: true });
-          await w.__humanette.ready;
-          if (cursorHidden) w.__humanette.hideCursor();
+          w.__bigcursor = w.BigCursor.createCursorRenderer({ ...appearance, follow: true });
+          await w.__bigcursor.ready;
+          if (cursorHidden) w.__bigcursor.hideCursor();
         },
         { appearance, cursorHidden },
       );
@@ -101,7 +101,7 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
     while (true) {
       opts.signal?.throwIfAborted();
       const t = Math.min(1, (performance.now() - started) / duration),
-        p = humanPoint(from, to, t, seed);
+        p = naturalPoint(from, to, t, seed);
       await page.mouse.move(p.x, p.y);
       position = p;
       if (t === 1) break;
@@ -109,8 +109,8 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
     }
   }
   async function action<T>(fn: () => Promise<T>): Promise<T> {
-    if (busy) throw new Error('Await each Humanette action; parallel input is ambiguous.');
-    if (disposed) throw new Error('Humanette automation is disposed.');
+    if (busy) throw new Error('Await each Bigcursor action; parallel input is ambiguous.');
+    if (disposed) throw new Error('Bigcursor automation is disposed.');
     busy = true;
     try {
       return await fn();
@@ -236,19 +236,19 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
     configure: (next: Partial<FeedbackOptions>) =>
       action(async () => {
         await install();
-        await page.evaluate((value) => (window as Surface).__humanette!.configure(value), next);
+        await page.evaluate((value) => (window as Surface).__bigcursor!.configure(value), next);
         Object.assign(appearance, next);
       }),
     hideCursor: () =>
       action(async () => {
         await install();
-        await page.evaluate(() => (window as Surface).__humanette!.hideCursor());
+        await page.evaluate(() => (window as Surface).__bigcursor!.hideCursor());
         cursorHidden = true;
       }),
     showCursor: () =>
       action(async () => {
         await install();
-        await page.evaluate(() => (window as Surface).__humanette!.showCursor());
+        await page.evaluate(() => (window as Surface).__bigcursor!.showCursor());
         cursorHidden = false;
       }),
     async dispose() {
@@ -257,8 +257,8 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
       await page
         .evaluate(() => {
           const w = window as Surface;
-          w.__humanette?.dispose();
-          delete w.__humanette;
+          w.__bigcursor?.dispose();
+          delete w.__bigcursor;
         })
         .catch(() => {});
     },

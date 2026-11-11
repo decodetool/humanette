@@ -14,7 +14,7 @@ tags: [cdp, recording, cursor, retina, chromium, frame-pacing]
 
 # Cursor capture stalls and misleading Retina resolution
 
-Historical report copied from the agent-browser fork. Paths and commands below describe that implementation, not the Humanette package. Source: https://github.com/seflless/agent-browser. Apache-2.0; see ../../packages/humanette/LICENSE-APACHE-2.0.
+Historical report copied from the agent-browser fork. Paths and commands below describe that implementation, not the Bigcursor package. Source: https://github.com/seflless/agent-browser. Apache-2.0; see ../../packages/bigcursor/LICENSE-APACHE-2.0.
 
 ## Problem and environment
 
@@ -78,6 +78,6 @@ The confirmed final Decode take was approximately 16.1 seconds, with 2560×1600 
 
 ## Related guidance
 
-- [Humanette architecture and transferred learnings](../architecture.md)
+- [Bigcursor architecture and transferred learnings](../architecture.md)
 - [Preserved Decode palette recipe](../../examples/legacy/README.md)
 - [Original fork](https://github.com/seflless/agent-browser)

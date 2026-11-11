@@ -8,7 +8,7 @@ import {
   cursorIdleOpacity,
   dimmingTimings,
   feedbackAt,
-  humanPoint,
+  naturalPoint,
   moveDuration,
   validateTimeline,
   sampleTimeline,
@@ -20,7 +20,7 @@ import {
 } from './motion.js';
 export * from './motion.js';
 export * from './cursors.js';
-export interface HumanetteOptions extends Partial<FeedbackOptions> {
+export interface CursorRendererOptions extends Partial<FeedbackOptions> {
   /** Inline SVG artwork by default; canvas is retained for capture comparisons. */
   renderer?: 'svg' | 'canvas';
   /** Omit for viewport overlay. A custom root must be positioned, e.g. position:relative. */
@@ -36,14 +36,14 @@ export interface MoveOptions {
   seed?: number;
   signal?: AbortSignal;
 }
-export function createHumanette(input: HumanetteOptions = {}) {
+export function createCursorRenderer(input: CursorRendererOptions = {}) {
   if (typeof document === 'undefined')
-    throw new Error('createHumanette needs a browser. Import is SSR-safe; create it in an effect.');
+    throw new Error('createCursorRenderer needs a browser. Import is SSR-safe; create it in an effect.');
   let config = options(input),
     theme: CursorTheme = { ...cursors, ...input.theme };
   const root = input.root,
-    host = document.createElement('humanette-pointer');
-  host.dataset.humanette = '';
+    host = document.createElement('bigcursor-pointer');
+  host.dataset.bigcursor = '';
   host.setAttribute('aria-hidden', 'true');
   host.inert = true;
   host.style.cssText = `all:initial!important;position:${root ? 'absolute' : 'fixed'}!important;inset:0!important;overflow:hidden!important;pointer-events:none!important;z-index:2147483646!important;contain:layout style!important;`;
@@ -209,7 +209,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
     if (!visible) return;
     const b = dimensions(),
       hit = cursorAt(position.x + b.x, position.y + b.y);
-    const nativeZone = hit.element?.closest('[data-humanette-native]');
+    const nativeZone = hit.element?.closest('[data-bigcursor-native]');
     resolved = type === 'auto' ? hit.type : type;
     if (resolved !== 'none' && !theme[resolved]) resolved = 'default';
     host.dataset.cursor = resolved;
@@ -385,7 +385,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
     if (!disposed && !raf) raf = requestAnimationFrame(draw);
   }
   function check() {
-    if (disposed) throw new Error('Humanette instance is disposed.');
+    if (disposed) throw new Error('Bigcursor instance is disposed.');
   }
   function setPosition(p: Point) {
     check();
@@ -634,7 +634,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
       const from = { ...position };
       await animate(
         opts.duration ?? moveDuration(from, target),
-        (p) => setPosition(humanPoint(from, target, p, opts.seed)),
+        (p) => setPosition(naturalPoint(from, target, p, opts.seed)),
         opts.signal,
       );
     },
@@ -708,7 +708,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
     },
   };
 }
-export type Humanette = ReturnType<typeof createHumanette>;
+export type CursorRenderer = ReturnType<typeof createCursorRenderer>;
 
 export { createPreviewAudio, type PreviewAudio, type KeySoundRole } from './preview-audio.js';
 export { typingPlan, typingSpeeds, type TypingSpeed, type TypingStep } from './typing.js';

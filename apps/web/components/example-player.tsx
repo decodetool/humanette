@@ -1,14 +1,14 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  createHumanette,
+  createCursorRenderer,
   typingPlan,
   dimmingTimings,
   type TypingSpeed,
   sampleTimeline,
-  type Humanette,
+  type CursorRenderer,
   type TimelineEvent,
-} from 'humanette/internal';
+} from 'bigcursor/internal';
 import { useDemoAudio } from './demo-audio';
 export type Scene = 'click' | 'text' | 'drag' | 'typing' | 'dimming';
 const typedText = 'Make something great.';
@@ -56,7 +56,7 @@ export function ExamplePlayer({
   const root = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
   const target = useRef<HTMLDivElement>(null);
-  const human = useRef<Humanette | null>(null);
+  const cursor = useRef<CursorRenderer | null>(null);
   const clock = useRef(0);
   const startDelay = useRef(scene === 'typing' ? 600 : 0);
   const measure = useRef<() => void>(() => {});
@@ -135,7 +135,7 @@ export function ExamplePlayer({
       initial,
       geometry: { ratio, ratioY, originX },
     } = live.current;
-    human.current?.seek(
+    cursor.current?.seek(
       events.map((e) =>
         e.type === 'move' ? { ...e, x: e.x * ratio + originX, y: e.y * ratioY } : e,
       ),
@@ -146,8 +146,8 @@ export function ExamplePlayer({
   }
   useEffect(() => {
     let active = true;
-    const h = createHumanette({ root: root.current!, scale, ...appearance });
-    human.current = h;
+    const h = createCursorRenderer({ root: root.current!, scale, ...appearance });
+    cursor.current = h;
     void h.ready
       .then(() => {
         if (active) {
@@ -214,11 +214,11 @@ export function ExamplePlayer({
       document.removeEventListener('visibilitychange', updateVisibility);
       reduced.removeEventListener('change', onReduced);
       h.dispose();
-      human.current = null;
+      cursor.current = null;
     };
   }, [scene]);
   useEffect(() => {
-    human.current?.configure({ scale, ...appearance });
+    cursor.current?.configure({ scale, ...appearance });
     if (ready) draw(clock.current);
   }, [scale, geometry, ready, appearance]);
   useEffect(() => {

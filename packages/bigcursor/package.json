@@ -1,6 +1,6 @@
 {
-  "name": "humanette",
-  "version": "1.2.1",
+  "name": "bigcursor",
+  "version": "1.0.0",
   "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
   "type": "module",
   "main": "./dist/playwright.js",
@@ -22,7 +22,7 @@
       "types": "./dist/playwright.d.ts",
       "import": "./dist/playwright.js"
     },
-    "./browser": "./dist/humanette.global.js",
+    "./browser": "./dist/bigcursor.global.js",
     "./assets/*": "./dist/assets/*",
     "./package.json": "./package.json",
     "./recording": {
@@ -46,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seflless/humanette.git",
-    "directory": "packages/humanette"
+    "url": "git+https://github.com/seflless/bigcursor.git",
+    "directory": "packages/bigcursor"
   },
-  "homepage": "https://github.com/seflless/humanette",
+  "homepage": "https://github.com/seflless/bigcursor",
   "license": "ISC",
   "engines": {
     "node": ">=22"

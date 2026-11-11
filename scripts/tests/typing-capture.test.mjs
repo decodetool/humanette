@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import { installCaptureRefresh } from '../../packages/humanette/src/recording/runtime.js';
+import { installCaptureRefresh } from '../../packages/bigcursor/src/recording/runtime.js';
 import { test } from 'node:test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright-core';
-import { createHuman } from '../../packages/humanette/dist/playwright.js';
-import { launchForPreset, startRecording } from '../../packages/humanette/dist/recording.js';
+import { createCursor } from '../../packages/bigcursor/dist/playwright.js';
+import { launchForPreset, startRecording } from '../../packages/bigcursor/dist/recording.js';
 
 test('capture refresh preserves pixels, handles frames/navigation, and stops when idle', async () => {
   const browser = await chromium.launch({ channel: 'chromium' });
@@ -21,7 +21,7 @@ test('capture refresh preserves pixels, handles frames/navigation, and stops whe
     const before = await page.screenshot();
     refresh = await installCaptureRefresh(page);
     await page.keyboard.press('a');
-    await page.waitForFunction(() => window.__humanetteCaptureRefresh.stats().frames >= 3);
+    await page.waitForFunction(() => window.__bigcursorCaptureRefresh.stats().frames >= 3);
     assert.deepEqual(
       await page.screenshot(),
       before,
@@ -34,18 +34,18 @@ test('capture refresh preserves pixels, handles frames/navigation, and stops whe
     assert.equal((await refresh.stats()).frames, idle.frames, 'No permanent idle rendering');
     const child = page.frames()[1];
     await child.goto('data:text/html,<input aria-label="Child">');
-    await child.waitForFunction(() => window.__humanetteCaptureRefresh);
+    await child.waitForFunction(() => window.__bigcursorCaptureRefresh);
     await child.getByRole('textbox').pressSequentially('x');
     await page.waitForFunction(
-      (count) => window.__humanetteCaptureRefresh.stats().frames > count,
+      (count) => window.__bigcursorCaptureRefresh.stats().frames > count,
       idle.frames,
     );
     await page.goto('data:text/html,<body>New page</body>');
-    await page.waitForFunction(() => window.__humanetteCaptureRefresh);
+    await page.waitForFunction(() => window.__bigcursorCaptureRefresh);
     await page.keyboard.press('a');
-    await page.waitForFunction(() => window.__humanetteCaptureRefresh.stats().frames > 0);
+    await page.waitForFunction(() => window.__bigcursorCaptureRefresh.stats().frames > 0);
     await refresh.dispose();
-    assert.equal(await page.evaluate(() => Boolean(window.__humanetteCaptureRefresh)), false);
+    assert.equal(await page.evaluate(() => Boolean(window.__bigcursorCaptureRefresh)), false);
     assert.equal(await page.locator('canvas').count(), 0);
     assert.equal(page.listenerCount('framenavigated'), 0);
   } finally {
@@ -62,7 +62,7 @@ test(
     const output = `test-results/typing-capture-regression/${Date.now()}`;
     const { browser, context, preset } = await launchForPreset(chromium, 'vertical');
     const page = await context.newPage();
-    let human;
+    let cursor;
     try {
       await page.setContent(`<!doctype html><style>
       *{box-sizing:border-box}body{margin:0;background:#f6f4ef;color:#292622;font:22px system-ui;display:grid;place-items:center;min-height:100vh}
@@ -79,14 +79,14 @@ test(
         inputs.push({at:performance.now(),trusted:event.isTrusted});draw(inputs.length);
       });</script>`);
       await page.evaluate(() => document.fonts.ready);
-      human = await createHuman(page, { scale: 4, seed: 42 });
+      cursor = await createCursor(page, { scale: 4, seed: 42 });
       const recording = await startRecording(page, preset);
       const text = 'Plan the launch, invite the team. Let’s ship something great!';
       try {
-        await human.wait(700);
-        await human.type(page.getByLabel('Message'), text);
+        await cursor.wait(700);
+        await cursor.type(page.getByLabel('Message'), text);
         assert.equal(await page.getByLabel('Message').inputValue(), text);
-        await human.wait(700);
+        await cursor.wait(700);
       } finally {
         await recording.stop(`${output}.mp4`);
       }
@@ -131,7 +131,7 @@ test(
       await page.screenshot({ path: `${output}-failed.png` }).catch(() => {});
       throw error;
     } finally {
-      await human?.dispose();
+      await cursor?.dispose();
       await browser.close();
     }
   },

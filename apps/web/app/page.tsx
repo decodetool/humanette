@@ -10,7 +10,7 @@ export default function Home() {
           Screen Studio for browser automation
         </h1>
         <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-muted">
-          Humanette adds large cursors, natural movement and typing, and live click and keyboard
+          Bigcursor adds large cursors, natural movement and typing, and live click and keyboard
           sounds to video captures made with Playwright.
         </p>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-muted">

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  humanPoint,
+  naturalPoint,
   moveDuration,
   validateTimeline,
   sampleTimeline,
@@ -10,19 +10,19 @@ import {
   scenarios,
   timelineDuration,
 } from '../dist/motion.js';
-import { cursors, cursorGroups, createHumanette } from '../dist/index.js';
+import { cursors, cursorGroups, createCursorRenderer } from '../dist/index.js';
 test('import is SSR-safe, creation explains browser requirement', () =>
-  assert.throws(() => createHumanette(), /browser/));
+  assert.throws(() => createCursorRenderer(), /browser/));
 test('curve is seeded, exact at endpoints, and slows toward the target', () => {
   const a = { x: 0, y: 0 },
     b = { x: 600, y: 300 };
-  assert.deepEqual(humanPoint(a, b, 0), a);
-  assert.deepEqual(humanPoint(a, b, 1), b);
-  assert.deepEqual(humanPoint(a, b, 0.4, 23), humanPoint(a, b, 0.4, 23));
-  assert.notDeepEqual(humanPoint(a, b, 0.4, 23), humanPoint(a, b, 0.4, 99));
+  assert.deepEqual(naturalPoint(a, b, 0), a);
+  assert.deepEqual(naturalPoint(a, b, 1), b);
+  assert.deepEqual(naturalPoint(a, b, 0.4, 23), naturalPoint(a, b, 0.4, 23));
+  assert.notDeepEqual(naturalPoint(a, b, 0.4, 23), naturalPoint(a, b, 0.4, 99));
   assert.ok(
-    Math.hypot(...Object.values(humanPoint(a, b, 0.1))) >
-      Math.hypot(b.x - humanPoint(a, b, 0.9).x, b.y - humanPoint(a, b, 0.9).y),
+    Math.hypot(...Object.values(naturalPoint(a, b, 0.1))) >
+      Math.hypot(b.x - naturalPoint(a, b, 0.9).x, b.y - naturalPoint(a, b, 0.9).y),
   );
   assert.ok(moveDuration(a, { x: 2, y: 2 }) >= 280);
 });

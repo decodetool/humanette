@@ -1,6 +1,6 @@
 # Recording quality and audio
 
-Import `launchForPreset` and `startRecording` from `humanette/recording`. The installed package uses the optional `chrome-capture@0.1.2` dependency and Chrome 153+ native `Page.startScreenRecording`: compositor video and tab audio are encoded directly into an AV1/Opus MP4. Recording starts after page readiness and finalizes at `stop()`. Scripts do not copy runtime code from the skill.
+Import `launchForPreset` and `startRecording` from `bigcursor/recording`. The installed package uses the optional `chrome-capture@0.1.2` dependency and Chrome 153+ native `Page.startScreenRecording`: compositor video and tab audio are encoded directly into an AV1/Opus MP4. Recording starts after page readiness and finalizes at `stop()`. Scripts do not copy runtime code from the skill.
 
 ## Presets
 
@@ -21,7 +21,7 @@ Native DPR and real content dimensions matter. `launchForPreset` sets the device
 
 `startRecording(page, preset)` defaults to tab audio **and** quiet injected interaction sounds. This records the app's tab output, not the microphone or unrelated system sounds. Media and Web Audio in the app share the tab audio track. Permissions, protected content, and the app's own mute controls still apply.
 
-The sounds play in the page while the demo runs. Pointer presses generate a short soft click; typing uses Cuelume’s **Type / Press** cue, with per-stroke variation, key-size and cadence shaping, and a quieter release; direct insertion also works; shortcuts and other key presses use real keyboard events. Printable keys are not sounded twice. Navigation and child frames receive the listeners too. Password fields, synthetic DOM events, and intermediate IME composition are excluded. No entered text or shortcut labels are logged. Stopping recording removes listeners and closes only Humanette's audio contexts, leaving the app's own audio intact.
+The sounds play in the page while the demo runs. Pointer presses generate a short soft click; typing uses Cuelume’s **Type / Press** cue, with per-stroke variation, key-size and cadence shaping, and a quieter release; direct insertion also works; shortcuts and other key presses use real keyboard events. Printable keys are not sounded twice. Navigation and child frames receive the listeners too. Password fields, synthetic DOM events, and intermediate IME composition are excluded. No entered text or shortcut labels are logged. Stopping recording removes listeners and closes only Bigcursor's audio contexts, leaving the app's own audio intact.
 
 ```js
 // App audio only, without extra interaction sounds:
@@ -32,7 +32,7 @@ await startRecording(page, preset, { sounds: { volume: 0.1 } });
 await startRecording(page, preset, { audio: false, sounds: false });
 ```
 
-For live interactions without a recorder, call `installInteractionSounds(page, options)` from `humanette/recording` and await its `dispose()` when done. It uses the same package implementation as the recorder. Keyboard sound is separate from modifier-chord badges; full keyboard visualization is not implemented.
+For live interactions without a recorder, call `installInteractionSounds(page, options)` from `bigcursor/recording` and await its `dispose()` when done. It uses the same package implementation as the recorder. Keyboard sound is separate from modifier-chord badges; full keyboard visualization is not implemented.
 
 `stats.audio` means the MP4 contains an audio track. It does not prove audibility. Inspect/listen to the actual output when audio matters, and inspect sound counters/errors. App audio is captured as played; automatic narration, music ducking, loudness normalization, and external audio-file mixing are separate work, not built-in options.
 
@@ -50,8 +50,8 @@ AV1/Opus MP4 playback and upload compatibility differs by destination. Preserve 
 
 ## Natural typing and provenance
 
-Natural typing is built into `createHuman` from `humanette`. Its measured dwell/flight profile and seeded sampling are adapted from [human-input](https://github.com/heydryft/human-input), with readable word, punctuation, and line pauses added for demos. Set `typing: { speed: 'slow' }` on `createHuman` for 3× the original typing timings, `'default'` (the default) for 6×, or `'fast'` for 8×. Per-call `human.type` accepts `speed` and `pace` too. An explicit numeric `pace` from 0.25 to 8 overrides the preset; higher values are faster, including `pace: 4` and `pace: 8` for quick comparisons. Browser input overhead and minimum hold times mean wall-clock typing duration is approximate. Pointer movement and presentation holds stay unchanged. Explicit per-call `delay` retains fixed timing. Text is inserted exactly, without deliberate typos. Unicode graphemes stay together and literal newlines do not become form submissions.
+Natural typing is built into `createCursor` from `bigcursor`. Its measured dwell/flight profile and seeded sampling are adapted from [human-input](https://github.com/heydryft/human-input), with readable word, punctuation, and line pauses added for demos. Set `typing: { speed: 'slow' }` on `createCursor` for 3× the original typing timings, `'default'` (the default) for 6×, or `'fast'` for 8×. Per-call `cursor.type` accepts `speed` and `pace` too. An explicit numeric `pace` from 0.25 to 8 overrides the preset; higher values are faster, including `pace: 4` and `pace: 8` for quick comparisons. Browser input overhead and minimum hold times mean wall-clock typing duration is approximate. Pointer movement and presentation holds stay unchanged. Explicit per-call `delay` retains fixed timing. Text is inserted exactly, without deliberate typos. Unicode graphemes stay together and literal newlines do not become form submissions.
 
 Change typing speed before recording; do not time-compress the video or its audio to achieve these presets. Each downstroke and release sound plays at its natural speed. Faster input starts sounds closer together, with overlapping tails; it does not shorten the sound envelopes or drop rapid keystrokes. Per-strike pitch/force/decay variation and key-role differences remain. Key-hold duration controls when the release starts, independently of either sound's envelope.
 
-Only Cuelume’s Type cue in the Press theme is extracted, including its output/room stage, key roles, strike variation, and press/release synthesis. Humanette keeps envelope lengths independent of typing cadence and removes the upstream 40ms throttle so every keystroke can sound. Other Cuelume cues/themes and DOM bindings are not bundled. The package preserves upstream MIT notices, pinned source commits, and adaptation notes in NOTICE.md and its source modules. Sources: [Cuelume](https://github.com/danielwh2/cuelume), [human-input](https://github.com/heydryft/human-input).
+Only Cuelume’s Type cue in the Press theme is extracted, including its output/room stage, key roles, strike variation, and press/release synthesis. Bigcursor keeps envelope lengths independent of typing cadence and removes the upstream 40ms throttle so every keystroke can sound. Other Cuelume cues/themes and DOM bindings are not bundled. The package preserves upstream MIT notices, pinned source commits, and adaptation notes in NOTICE.md and its source modules. Sources: [Cuelume](https://github.com/danielwh2/cuelume), [human-input](https://github.com/heydryft/human-input).
