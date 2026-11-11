@@ -16,9 +16,9 @@ The Next.js site runs at http://localhost:3410. Turborepo builds bigcursor befor
 
 ## Vercel
 
-Import seflless/bigcursor. Root Directory: apps/web. Framework: Next.js. Enable source files outside the root directory. Install command: cd ../.. && bun install --frozen-lockfile. Build command: cd ../.. && bunx turbo build --filter=@bigcursor/web. Keep the default .next output directory. Node version: 22.x. Bun is pinned by packageManager and bun.lock.
+The project is [humanette in the personal Vercel account](https://vercel.com/francoislaberges-projects/humanette), connected to seflless/bigcursor with main as its production branch. Root Directory: apps/web. Framework: Next.js. Source files outside the root directory are enabled. Node version: 24.x. Vercel detects Turborepo and runs bun install followed by turbo run build, building the shared package before the site. Keep the default .next output directory. Bun 1.3.14 is pinned by packageManager and bun.lock; its use was confirmed in the Vercel build logs.
 
-No environment secrets are required for the site. Set `NEXT_PUBLIC_SITE_URL` to the connected website domain before building; `.env.example` uses `https://bigcursor.dev` as the canonical URL. Metadata, sitemap, robots, Markdown headers, and agent-guide links share this setting. A branding change does not register a domain or change hosting/DNS. No deployment was created by this implementation. Preview deployments can follow PRs once the repository is connected to Vercel.
+No environment secrets are required for the site. The project has verified bigcursor.dev and www.bigcursor.dev domains, with bigcursor.dev redirecting to www.bigcursor.dev. Production and preview use `NEXT_PUBLIC_SITE_URL=https://www.bigcursor.dev` to match that redirect. Metadata, sitemap, robots, Markdown headers, and agent-guide links share this setting. The local `.env.example` defaults to https://bigcursor.dev. Pull requests build previews; merging into main triggers a production deployment.
 
 ## npm release
 
@@ -39,6 +39,6 @@ For [npm staged publishing](https://docs.npmjs.com/staged-publishing/), `npm sta
 
 To test local package changes before publishing, maintainers can run bun run test:skill. The harness builds and packs this checkout itself, then serves that artifact through a disposable npm registry. The consuming agent installs bigcursor by package name; it receives no Bigcursor source checkout. This verifies the package installation workflow, but does not prove the public npm release is available. Normal skill use installs the published package and stops if the runtime release is missing.
 
-CI checks builds, type safety, pure behavior, browser integration, and the packed consumer installation. CI has no npm publishing token.
+CI checks builds, type safety, pure behavior, browser integration, and the packed consumer installation. It uses the Ubuntu 24.04 hosted image's Chrome system libraries and downloads the exact browser required by the installed Playwright, avoiding an apt/font download that failed resolving Ubuntu mirrors. CI has no npm publishing token.
 
-Keep the draft PR open through publication and published-package tests. Publish from its committed release branch; do not merge until that verification is satisfactory. Temporary recordings, browser caches, transcripts, and diagnostic probes stay under ignored test-results or OS temporary directories. Maintained regression and fresh-consumer tests are part of the change.
+The website can deploy from main independently of the npm release. Publish the package from a committed revision and keep published-package verification as a separate follow-up; a website deployment is not proof that the npm archive matches it. Temporary recordings, browser caches, transcripts, and diagnostic probes stay under ignored test-results or OS temporary directories. Maintained regression and fresh-consumer tests are part of the change.

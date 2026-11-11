@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,9 @@ jobs:
           bun-version: 1.3.14
       - run: bun install --frozen-lockfile
       - run: bun check
-      - run: bunx playwright install --with-deps chromium
+      # The hosted image includes Chrome's system libraries. Install the matching
+      # Playwright browser without depending on Ubuntu's package mirrors.
+      - run: bunx playwright install chromium
         working-directory: apps/web
       - run: bun run test:e2e
       - run: bun run pack:check
