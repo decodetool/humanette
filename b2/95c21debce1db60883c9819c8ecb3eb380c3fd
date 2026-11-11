@@ -1,0 +1,45 @@
+scripts/test-skill.mjs
+  s_43311e4fe4b86a::t_4b6af7867c696f 108,119,299
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_5307c6c51b395c 19,22,25
+package.json
+  s_43311e4fe4b86a::t_5307c6c51b395c 52
+apps/web/tests/agent-docs.spec.ts
+  s_43311e4fe4b86a::t_5307c6c51b395c 42
+packages/bigcursor/package.json
+  s_43311e4fe4b86a::t_5307c6c51b395c 4,52-55
+  s_43311e4fe4b86a::t_b0c559865b808a 69-72
+packages/bigcursor/README.md
+  s_43311e4fe4b86a::t_5307c6c51b395c 3-5,19,22,91,116,164
+  s_43311e4fe4b86a::t_b0c559865b808a 47-48
+apps/web/content/documentation.ts
+  s_43311e4fe4b86a::t_3fcd1f6ddd5a11 106
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_3fcd1f6ddd5a11 25-27,31
+README.md
+  s_43311e4fe4b86a::t_3fcd1f6ddd5a11 17
+skills/bigcursor/references/setup.md
+  s_43311e4fe4b86a::t_4b6af7867c696f 9
+  s_43311e4fe4b86a::t_3fcd1f6ddd5a11 15,17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b295c21debce1db60883c9819c8ecb3eb380c3fd",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

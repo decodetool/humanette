@@ -1,0 +1,34 @@
+README.md
+  s_43311e4fe4b86a::t_1ceedc121c1796 17
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_1ceedc121c1796 19,22,25
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_1ceedc121c1796 25,27,31,35
+apps/web/content/documentation.ts
+  s_43311e4fe4b86a::t_1ceedc121c1796 106
+apps/web/tests/agent-docs.spec.ts
+  s_43311e4fe4b86a::t_1ceedc121c1796 42
+skills/bigcursor/references/setup.md
+  s_43311e4fe4b86a::t_1ceedc121c1796 9,15,17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "15e2edd805c9ed87c738d26ba757c216e5b631f7",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
