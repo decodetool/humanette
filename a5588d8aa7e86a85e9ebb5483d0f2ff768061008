@@ -1,0 +1,143 @@
+README.md
+  s_43311e4fe4b86a::t_b6afaab85f44ec 19
+apps/web/tests/text-selection.spec.ts
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 28,53
+apps/web/components/preview.tsx
+  s_43311e4fe4b86a::t_ac6c1446f43088 46
+apps/web/tests/idle-cursor.spec.ts
+  s_43311e4fe4b86a::t_e213f0fc1146be 1-11,13-32,39-42,46,53-70,75,77,79-80,88-89,101-113,115-121,167
+  s_43311e4fe4b86a::t_6a636150cc5801 33-38,114,122-125
+  s_43311e4fe4b86a::t_ae46e61dde7402 43,45,48,93,135,139-145
+  s_43311e4fe4b86a::t_dbfbed36270f7c 73,126-133,136-138,146,152,154-156,160,162-166
+  s_43311e4fe4b86a::t_59ecc9366877eb 134,147-151,153
+  s_43311e4fe4b86a::t_915488f1b724a0 94-95,99
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 44,74,76
+  s_43311e4fe4b86a::t_6510222c31abfa 47,49-51,72,78,91
+  s_43311e4fe4b86a::t_f83c2593364917 52,71
+  s_43311e4fe4b86a::t_2fdd9d97a7417b 81-86
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 87,90,92,100,159
+  s_43311e4fe4b86a::t_2493f5964a4862 96-98
+  s_43311e4fe4b86a::t_9f19fa2b68937f 12
+  s_43311e4fe4b86a::t_44997bde4d408e 157-158,161
+scripts/pack-check.mjs
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 56
+packages/humanette/src/motion.ts
+  s_43311e4fe4b86a::t_6a636150cc5801 44-45
+  s_43311e4fe4b86a::t_dbfbed36270f7c 256
+  s_43311e4fe4b86a::t_a36d7259be8318 127,150-153,170-172,235-236,242,244,248,255
+  s_43311e4fe4b86a::t_ccba9bfe6c919c 84-85,94
+  s_43311e4fe4b86a::t_f0ee7847dd1021 96,234,239-241,243,245-247,249,251-254,263-264
+  s_43311e4fe4b86a::t_6510222c31abfa 70-73,76,87-92,257-259,262
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 24,78-79,260
+  s_43311e4fe4b86a::t_f83c2593364917 23,25-28,74-75,86,93,95,261
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 46
+  s_43311e4fe4b86a::t_ac6c1446f43088 166-169,173-177
+apps/web/components/example-player.tsx
+  s_43311e4fe4b86a::t_ccba9bfe6c919c 6
+  s_43311e4fe4b86a::t_6a636150cc5801 13,26-30,43-53,81,84-85,87,90,93-100,102,105,107-108,110-128,149,221,223,310-316
+  s_43311e4fe4b86a::t_d6e6b031d299a3 317-318
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_ae46e61dde7402 31
+  s_43311e4fe4b86a::t_b673f414b5778f 2-8,80
+  s_43311e4fe4b86a::t_59ecc9366877eb 18,74
+  s_43311e4fe4b86a::t_b6afaab85f44ec 75
+  s_43311e4fe4b86a::t_c4afc96b2786f4 1
+apps/web/app/docs/page.tsx
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 92
+  s_43311e4fe4b86a::t_b673f414b5778f 9,93-94,101
+  s_43311e4fe4b86a::t_38ba3f681ec320 5-8,10-11
+  s_43311e4fe4b86a::t_c7f4c35ff51e28 4
+apps/web/tests/agent-docs.spec.ts
+  s_43311e4fe4b86a::t_b673f414b5778f 2,35
+apps/web/components/examples.tsx
+  s_43311e4fe4b86a::t_6a636150cc5801 11-12,30
+apps/web/tests/examples.spec.ts
+  s_43311e4fe4b86a::t_6a636150cc5801 40
+  s_43311e4fe4b86a::t_156386338905df 104-107
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_59ecc9366877eb 29
+packages/humanette/README.md
+  s_43311e4fe4b86a::t_59ecc9366877eb 49,75-76
+  s_43311e4fe4b86a::t_b6afaab85f44ec 66,70
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 74,108,113
+  s_43311e4fe4b86a::t_a7971b26de6a17 116
+  s_43311e4fe4b86a::t_9f19fa2b68937f 57-59
+  s_43311e4fe4b86a::t_24477d892b0d13 81
+  s_43311e4fe4b86a::t_b673f414b5778f 68,78,91
+  s_43311e4fe4b86a::t_38ba3f681ec320 67,69,71-72,79-80
+  s_43311e4fe4b86a::t_940b46fa0256be 73,77
+  s_43311e4fe4b86a::t_ae46e61dde7402 83-90
+  s_43311e4fe4b86a::t_08bf5cb8ac519f 82
+packages/humanette/test/motion.test.mjs
+  s_43311e4fe4b86a::t_b899c7e9d7fb19 137-140
+  s_43311e4fe4b86a::t_915488f1b724a0 89-91,102,117-128,134-135,141
+  s_43311e4fe4b86a::t_6510222c31abfa 103
+  s_43311e4fe4b86a::t_f83c2593364917 76-77,142
+  s_43311e4fe4b86a::t_9f19fa2b68937f 72
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 58,75
+  s_43311e4fe4b86a::t_24477d892b0d13 57
+  s_43311e4fe4b86a::t_e213f0fc1146be 71,81-87,92-93,104-105,107-116,143
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 78-80,106
+  s_43311e4fe4b86a::t_156386338905df 136
+  s_43311e4fe4b86a::t_6a636150cc5801 73-74,88,94-101,129-133
+scripts/tests/recording.test.mjs
+  s_43311e4fe4b86a::t_59ecc9366877eb 421
+  s_43311e4fe4b86a::t_915488f1b724a0 356,358-361,363-365,372-374,377,381-383,385-386,392-399,402-404,407,424-431,433,435-436
+  s_43311e4fe4b86a::t_6bcc23fac11bab 357,375-376,378-380,384,387-391,400-401,405-406,408-420,422-423
+  s_43311e4fe4b86a::t_6a636150cc5801 367-371
+  s_43311e4fe4b86a::t_38ba3f681ec320 355,362,366,432,434
+packages/humanette/src/index.ts
+  s_43311e4fe4b86a::t_dbfbed36270f7c 269
+  s_43311e4fe4b86a::t_a36d7259be8318 95,97-99,143-149,156-157,159,276,497-527,533,542,620,648,678,699
+  s_43311e4fe4b86a::t_f0ee7847dd1021 8,96,120-125,137-142,158,160-162,301,374,394,399,414,424,532,541,602,619,647,677,698
+  s_43311e4fe4b86a::t_6510222c31abfa 126-127,129-130,133-135
+  s_43311e4fe4b86a::t_ccba9bfe6c919c 9,150,155
+  s_43311e4fe4b86a::t_2ab00aeb698f1b 86,128,277-283,288,616-618,621-629
+  s_43311e4fe4b86a::t_ac6c1446f43088 672
+  s_43311e4fe4b86a::t_915488f1b724a0 151-154
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 131,136,273,371-373
+  s_43311e4fe4b86a::t_f83c2593364917 132,270-272,274-275
+apps/web/content/documentation.ts
+  s_43311e4fe4b86a::t_ae46e61dde7402 87-94
+  s_43311e4fe4b86a::t_b673f414b5778f 105
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 86
+  s_43311e4fe4b86a::t_38ba3f681ec320 104
+  s_43311e4fe4b86a::t_59ecc9366877eb 54,103,106
+apps/web/tests/design.spec.ts
+  s_43311e4fe4b86a::t_6a636150cc5801 89
+packages/humanette/src/playwright.ts
+  s_43311e4fe4b86a::t_2ab00aeb698f1b 61-62,69-77,241-252
+  s_43311e4fe4b86a::t_dbfbed36270f7c 240
+docs/architecture.md
+  s_43311e4fe4b86a::t_59ecc9366877eb 18,32
+apps/web/tests/svg-renderer.spec.ts
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 83
+  s_43311e4fe4b86a::t_09e2d64c0b7e41 56
+  s_43311e4fe4b86a::t_2ab00aeb698f1b 87
+apps/web/components/workbench.tsx
+  s_43311e4fe4b86a::t_6a636150cc5801 20-21
+  s_43311e4fe4b86a::t_f83c2593364917 226
+  s_43311e4fe4b86a::t_59ecc9366877eb 225
+  s_43311e4fe4b86a::t_1ba24e7b0caa22 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a5588d8aa7e86a85e9ebb5483d0f2ff768061008",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+apps/web/components/examples.tsx
+  s_43311e4fe4b86a::t_410af2ce05c763 31,33
+apps/web/tests/examples.spec.ts
+  s_43311e4fe4b86a::t_410af2ce05c763 44-45,48
+apps/web/components/example-player.tsx
+  s_43311e4fe4b86a::t_410af2ce05c763 14,50,63,117,121,124,149-151,165-167,176,274-275,293,297,304,306,325-328,333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "07a0d1788d7cc6d7a18eec6954bb42b2cafad9cf",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

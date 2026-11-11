@@ -1,0 +1,33 @@
+apps/web/components/example-player.tsx
+  s_408157d782cb56::t_84ecf7e6d936c4 31,37,45,53,59,198,204
+  s_408157d782cb56::t_8628c1a26226fa 205-207,229,231
+apps/web/components/examples.tsx
+  s_408157d782cb56::t_84ecf7e6d936c4 25
+apps/web/tests/examples.spec.ts
+  s_408157d782cb56::t_95df6cbd0a8c13 93,106-110,115,120-122,131-145,178-183,187-193
+  s_408157d782cb56::t_596b70a4bee9d8 111-114,116-119,123-130,146-177,184-186
+  s_408157d782cb56::t_7176832b3295ae 194
+apps/web/tests/design.spec.ts
+  s_408157d782cb56::t_ecccdcdfb29d9d 71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "520d2a8d810fbfd34c5cb605f60eeb2e280f32a4",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

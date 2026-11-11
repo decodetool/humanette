@@ -1,0 +1,39 @@
+apps/web/content/onboarding.ts
+  s_43311e4fe4b86a::t_ffd63b5c67e857 2
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_ffd63b5c67e857 19,27
+  s_43311e4fe4b86a::t_652aefa3a01c62 28
+apps/web/components/site-nav.tsx
+  s_43311e4fe4b86a::t_ffd63b5c67e857 37
+package.json
+  s_43311e4fe4b86a::t_ffd63b5c67e857 30,50,52
+packages/humanette/package.json
+  s_43311e4fe4b86a::t_ffd63b5c67e857 49,52
+packages/humanette/README.md
+  s_43311e4fe4b86a::t_ffd63b5c67e857 8
+README.md
+  s_43311e4fe4b86a::t_ffd63b5c67e857 10,17
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_ffd63b5c67e857 11,21,33,40,83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c626618c69a74bb5784a44580a449f79544c7ae9",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

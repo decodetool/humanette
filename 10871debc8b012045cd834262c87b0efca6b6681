@@ -1,0 +1,26 @@
+apps/web/app/layout.tsx
+  s_408157d782cb56::t_6cc8289de4a989 30
+apps/web/tests/examples.spec.ts
+  s_408157d782cb56::t_6cc8289de4a989 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "10871debc8b012045cd834262c87b0efca6b6681",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

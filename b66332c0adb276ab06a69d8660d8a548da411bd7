@@ -1,0 +1,28 @@
+apps/web/components/demo-audio.tsx
+  s_43311e4fe4b86a::t_0636d8727893ad 52,56-68
+apps/web/components/examples.tsx
+  s_43311e4fe4b86a::t_0636d8727893ad 18-20
+apps/web/tests/demo-audio.spec.ts
+  s_43311e4fe4b86a::t_0636d8727893ad 58-63,84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b66332c0adb276ab06a69d8660d8a548da411bd7",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

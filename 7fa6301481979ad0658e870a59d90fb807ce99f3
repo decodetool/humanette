@@ -1,0 +1,44 @@
+README.md
+  s_43311e4fe4b86a::t_b84167085990ef 17
+apps/web/tests/agent-docs.spec.ts
+  s_43311e4fe4b86a::t_b84167085990ef 42
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_abbf983e9afca1 25
+  s_43311e4fe4b86a::t_fe77f0de956e18 29,33,38
+  s_43311e4fe4b86a::t_b379b4396f0c89 39
+packages/bigcursor/package.json
+  s_43311e4fe4b86a::t_b84167085990ef 3
+apps/web/content/documentation.ts
+  s_43311e4fe4b86a::t_b84167085990ef 106
+skills/bigcursor/references/setup.md
+  s_43311e4fe4b86a::t_b84167085990ef 9,15,17
+packages/bigcursor/README.md
+  s_43311e4fe4b86a::t_3a8576d310c838 17,93
+  s_43311e4fe4b86a::t_b84167085990ef 22
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_b84167085990ef 25
+  s_43311e4fe4b86a::t_fe77f0de956e18 19,22
+bun.lock
+  s_43311e4fe4b86a::t_4bb0812fb86602 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7fa6301481979ad0658e870a59d90fb807ce99f3",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
