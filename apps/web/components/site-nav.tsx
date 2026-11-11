@@ -34,7 +34,7 @@ export function SiteNav() {
         </nav>
         <div className="flex items-center gap-2">
           <a
-            href="https://github.com/decodetool/humanette"
+            href="https://github.com/seflless/humanette"
             className="icon-button nav-icon w-[30px]"
             aria-label="GitHub"
             title="GitHub"

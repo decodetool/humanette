@@ -46,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decodetool/humanette.git",
+    "url": "git+https://github.com/seflless/humanette.git",
     "directory": "packages/humanette"
   },
-  "homepage": "https://github.com/decodetool/humanette",
+  "homepage": "https://github.com/seflless/humanette",
   "license": "ISC",
   "engines": {
     "node": ">=22"

@@ -16,13 +16,15 @@ The Next.js site runs at http://localhost:3410. Turborepo builds humanette befor
 
 ## Vercel
 
-Import decodetool/humanette. Root Directory: apps/web. Framework: Next.js. Enable source files outside the root directory. Install command: cd ../.. && bun install --frozen-lockfile. Build command: cd ../.. && bunx turbo build --filter=@humanette/web. Keep the default .next output directory. Node version: 22.x. Bun is pinned by packageManager and bun.lock.
+Import seflless/humanette. Root Directory: apps/web. Framework: Next.js. Enable source files outside the root directory. Install command: cd ../.. && bun install --frozen-lockfile. Build command: cd ../.. && bunx turbo build --filter=@humanette/web. Keep the default .next output directory. Node version: 22.x. Bun is pinned by packageManager and bun.lock.
 
 No environment secrets are required for the site. No deployment was created by this implementation. Preview deployments can follow PRs once the repository is connected to Vercel.
 
 ## npm release
 
 humanette@1.2.0 was published November 10, 2026. Its actual registry tarball was downloaded and integrity-verified: root natural-typing and humanette/recording exports, declarations, browser bundle, 35 cursor SVGs, and upstream notices are present; runtime bundles match the reviewed source build. The skill consumes these package APIs without copying runtime code. The root and website are private; only packages/humanette is publishable.
+
+The repository moved to https://github.com/seflless/humanette on November 11, 2026. Local remotes, skill installation commands, website links, and the prepared package metadata use that owner.
 
 The prepared 1.2.1 patch shares procedural sound engines and the typing model with the website’s browser previews. It also migrates the maintained recording example to native audio/video capture. It has not been published; installation guidance continues to reference verified 1.2.0 until the new tarball is checked.
 

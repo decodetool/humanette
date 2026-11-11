@@ -7,14 +7,14 @@ A steady hand for browser automation. Natural, seeded pointer motion; bundled, C
 Install the skill in your project and choose your coding agent when prompted:
 
 ```sh
-npx skills add decodetool/humanette --skill humanette
+npx skills add seflless/humanette --skill humanette
 ```
 
 In Claude Code, ask `/humanette record a demo of the new UX features in this PR`. In Codex, select the Humanette skill and describe the demo. The agent handles package and browser setup, records native high-resolution MP4 with tab audio, and injects quiet live click/typing sounds. The skill recorder needs Node 24.11+ and Chrome 153+; it installs missing tools in the chosen workspace. Open browser sessions need a supported Playwright connection and an available recorder.
 
 For a product demo, ask `/humanette create a product demo of a my to-do app`.
 
-The [skill](skills/humanette/SKILL.md) includes a runnable local example. The published `humanette@1.2.0` tarball was verified November 10, 2026: natural typing, sounds, recording, and capture fixes are owned by the package. It includes the root API, optional `humanette/recording` module, types, browser bundle, cursor assets, and license notices. The skill installs from npm; no Humanette source checkout or build tools are needed.
+The [skill](skills/humanette/SKILL.md) includes a runnable local example. The published `humanette@1.2.0` tarball was verified November 11, 2026: natural typing, sounds, recording, and capture fixes are owned by the package. It includes the root API, optional `humanette/recording` module, types, browser bundle, cursor assets, and license notices. The skill installs from npm; no Humanette source checkout or build tools are needed.
 
 The pending 1.2.1 patch shares those sound engines and the typing model with the website previews. The homepage includes a natural typing demo with Slow, Default, and Fast presets. Enable sound to hear click and key effects; audio starts only after that gesture. The Pointer Lab and live demo use the same packaged engines. Visual previews illustrate actions; the Playwright examples deliver real input.
 

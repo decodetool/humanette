@@ -8,7 +8,7 @@ import {
 
 export const siteUrl = 'https://humanette.dev';
 export const releaseNotice =
-  'Published tarball rechecked November 10, 2026: npm humanette@1.2.0 includes createHuman with natural typing and typingSpeeds at the package root, the optional humanette/recording module, browser bundle, TypeScript declarations, all 35 cursor SVGs, and license notices. Its runtime bundles match the reviewed release. Install from npm; no Humanette source checkout or build is required.';
+  'Published tarball rechecked November 11, 2026: npm humanette@1.2.0 includes createHuman with natural typing and typingSpeeds at the package root, the optional humanette/recording module, browser bundle, TypeScript declarations, all 35 cursor SVGs, and license notices. Its runtime bundles match the reviewed release. Install from npm; no Humanette source checkout or build is required.';
 
 export const install =
   'npm install --save-dev humanette@^1.2.0 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
@@ -18,7 +18,7 @@ export const llmsIndex =
   [
     '# Humanette',
     '> Humanette is a TypeScript/JavaScript library that adds large cursors, natural mouse movement and typing, visible click feedback, and optional live click/key sounds to real Playwright browser input. Use it for product walkthroughs and recordings of coding agents testing features.',
-    'Website: https://humanette.dev. Source: https://github.com/decodetool/humanette. Package name: humanette. Public API: import { createHuman } from "humanette", then await createHuman(page, { scale: 4 }) using an existing Playwright Page.',
+    'Website: https://humanette.dev. Source: https://github.com/seflless/humanette. Package name: humanette. Public API: import { createHuman } from "humanette", then await createHuman(page, { scale: 4 }) using an existing Playwright Page.',
     releaseNotice,
     'Humanette delivers real Playwright input, with optional native capture through humanette/recording. It is not an autonomous agent, video editor, or replacement for assertions. Keep navigation, readiness checks, and assertions in Playwright. Await human actions sequentially and await human.dispose() in finally. A visual website demo or a video alone is not proof that a feature passed its checks.',
     'Main actions: human.moveTo, human.click, human.drag, human.selectText, human.type, human.press, human.wait, human.configure, and human.dispose. Targets generally accept Playwright locators, CSS selectors, or main-viewport CSS coordinates; selectText requires a locator or selector. Keyboard badges are opt-in and show modifier chords only, not all typed characters. Humanette does not guarantee capture FPS.',
@@ -30,14 +30,14 @@ export const llmsIndex =
     '## Documentation',
     '- [Complete agent guide](https://humanette.dev/docs.md): Skill installation, demo prompts, release status, manual setup, API, recording workflow, and limits. Read this before implementing.\n- [Full-text alias](https://humanette.dev/llms-full.txt): The same complete guide in one plain-text response.\n- [Human-readable docs](https://humanette.dev/docs): Skill installation, short demo prompts, and the Playwright reference.\n- [Examples](https://humanette.dev/#examples): Visual previews and focused action snippets; these animations do not run real input against a product.',
     '## Optional',
-    '- [Source and issues](https://github.com/decodetool/humanette): Repository, package source, and bug reports.\n- [npm package](https://www.npmjs.com/package/humanette): Check the available runtime release before installing.\n- [Pointer Lab](https://humanette.dev/workbench): Tune appearance and export configuration.\n- [Playwright video documentation](https://playwright.dev/docs/videos): Recording and video finalization.\n- [Decode](https://decode.dev): Humanette is made by Decode.',
+    '- [Source and issues](https://github.com/seflless/humanette): Repository, package source, and bug reports.\n- [npm package](https://www.npmjs.com/package/humanette): Check the available runtime release before installing.\n- [Pointer Lab](https://humanette.dev/workbench): Tune appearance and export configuration.\n- [Playwright video documentation](https://playwright.dev/docs/videos): Recording and video finalization.\n- [Decode](https://decode.dev): Humanette is made by Decode.',
   ].join('\n\n') + '\n';
 
 export const agentGuide =
   [
     '# Humanette: agent guide',
     '> Humanette adds readable cursor movement, natural typing, click feedback, and optional live sounds to real Playwright actions. It helps people follow product walkthroughs, bug reproductions, and coding-agent test recordings.',
-    'Canonical website: https://humanette.dev. HTML docs: https://humanette.dev/docs. Discovery index: https://humanette.dev/llms.txt. Source: https://github.com/decodetool/humanette.',
+    'Canonical website: https://humanette.dev. HTML docs: https://humanette.dev/docs. Discovery index: https://humanette.dev/llms.txt. Source: https://github.com/seflless/humanette.',
     '## Install humanette skill',
     'Run this in your project and choose your coding agent when prompted. The installer reads skills/humanette from the official repository. The agent handles runtime and browser setup when you request a demo.',
     fence('sh', skillInstall),
@@ -80,5 +80,5 @@ export const agentGuide =
     'Targets are measured before movement and can move afterward; Humanette does not reproduce all locator.click actionability checks. selectText assumes ordinary left-to-right selectable text, including nested spans and wrapped lines. For inputs, use human.type with selectAll or keyboard shortcuts; specialized editors may need explicit coordinates or keyboard input.',
     'CSS cursor inference has limits for closed shadow roots, cross-origin frames, native controls, and custom cursor images. Busy cursor artwork is static. Browser CSP and permissions still apply. Bundled assets require no remote requests; Humanette itself does not upload recordings or send telemetry. Your app and recorder can have their own network behavior.',
     '## More resources',
-    '- [Focused examples](https://humanette.dev/#examples)\n- [Pointer Lab](https://humanette.dev/workbench)\n- [Source and issues](https://github.com/decodetool/humanette)\n- [Playwright videos](https://playwright.dev/docs/videos)\n- [Playwright assertions](https://playwright.dev/docs/test-assertions)',
+    '- [Focused examples](https://humanette.dev/#examples)\n- [Pointer Lab](https://humanette.dev/workbench)\n- [Source and issues](https://github.com/seflless/humanette)\n- [Playwright videos](https://playwright.dev/docs/videos)\n- [Playwright assertions](https://playwright.dev/docs/test-assertions)',
   ].join('\n\n') + '\n';

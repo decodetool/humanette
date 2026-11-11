@@ -5,7 +5,7 @@ Natural cursor movement and legible click feedback for Playwright product demos.
 ## Ask your agent for a demo
 
 ```sh
-npx skills add decodetool/humanette --skill humanette
+npx skills add seflless/humanette --skill humanette
 ```
 
 Run in your project and choose your coding agent. In Claude Code, ask `/humanette record a demo of the new UX features in this PR`. In Codex, select the Humanette skill and describe the demo. The agent handles runtime and browser setup. Open sessions require a supported Playwright connection and an available recorder.
