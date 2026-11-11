@@ -1,0 +1,22 @@
+apps/web/tests/svg-renderer.spec.ts
+  s_408157d782cb56::t_dcbc8209dcf60e 186-215,217,219-221
+  s_408157d782cb56::t_d2df05ba2b489f 216,218,222-223
+packages/humanette/src/index.ts
+  s_408157d782cb56::t_3dda5be441937f 214-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "99e585e26d26e5894d85d93cce1cd9132e340729",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

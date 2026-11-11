@@ -1,0 +1,31 @@
+apps/web/package.json
+  s_408157d782cb56::t_0932f009af6c71 22
+examples/record-demo.mjs
+  s_408157d782cb56::t_0932f009af6c71 20,61-62
+packages/humanette/package.json
+  s_408157d782cb56::t_0932f009af6c71 61,64
+README.md
+  s_408157d782cb56::t_0932f009af6c71 31-36
+scripts/pack-check.mjs
+  s_408157d782cb56::t_0932f009af6c71 40
+package.json
+  s_408157d782cb56::t_0932f009af6c71 36
+bun.lock
+  s_408157d782cb56::t_33fd0c6899cfd9 11,29,40,43,191,305,307,351-352,354-357
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0fa54e695c7c7b03faf363a113766f0433882efc",
+  "prompts": {},
+  "sessions": {
+    "s_408157d782cb56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0c0d0-c86b-7383-9571-52c6e63302a7",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

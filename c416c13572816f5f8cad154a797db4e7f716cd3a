@@ -1,0 +1,86 @@
+.gitignore
+  h_0dbcbba47c7061 1-2
+alias.svg
+  h_0dbcbba47c7061 1-18
+all-scroll.svg
+  h_0dbcbba47c7061 1-18
+auto.svg
+  h_0dbcbba47c7061 1-18
+cell.svg
+  h_0dbcbba47c7061 1-18
+col-resize.svg
+  h_0dbcbba47c7061 1-18
+context-menu.svg
+  h_0dbcbba47c7061 1-20
+copy.svg
+  h_0dbcbba47c7061 1-91
+crosshair.svg
+  h_0dbcbba47c7061 1-4
+default.svg
+  h_0dbcbba47c7061 1-18
+e-resize.svg
+  h_0dbcbba47c7061 1-32
+ew-resize.svg
+  h_0dbcbba47c7061 1-32
+grab.svg
+  h_0dbcbba47c7061 1-18
+grabbing.svg
+  h_0dbcbba47c7061 1-18
+help.svg
+  h_0dbcbba47c7061 1-19
+index.html
+  h_0dbcbba47c7061 1-524
+move.svg
+  h_0dbcbba47c7061 1-18
+n-resize.svg
+  h_0dbcbba47c7061 1-32
+ne-resize.svg
+  h_0dbcbba47c7061 1-32
+nesw-resize.svg
+  h_0dbcbba47c7061 1-32
+no-drop.svg
+  h_0dbcbba47c7061 1-92
+not-allowed.svg
+  h_0dbcbba47c7061 1-92
+ns-resize.svg
+  h_0dbcbba47c7061 1-32
+nw-resize.svg
+  h_0dbcbba47c7061 1-32
+nwse-resize.svg
+  h_0dbcbba47c7061 1-32
+pointer.svg
+  h_0dbcbba47c7061 1-18
+progress.svg
+  h_0dbcbba47c7061 1-94
+row-resize.svg
+  h_0dbcbba47c7061 1-18
+s-resize.svg
+  h_0dbcbba47c7061 1-32
+se-resize.svg
+  h_0dbcbba47c7061 1-32
+sw-resize.svg
+  h_0dbcbba47c7061 1-32
+text.svg
+  h_0dbcbba47c7061 1-4
+vertical-text.svg
+  h_0dbcbba47c7061 1-4
+w-resize.svg
+  h_0dbcbba47c7061 1-32
+wait.svg
+  h_0dbcbba47c7061 1-94
+zoom-in.svg
+  h_0dbcbba47c7061 1-19
+zoom-out.svg
+  h_0dbcbba47c7061 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c416c13572816f5f8cad154a797db4e7f716cd3a",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
