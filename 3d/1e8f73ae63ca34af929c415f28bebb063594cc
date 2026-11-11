@@ -1,0 +1,26 @@
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_f18f827b5190e1 19,21,42,44
+.github/workflows/ci.yml
+  s_43311e4fe4b86a::t_f18f827b5190e1 10,22-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3d1e8f73ae63ca34af929c415f28bebb063594cc",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}

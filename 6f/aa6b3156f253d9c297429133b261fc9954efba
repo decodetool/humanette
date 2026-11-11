@@ -1,0 +1,168 @@
+skills/humanette/references/recording-quality.md
+  s_43311e4fe4b86a::t_e08c7380e19975 45-46
+  s_43311e4fe4b86a::t_25112e4f0e6b90 3,53,57
+  s_43311e4fe4b86a::t_4ec32afaa84676 35
+  s_43311e4fe4b86a::t_f7a17fbd9b4cec 1,5,7,18,20,22,26-33,37,39,41,43,47-49
+  s_d8caab9971a131::t_f1c5609ab4788b 2,4,6,8,15,17,19,21,23,25,34,36,38,40,42,44
+  s_43311e4fe4b86a::t_38f7eeb1e69c41 24,50-52,54
+  s_43311e4fe4b86a::t_dfc3acb373ee3f 9-14,16
+  s_43311e4fe4b86a::t_ec612914296143 55-56
+packages/humanette/src/typing.ts
+  s_43311e4fe4b86a::t_4f841b2e4fa9e1 1-70,72-131
+  s_43311e4fe4b86a::t_f0de71b790d364 71
+scripts/verify-native-recording.mjs
+  s_43311e4fe4b86a::t_dfc3acb373ee3f 5-13,18-19,21-25,36-37,39-41,43,51-65,68-73,78-79,85-88
+  s_43311e4fe4b86a::t_71bc55053a8531 66-67
+  s_43311e4fe4b86a::t_baacc06e0e1131 1-4,14-17,20,26-35,38,42,44-50,74-77,80-84,89-91
+scripts/tests/typing-capture.test.mjs
+  s_43311e4fe4b86a::t_a8f1058ce9968b 1-7,9,17,68-80,133,136
+  s_43311e4fe4b86a::t_f3018df1c75195 10-11,16,21-24,30-38,43-67,81,83-132,134-135,137-138
+  s_43311e4fe4b86a::t_902572c955114e 12-15,18-20,25-29,39-42
+  s_43311e4fe4b86a::t_af7609837e3384 8,82
+packages/humanette/src/recording/runtime.js
+  s_43311e4fe4b86a::t_f497e339ff376d 153,201
+  s_43311e4fe4b86a::t_4f841b2e4fa9e1 1-152,154-200,202-210,212-363
+  s_43311e4fe4b86a::t_81b8ed9ad65664 211
+scripts/pack-check.mjs
+  s_43311e4fe4b86a::t_788eadf61b3fa8 6,21-23,44,51,56,77,90-97,101-102,106-108,112-122
+  s_43311e4fe4b86a::t_4e8d5ff81a8aa4 78-81,98-100,103-105,109-111
+docs/release-and-deployment.md
+  s_43311e4fe4b86a::t_f39ee6fa075ade 34,36
+  s_43311e4fe4b86a::t_6937e15793da9d 25,28,32,37-38
+packages/humanette/README.md
+  s_43311e4fe4b86a::t_8e72617458b23d 20,49,54,62-74,87-127,129
+packages/humanette/src/playwright.ts
+  s_43311e4fe4b86a::t_5398289a3bf0d3 11-13,25-30,54,57-58,180,182-192,197-214,218
+scripts/tests/recording.test.mjs
+  s_43311e4fe4b86a::t_969075b7cfec35 292,310
+  s_43311e4fe4b86a::t_dfc3acb373ee3f 8-11,18,22-27,29-33,35-65,72-102,105-125,127-150,156-162,164-169
+  s_43311e4fe4b86a::t_3485a94726b0d6 103
+  s_43311e4fe4b86a::t_e08c7380e19975 104,151-155,163
+  s_43311e4fe4b86a::t_acfbc900be7236 19
+  s_43311e4fe4b86a::t_6824f0baca5032 173-180,182-246,249-288,290-291,293-309,311-354
+  s_43311e4fe4b86a::t_3438bc1b231157 3,16
+  s_43311e4fe4b86a::t_94da76429af2be 5,172,181,289
+  s_43311e4fe4b86a::t_71bc55053a8531 247-248
+  s_43311e4fe4b86a::t_af853c1a84ad90 1-2,4,6-7,14-15,17,20-21,28,126,170-171
+  s_43311e4fe4b86a::t_25ac1ca066a2f1 66-71
+  s_43311e4fe4b86a::t_e4bbd31f0a0aaf 12-13,34
+skills/humanette/SKILL.md
+  s_43311e4fe4b86a::t_7b1dfde5c84ab0 33
+  s_43311e4fe4b86a::t_6824f0baca5032 63-68
+  s_43311e4fe4b86a::t_25112e4f0e6b90 27,40,52,55-58
+  s_43311e4fe4b86a::t_4d453a7e8f5d81 26,31,71-72
+  s_43311e4fe4b86a::t_3256d3d991063d 32,59-62,69-70
+apps/web/tests/agent-docs.spec.ts
+  s_43311e4fe4b86a::t_5edd76b52339e7 3,15
+  s_43311e4fe4b86a::t_4e8d5ff81a8aa4 37-42
+packages/humanette/tsconfig.json
+  s_43311e4fe4b86a::t_4f841b2e4fa9e1 11-12,14
+packages/humanette/src/recording.ts
+  s_43311e4fe4b86a::t_b23fb600f6dba4 1-6,8-102,104-106
+  s_43311e4fe4b86a::t_bc08a8f5a9385d 7,103
+packages/humanette/src/recording/interaction-sounds.js
+  s_43311e4fe4b86a::t_4f841b2e4fa9e1 1-189
+skills/humanette/scripts/record-todo.mjs
+  s_43311e4fe4b86a::t_4d453a7e8f5d81 12,15,59-60,85
+  s_43311e4fe4b86a::t_71bc55053a8531 75-80
+  s_43311e4fe4b86a::t_bd67f45c7ef6f8 8
+apps/web/content/documentation.ts
+  s_43311e4fe4b86a::t_bed0954c28f121 22,24
+  s_43311e4fe4b86a::t_c02d28d107c680 23,27,34,53,72-73
+  s_43311e4fe4b86a::t_0625fbc7df9c96 29,32-33,35,37-39,41-42
+scripts/test-skill.mjs
+  s_43311e4fe4b86a::t_4e8d5ff81a8aa4 460-463,466-473
+  s_43311e4fe4b86a::t_ed09a4a5135f57 586
+  s_43311e4fe4b86a::t_7c425a8c963190 23,190,192-193,195-196,237,430,434,456-457,496,532,536
+  s_43311e4fe4b86a::t_9401895a8288fe 37-43
+  s_43311e4fe4b86a::t_d8c282d6e20487 28-29,213,218-219,412,422,567-571,573-578,583
+  s_43311e4fe4b86a::t_6824f0baca5032 214-217,413-421,475-480,572,579-582
+  s_43311e4fe4b86a::t_f3a4ddb514e3d4 36,44
+  s_43311e4fe4b86a::t_30ab7a05450d20 197-200,389
+  s_43311e4fe4b86a::t_b719a37ba3cae0 382-388,390,392-393
+  s_43311e4fe4b86a::t_7b1dfde5c84ab0 331
+  s_43311e4fe4b86a::t_4ec32afaa84676 391,459,464-465,474
+scripts/tests/natural-typing.test.mjs
+  s_43311e4fe4b86a::t_0db5e3e935bbcb 59-105
+  s_43311e4fe4b86a::t_806d379cd4cdc5 1-4,8-10,12-13,16-19,24,27-28,116-117,167
+  s_43311e4fe4b86a::t_aa268a102780f1 11,14-15,35-39,41,45-46,157
+  s_43311e4fe4b86a::t_38f7eeb1e69c41 20-23,108-115,118,122-124,130-142,144-145,151-156,158,161-166,168-179,181-191,193-206
+  s_43311e4fe4b86a::t_756f1f3d87204b 25,42-44
+  s_43311e4fe4b86a::t_fa4bd5e99c80d8 51-58
+  s_43311e4fe4b86a::t_ca4daf5897898d 26,29-34,106-107
+  s_43311e4fe4b86a::t_c02d28d107c680 180
+  s_43311e4fe4b86a::t_14ada6afd09dc3 47-50
+  s_43311e4fe4b86a::t_dbae944d9f4bb9 119-121,126-129,146-150
+  s_43311e4fe4b86a::t_bc81193ccde9a6 40,159-160
+  s_43311e4fe4b86a::t_03cce98bb95a98 125,143,192
+  s_43311e4fe4b86a::t_117fe4cfd71b64 5-7
+apps/web/app/docs/page.tsx
+  s_43311e4fe4b86a::t_4e8d5ff81a8aa4 99-100
+  s_43311e4fe4b86a::t_bed0954c28f121 4,103
+  s_43311e4fe4b86a::t_0625fbc7df9c96 97,105,108
+  s_43311e4fe4b86a::t_6937e15793da9d 119
+  s_43311e4fe4b86a::t_dfc3acb373ee3f 106-107
+  s_43311e4fe4b86a::t_1c06a520695e93 98
+docs/architecture.md
+  s_43311e4fe4b86a::t_6937e15793da9d 14,26
+  s_43311e4fe4b86a::t_e08c7380e19975 27
+packages/humanette/src/recording/typing-sound.js
+  s_43311e4fe4b86a::t_4f841b2e4fa9e1 1-297
+README.md
+  s_43311e4fe4b86a::t_6937e15793da9d 17,39,75,81
+  s_43311e4fe4b86a::t_0625fbc7df9c96 13,40
+  s_43311e4fe4b86a::t_6824f0baca5032 46,57
+  s_43311e4fe4b86a::t_efc74a9bc28fc0 78-80
+apps/web/content/agent-guide.ts
+  s_43311e4fe4b86a::t_6937e15793da9d 11,14,23,48,51,56,67,69,71,74,78
+  s_43311e4fe4b86a::t_0625fbc7df9c96 53
+  s_43311e4fe4b86a::t_bed0954c28f121 1
+  s_43311e4fe4b86a::t_af985504cb830b 73
+packages/humanette/scripts/build.mjs
+  s_43311e4fe4b86a::t_5398289a3bf0d3 39,47
+skills/humanette/references/setup.md
+  s_43311e4fe4b86a::t_7b1dfde5c84ab0 32
+  s_43311e4fe4b86a::t_25112e4f0e6b90 7,9,15,17,22,49
+  s_43311e4fe4b86a::t_f7a17fbd9b4cec 3,5,11,14,16,20,24,26,28-30,34-36,39-40,43-47,51,53,55
+  s_43311e4fe4b86a::t_fa6582b96c6561 21
+package.json
+  s_43311e4fe4b86a::t_4e8d5ff81a8aa4 25-26
+  s_43311e4fe4b86a::t_581d9f954126e0 38
+  s_43311e4fe4b86a::t_38f7eeb1e69c41 24
+packages/humanette/package.json
+  s_43311e4fe4b86a::t_4f841b2e4fa9e1 3,27-31,69-70,73-74,79-80
+  s_43311e4fe4b86a::t_3fbbeeab7475af 81
+bun.lock
+  s_43311e4fe4b86a::t_1db7cb87bf196b 9,40,42,46,50,254-255
+packages/humanette/NOTICE.md
+  s_43311e4fe4b86a::t_dcdf6040f8b9a9 10-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6faa6b3156f253d9c297429133b261fc9954efba",
+  "prompts": {},
+  "humans": {
+    "h_0dbcbba47c7061": {
+      "author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_43311e4fe4b86a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10cf8-44a9-7933-ab21-da1054c27e39",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    },
+    "s_d8caab9971a131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a632a280-80a7-4634-a026-1c9b901c6dc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Francois Laberge <francoislaberge@gmail.com>"
+    }
+  }
+}
