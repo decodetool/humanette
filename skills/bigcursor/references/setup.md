@@ -6,15 +6,15 @@ Use the temporary or repository workspace chosen in SKILL.md. Handle missing pac
 
 The optional package recorder needs Node.js **24.11+** (the core Bigcursor package itself needs 22+). Reuse a suitable runtime. If missing or too old, download an official Node distribution for the detected OS/architecture into the task's tools directory, verify its checksum against the official release, and scope its bin directory to task commands. Do not replace system Node or change shell profiles. Saved demos must disclose Node 24.11+ in their rerun instructions.
 
-Use the verified published `bigcursor@1.0.0` package: the root exports `createCursor` with natural typing, and `bigcursor/recording` exports the recorder. Its registry tarball was integrity-verified November 11, 2026; all 58 dist files match the tested build, with declarations, 35 SVGs, and license notices. For normal public-registry use, pin 1.0.0 explicitly: the historical 1.1.0 package contains an older API without recording, despite its higher version number. The next 1.1.1 metadata/README release is not yet published. If the user supplies an explicit release-candidate version or development artifact, use that instead of the public default, then perform the same import/launch/recording checks. Before recording, verify both runtime imports, not just a version string. If the required runtime is unavailable, report that blocker; never substitute a source build. Use `chrome-capture@0.1.2` for the native recorder. Reuse compatible `playwright`, `@playwright/test`, or `playwright-core`; adapt imports to the directly available package.
+Use the verified published `bigcursor@1.1.1` package: the root exports `createCursor` with natural typing, and `bigcursor/recording` exports the recorder. Its registry tarball was integrity-verified November 11, 2026; all 58 dist files match the tested build, with declarations, 35 SVGs, and license notices. For normal public-registry use, pin 1.1.1 explicitly: the historical 1.1.0 package contains an older API without recording, and is not compatible with this workflow. If the user supplies an explicit release-candidate version or development artifact, use that instead of the public default, then perform the same import/launch/recording checks. Before recording, verify both runtime imports, not just a version string. If the required runtime is unavailable, report that blocker; never substitute a source build. Use `chrome-capture@0.1.2` for the native recorder. Reuse compatible `playwright`, `@playwright/test`, or `playwright-core`; adapt imports to the directly available package.
 
 Install only missing packages. For a new npm workspace:
 
 ```sh
 # Saved repo: development dependencies, using its existing package manager.
-npm install --save-dev bigcursor@1.0.0 playwright chrome-capture@0.1.2
+npm install --save-dev bigcursor@1.1.1 playwright chrome-capture@0.1.2
 # One-off: ordinary dependencies in a private temporary ESM package instead.
-npm install bigcursor@1.0.0 playwright chrome-capture@0.1.2
+npm install bigcursor@1.1.1 playwright chrome-capture@0.1.2
 ```
 
 Restore declared dependencies before adding duplicates. New setups can use stable Playwright. Preserve a project's existing compatible Playwright even when its browser is too old for recording. Never clone/build Bigcursor, inspect sibling source checkouts, or substitute a local build. If npm has no usable runtime release, report the publication blocker. A user-supplied development artifact is the sole exception; saved demos must keep it at a durable repo-relative path.

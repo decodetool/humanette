@@ -16,13 +16,13 @@ import {
 import { siteUrl } from './site';
 export { siteUrl } from './site';
 export const releaseStatus =
-  'bigcursor 1.0.0 is published and verified. The skill is available from the official repository.';
+  'bigcursor 1.1.1 is published and verified. The skill is available from the official repository.';
 export const releaseNotice =
   releaseStatus +
-  ' Registry tarball rechecked November 11, 2026: 1.0.0 exports createCursor, typingSpeeds, and bigcursor/recording, with natural typing, cursor dimming, browser bundle, declarations, 35 SVGs, and license notices. Its 58 dist files match the tested build byte for byte. Install the verified 1.0.0 explicitly: the historical 1.1.0 archive has an older API without recording, and 0.0.0-stage is only a placeholder. A metadata/README refresh is prepared as 1.1.1 but is not published. No source checkout or build tools are required.';
+  ' Registry tarball rechecked November 11, 2026: 1.1.1 is npm latest and exports createCursor, typingSpeeds, and bigcursor/recording, with natural typing, cursor dimming, browser bundle, declarations, 35 SVGs, and license notices. Its 58 dist files match the tested build byte for byte. Homepage points to bigcursor.dev, and the README links directly to docs/examples with current installation instructions. Avoid the historical 1.1.0 archive, which has an older API without recording; 0.0.0-stage is only a placeholder. No source checkout or build tools are required.';
 
 export const install =
-  'npm install --save-dev bigcursor@1.0.0 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
+  'npm install --save-dev bigcursor@1.1.1 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
 const fence = (language: string, code: string) => ['```' + language, code, '```'].join('\n');
 
 export const llmsIndex =

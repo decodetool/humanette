@@ -39,7 +39,7 @@ test('agent entry point and full guide are plain, complete, and linked without J
   for (const detail of [
     'Node.js >=22',
     'modifier chords',
-    'bigcursor@1.0.0',
+    'bigcursor@1.1.1',
     'bigcursor/recording',
   ]) {
     expect(summary + guide).toContain(detail);
