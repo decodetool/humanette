@@ -1,6 +1,6 @@
 {
   "name": "bigcursor",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
   "type": "module",
   "main": "./dist/playwright.js",

@@ -14,12 +14,12 @@ For an example without an existing app, ask the skill to record its bundled loca
 
 ## Installation
 
-The first release, 1.0.0, is prepared but not published. The installation commands below apply after publication.
+This guide requires 1.1.1 or newer. The older 1.1.0 archive uses a different API without the recording module. Check that the required version is available on npm before installing.
 
 Requires Node.js 22+. Install Bigcursor and Playwright with your project's package manager, then install the matching browser:
 
 ```sh
-npm install --save-dev bigcursor@^1.0.0 playwright
+npm install --save-dev bigcursor@^1.1.1 playwright
 npx --no-install playwright install chromium
 ```
 
@@ -90,7 +90,7 @@ await cursor.showCursor(); // Show at the last position; resume automatic dimmin
 
 Manual hiding persists through mouse activity and navigation until explicitly shown. It does not change real input, app state, keyboard badges, or interaction audio. The internal renderer uses the same `hideCursor()` / `showCursor()` methods.
 
-The shared renderer stops RAF after each transition; keyboard badges and interaction sounds remain independent. Website `typing` intervals affect presentation only and never type into a product. Visual timelines calculate dimming in timeline time, preserving seek/pause. The first bigcursor release, 1.0.0, is prepared but not published.
+The shared renderer stops RAF after each transition; keyboard badges and interaction sounds remain independent. Website `typing` intervals affect presentation only and never type into a product. Visual timelines calculate dimming in timeline time, preserving seek/pause. These APIs require 1.1.1 or newer.
 
 ## Natural typing
 

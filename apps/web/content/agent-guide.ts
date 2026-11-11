@@ -16,13 +16,13 @@ import {
 import { siteUrl } from './site';
 export { siteUrl } from './site';
 export const releaseStatus =
-  'bigcursor 1.0.0 is prepared but not published. Package installation requires the first npm release; skill installation also requires the renamed skill on the default branch.';
+  'bigcursor 1.1.1 is prepared but not published. The public 1.1.0 archive contains an older API without the recording module. This guide requires 1.1.1; skill installation also requires the renamed skill on the default branch.';
 export const releaseNotice =
   releaseStatus +
-  ' The public npm name had no release when checked November 11, 2026. The prepared package exports createCursor and typingSpeeds at the root, bigcursor/recording, the browser bundle, TypeScript declarations, all 35 cursor SVGs, and license notices, including cursor dimming (autoHideTimeout: 0, hiddenOpacity: 0, dimmedOpacity: 0.3). Until publication, report the missing release instead of cloning or building source. Maintainers can test the packed artifact locally.';
+  ' Registry tarballs inspected November 11, 2026: 0.0.0-stage is a placeholder, and 1.1.0 lacks createCursor and bigcursor/recording. The prepared 1.1.1 package includes those APIs, natural typing, cursor dimming, the browser bundle, declarations, all 35 SVGs, and license notices. Until the matching runtime is published, report the missing release instead of cloning or building source. Maintainers can test the packed artifact locally.';
 
 export const install =
-  'npm install --save-dev bigcursor@^1.0.0 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
+  'npm install --save-dev bigcursor@^1.1.1 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
 const fence = (language: string, code: string) => ['```' + language, code, '```'].join('\n');
 
 export const llmsIndex =

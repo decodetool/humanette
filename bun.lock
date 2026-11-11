@@ -37,7 +37,7 @@
     },
     "packages/bigcursor": {
       "name": "bigcursor",
-      "version": "1.0.0",
+      "version": "1.1.1",
       "devDependencies": {
         "chrome-capture": "0.1.2",
         "playwright-core": "1.64.0-alpha-2026-09-28",
