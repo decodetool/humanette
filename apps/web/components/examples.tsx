@@ -28,9 +28,9 @@ export function Examples() {
           ] as const
         ).map(([scene, title]) => (
           <section key={scene} aria-label={title}>
-            <h2 className="mb-2 text-2xl font-semibold tracking-tight">{title}</h2>
+            <h2 className="mb-2 text-center text-2xl font-semibold tracking-tight">{title}</h2>
             {scene === 'typing' && (
-              <label className="flex items-center gap-2 text-sm text-muted">
+              <label className="flex items-center justify-center gap-2 text-sm text-muted">
                 Typing speed
                 <select
                   aria-label="Typing speed"

@@ -41,10 +41,11 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
   await expect(page.getByRole('button', { name: 'Clicks', exact: true })).toHaveCount(0);
   const clickStage = (await page.getByTestId('example-click').boundingBox())!;
   const clickTarget = (await page.getByText('Click me', { exact: true }).boundingBox())!;
-  expect(clickTarget.x).toBe(clickStage.x);
+  const center = clickStage.x + clickStage.width / 2;
+  expect(Math.abs(clickTarget.x + clickTarget.width / 2 - center)).toBeLessThan(1);
   const drop = (await page.getByText('Drop here', { exact: true }).boundingBox())!;
   const draggable = (await page.getByText('Drag me', { exact: true }).boundingBox())!;
-  expect(drop.x).toBe(clickStage.x);
+  expect(Math.abs((drop.x + draggable.x + draggable.width) / 2 - center)).toBeLessThan(1);
   expect(draggable.x - drop.x).toBe(216);
   expect(draggable.width).toBe(128);
   expect(drop.width).toBe(128);

@@ -11,7 +11,7 @@ import {
 import { useDemoAudio } from './demo-audio';
 export type Scene = 'click' | 'text' | 'drag' | 'typing';
 const typedText = 'Make something great.';
-const cursorGutter = 20;
+const dragWidth = 344;
 export function ExamplePlayer({
   scene,
   scale = 4,
@@ -47,6 +47,7 @@ export function ExamplePlayer({
   );
   const root = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
+  const target = useRef<HTMLDivElement>(null);
   const human = useRef<Humanette | null>(null);
   const clock = useRef(0);
   const startDelay = useRef(scene === 'typing' ? 600 : 0);
@@ -59,6 +60,7 @@ export function ExamplePlayer({
   const [geometry, setGeometry] = useState({
     ratio: 1,
     ratioY: 0.25,
+    originX: 20,
     left: 0,
     right: 280,
     edges: [0, 280],
@@ -112,14 +114,14 @@ export function ExamplePlayer({
     const {
       events,
       initial,
-      geometry: { ratio, ratioY },
+      geometry: { ratio, ratioY, originX },
     } = live.current;
     human.current?.seek(
       events.map((e) =>
-        e.type === 'move' ? { ...e, x: e.x * ratio + cursorGutter, y: e.y * ratioY } : e,
+        e.type === 'move' ? { ...e, x: e.x * ratio + originX, y: e.y * ratioY } : e,
       ),
       at,
-      { x: initial.x * ratio + cursorGutter, y: initial.y * ratioY },
+      { x: initial.x * ratio + originX, y: initial.y * ratioY },
     );
     setTime(at);
   }
@@ -144,6 +146,9 @@ export function ExamplePlayer({
       const ratio = 1;
       if (!box.width) return;
       const bounds = label.current?.getBoundingClientRect();
+      const targetBounds = target.current?.getBoundingClientRect();
+      const contentWidth = scene === 'drag' ? dragWidth : (targetBounds?.width ?? 128);
+      const left = bounds && targetBounds ? bounds.left - targetBounds.left : 0;
       const edges = [0];
       const node = label.current?.firstChild;
       if (node) {
@@ -157,8 +162,9 @@ export function ExamplePlayer({
       setGeometry({
         ratio,
         ratioY: (box.height - 32) / 320,
-        left: bounds ? bounds.left - box.left - cursorGutter : 0,
-        right: bounds ? bounds.right - box.left - cursorGutter : 280,
+        originX: (box.width - contentWidth) / 2,
+        left,
+        right: bounds ? left + bounds.width : 280,
         edges,
       });
     };
@@ -167,6 +173,7 @@ export function ExamplePlayer({
     const resize = new ResizeObserver(measureGeometry);
     resize.observe(root.current!);
     if (label.current) resize.observe(label.current);
+    if (target.current) resize.observe(target.current);
     let intersecting = false;
     const updateVisibility = () => setVisible(intersecting && !document.hidden);
     const observer = new IntersectionObserver(([entry]) => {
@@ -264,7 +271,8 @@ export function ExamplePlayer({
       <div ref={root} data-testid="example-stage" className="relative -mx-5 h-28 overflow-hidden">
         {scene === 'typing' && (
           <div
-            className="field absolute left-5 top-[calc(50%-16px)] flex h-12 w-72 -translate-y-1/2 cursor-text items-center text-base"
+            ref={target}
+            className="field absolute left-1/2 top-[calc(50%-16px)] flex h-12 w-72 -translate-x-1/2 -translate-y-1/2 cursor-text items-center text-base"
             aria-label="Demo title"
             data-testid="example-typing-target"
           >
@@ -282,18 +290,20 @@ export function ExamplePlayer({
         )}
         {scene === 'click' && (
           <div
+            ref={target}
             data-testid="example-click-target"
             data-hovered={state.x >= 0 && state.x <= 128}
             data-pressed={time >= 1000 && time < 1100}
-            className="demo-click-target absolute left-5 top-[calc(50%-16px)] flex h-12 w-32 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border text-sm font-medium"
+            className="demo-click-target absolute left-1/2 top-[calc(50%-16px)] flex h-12 w-32 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border text-sm font-medium"
           >
             {time >= 1100 ? 'Clicked' : 'Click me'}
           </div>
         )}
         {scene === 'text' && (
           <div
+            ref={target}
             data-testid="example-text-target"
-            className="absolute left-5 top-[calc(50%-16px)] -translate-y-1/2 cursor-text whitespace-nowrap text-[1em]"
+            className="absolute left-1/2 top-[calc(50%-16px)] -translate-x-1/2 -translate-y-1/2 cursor-text whitespace-nowrap text-[1em]"
           >
             Select{' '}
             <span className="relative inline-block">
@@ -312,12 +322,15 @@ export function ExamplePlayer({
         )}
         {scene === 'drag' && (
           <>
-            <div className="absolute left-5 top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-y-1/2 items-center justify-center rounded-lg border border-dashed border-muted text-sm text-muted whitespace-nowrap">
+            <div
+              style={{ left: `calc(50% - ${dragWidth / 2}px)` }}
+              className="absolute top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-y-1/2 items-center justify-center rounded-lg border border-dashed border-muted text-sm text-muted whitespace-nowrap"
+            >
               Drop here
             </div>
             <div
               data-testid="example-drag-target"
-              style={{ left: cardX + cursorGutter }}
+              style={{ left: `calc(50% - ${dragWidth / 2}px + ${cardX}px)` }}
               className="absolute top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-x-1/2 -translate-y-1/2 cursor-grab items-center justify-center rounded-lg border border-line bg-success-surface text-sm font-medium whitespace-nowrap"
             >
               {time >= 2640 && time < 3900 ? 'Delivered ✓' : 'Drag me'}
