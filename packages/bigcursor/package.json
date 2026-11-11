@@ -1,7 +1,7 @@
 {
   "name": "bigcursor",
   "version": "1.1.1",
-  "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
+  "description": "Large cursors, natural input, and interaction sounds for Playwright demos.",
   "type": "module",
   "main": "./dist/playwright.js",
   "types": "./dist/playwright.d.ts",
@@ -49,7 +49,10 @@
     "url": "git+https://github.com/seflless/bigcursor.git",
     "directory": "packages/bigcursor"
   },
-  "homepage": "https://github.com/seflless/bigcursor",
+  "homepage": "https://bigcursor.dev",
+  "bugs": {
+    "url": "https://github.com/seflless/bigcursor/issues"
+  },
   "license": "ISC",
   "engines": {
     "node": ">=22"
@@ -63,7 +66,10 @@
     "playwright",
     "demo",
     "recording",
-    "pointer"
+    "pointer",
+    "typing",
+    "audio",
+    "product-demo"
   ],
   "devDependencies": {
     "playwright-core": "1.64.0-alpha-2026-09-28",

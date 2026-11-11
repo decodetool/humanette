@@ -105,6 +105,7 @@ async function run(command, args, { cwd, env, log } = {}) {
 const published = options.includes('--published');
 let registryUrl = 'https://registry.npmjs.org';
 let registry;
+let preparedVersion;
 if (!published) {
   await run('bun', ['run', '--cwd', 'packages/bigcursor', 'build'], { cwd: root });
   const packed = JSON.parse(
@@ -115,6 +116,7 @@ if (!published) {
   const manifest = JSON.parse(
     await readFile(join(root, 'packages/bigcursor/package.json'), 'utf8'),
   );
+  preparedVersion = manifest.version;
   const tarball = await readFile(join(suite, packed.filename));
   registry = createServer((req, res) => {
     if (req.url === `/bigcursor/-/${packed.filename}`) {
@@ -294,7 +296,7 @@ try {
       name === 'one-off'
         ? `/bigcursor record a demo of the new UX features in this PR. I only need the video.`
         : `/bigcursor create a product demo of my to-do app. Save a reusable script in this repository and add an npm run demo command.`;
-    const prompt = `${request}\nThe app is running at ${url}. Show adding "Buy groceries" and marking it complete. Save the finalized video under ${output}. The app's source is index.html.${name === 'saved' ? ' Let the saved command accept DEMO_URL and DEMO_OUT environment variables; the test will provide the app address and output directory when rerunning it.' : ''} Return the final video path, saved script path (null for video-only), and directory from which your demonstration resolves its dependencies.`;
+    const prompt = `${request}${preparedVersion ? `\nThis is a release-candidate test. The supplied registry serves bigcursor@${preparedVersion}; use this explicit version instead of the public default in the skill.` : ''}\nThe app is running at ${url}. Show adding "Buy groceries" and marking it complete. Save the finalized video under ${output}. The app's source is index.html.${name === 'saved' ? ' Let the saved command accept DEMO_URL and DEMO_OUT environment variables; the test will provide the app address and output directory when rerunning it.' : ''} Return the final video path, saved script path (null for video-only), and directory from which your demonstration resolves its dependencies.`;
     await writeFile(join(output, 'prompt.txt'), prompt);
     console.log(
       `${name}: starting Claude with no installed app dependencies, no Bun on PATH, and a fresh browser cache.`,

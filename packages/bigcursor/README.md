@@ -1,6 +1,8 @@
 # bigcursor
 
-Natural cursor movement and legible click feedback for Playwright product demos. TypeScript and all 35 cursor SVGs included.
+Bigcursor makes automated browser use easier to follow, with large cursors, natural movement and typing, and live click and keyboard sounds for Playwright demos.
+
+[Website](https://bigcursor.dev) · [Getting started](https://bigcursor.dev/docs) · [Examples](https://bigcursor.dev/#examples) · [API reference](https://bigcursor.dev/docs#api)
 
 ## Ask your agent for a demo
 
@@ -14,12 +16,10 @@ For an example without an existing app, ask the skill to record its bundled loca
 
 ## Installation
 
-This guide requires 1.1.1 or newer. The older 1.1.0 archive uses a different API without the recording module. Check that the required version is available on npm before installing.
-
-Requires Node.js 22+. Install Bigcursor and Playwright with your project's package manager, then install the matching browser:
+The core API requires Node.js 22+; recording requires Node.js 24.11+ and Chrome/Chromium 153+. Install the current npm release and Playwright with your project's package manager, then install the matching browser:
 
 ```sh
-npm install --save-dev bigcursor@^1.1.1 playwright
+npm install --save-dev bigcursor@latest playwright
 npx --no-install playwright install chromium
 ```
 
@@ -44,6 +44,8 @@ try {
 
 Pass an existing Playwright Page to createCursor. Continue to use Playwright for browser setup, navigation, assertions, app-readiness checks, and recording.
 
+For video with app audio and click/typing sounds, use the [optional recording module](#optional-recording). `createCursor` alone does not enable audio.
+
 ## API
 
 Targets accept Playwright Locator objects, CSS selector strings, or { x, y } in main-viewport CSS pixels. Locators are scrolled into view and centered before movement. Await each action in order.
@@ -62,10 +64,6 @@ Targets accept Playwright Locator objects, CSS selector strings, or { x, y } in 
 - dispose(): remove the overlay and listeners after pending actions finish; keep the page open.
 
 Pass an AbortSignal to cancel supported actions. Held mouse input is released even when a drag is cancelled. The overlay is reinstalled after navigation on the next action. Bigcursor respects CSP and browser permissions.
-
-## Website previews
-
-The repository’s homepage, Pointer Lab, and live demo share the package renderer and procedural click/Type-Press sound engines. The four homepage gesture demos disable dimming; a dedicated Auto dimming demo explicitly enables a 500 ms idle timeout. The homepage typing preview uses the same seeded `typingPlan` and Slow/Default/Fast presets as real Playwright typing. Sounds are opt-in in browser previews; no audio assets are downloaded. Preview helpers are browser-safe exports of `bigcursor/internal`, reserved for this repository. Use `createCursor` and `bigcursor/recording` for product walkthroughs.
 
 ## Cursor dimming
 
@@ -90,7 +88,7 @@ await cursor.showCursor(); // Show at the last position; resume automatic dimmin
 
 Manual hiding persists through mouse activity and navigation until explicitly shown. It does not change real input, app state, keyboard badges, or interaction audio. The internal renderer uses the same `hideCursor()` / `showCursor()` methods.
 
-The shared renderer stops RAF after each transition; keyboard badges and interaction sounds remain independent. Website `typing` intervals affect presentation only and never type into a product. Visual timelines calculate dimming in timeline time, preserving seek/pause. These APIs require 1.1.1 or newer.
+The renderer stops drawing after each transition; keyboard badges and interaction sounds remain independent.
 
 ## Natural typing
 
@@ -115,7 +113,7 @@ Feedback sits behind the cursor, grows on press, holds steady, then expands and 
 await cursor.configure({ scale: 4, dimmedOpacity: 0.3 });
 ```
 
-`dimmedOpacity` applies while typing or holding a text cursor down. Set it to 1 to disable that dimming. Pointer size is not limited by the OS cursor settings. All artwork is embedded; no asset server is required.
+`dimmedOpacity` applies while typing or holding a text cursor down. Set it to 1 to disable that dimming. Pointer size is not limited by the OS cursor settings. All 35 cursor SVGs are embedded; no asset server is required. TypeScript declarations are included.
 
 ## Optional recording
 
@@ -163,4 +161,4 @@ No FFmpeg, extension, virtual audio driver, or permission picker is needed for n
 
 Locator positions are sampled before movement, not continuously tracked. This adapter does not implement all locator.click actionability checks. CSS cursor inference is limited for cross-origin frames, closed shadow roots, native controls, and custom cursor images. Busy artwork is static. Keyboard badges are opt-in and display modifier chords only, never typed text.
 
-The project website includes Playwright examples, a recording guide, and Pointer Lab. The bigcursor/playwright subpath is an alias for the package root. No npm publishing, uploads, or telemetry happen automatically. See NOTICE.md for asset provenance.
+The [website](https://bigcursor.dev) includes [examples](https://bigcursor.dev/#examples), a [recording guide](https://bigcursor.dev/docs#recording), and [Pointer Lab](https://bigcursor.dev/workbench). The bigcursor/playwright subpath is an alias for the package root. No npm publishing, uploads, or telemetry happen automatically. See [NOTICE.md](https://github.com/seflless/bigcursor/blob/main/packages/bigcursor/NOTICE.md) for asset provenance.
