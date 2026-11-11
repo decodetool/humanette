@@ -8,6 +8,8 @@ const actions: Record<Scene, string> = {
   click: "await human.click(page.getByRole('button', { name: 'Click me' }));",
   text: "await human.selectText(page.getByText('these words', { exact: true }));",
   typing: "await human.type(page.getByLabel('Demo title'), 'Make something great.');",
+  dimming:
+    "await human.configure({ autoHideTimeout: 500 });\nawait human.moveTo(page.getByText('Pause here', { exact: true }));\nawait human.wait(1400);",
   drag: "await human.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
 };
 export function Examples() {
@@ -25,6 +27,7 @@ export function Examples() {
             ['typing', 'Natural typing'],
             ['text', 'Text selection'],
             ['drag', 'Drag & Drop'],
+            ['dimming', 'Auto dimming'],
           ] as const
         ).map(([scene, title]) => (
           <section key={scene} aria-label={title}>

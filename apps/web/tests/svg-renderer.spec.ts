@@ -53,6 +53,7 @@ test('bundled SVG retains artwork, display-size viewport and scaled hotspot; sto
       root: document.querySelector<HTMLElement>('#root')!,
       scale: 4,
       motionBlur: 0,
+      autoHideTimeout: 0,
     });
     await window.testCursor.ready;
     window.testCursor.setCursor('default');
@@ -79,11 +80,11 @@ test('bundled SVG retains artwork, display-size viewport and scaled hotspot; sto
     window.testCursor.setCursor('text');
     window.testCursor.down();
   });
-  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.4');
+  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.3');
   await page.screenshot({ path: 'test-results/svg-text-pressed.png' });
   await page.evaluate(() => {
     window.testCursor.up();
-    window.testCursor.hide();
+    window.testCursor.hideCursor();
   });
   await expect
     .poll(() => page.evaluate(() => (window.testShadows.at(-1)!.host as HTMLElement).style.display))

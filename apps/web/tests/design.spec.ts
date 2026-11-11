@@ -86,6 +86,7 @@ test('theme starts from system, then persists a two-state choice; navigation and
     'Natural typing',
     'Text selection',
     'Drag & Drop',
+    'Auto dimming',
   ]);
   await expect(page.getByLabel('Cursor size')).toHaveCount(0);
   await expect(page.locator('.token.keyword').first()).toBeVisible();

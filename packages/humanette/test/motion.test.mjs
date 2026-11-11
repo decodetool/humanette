@@ -54,8 +54,8 @@ test('timeline is seekable, validates ordering, and ends released', () => {
   );
   assert.throws(() => options({ scale: 0 }));
   assert.throws(() => options({ holdOpacity: 2 }));
-  assert.throws(() => options({ textSelectionOpacity: 1.1 }));
-  assert.equal(options().textSelectionOpacity, 0.4);
+  assert.throws(() => options({ dimmedOpacity: 1.1 }));
+  assert.equal(options().dimmedOpacity, 0.3);
   assert.throws(() => options({ scale: 'large' }));
   assert.equal('root' in options({ root: {} }), false);
 });
@@ -67,4 +67,77 @@ test('all 36 CSS keywords have assets or intentional behavior; assets embed offl
     assert.match(cursors[type].src, /^data:image\/svg\+xml;base64,/);
     assert.equal(cursors[type].hotspot.length, 2);
   }
+});
+
+test('idle dimming follows mouse activity, stays visible while held, and is seekable', () => {
+  assert.equal(options().autoHideTimeout, 0);
+  assert.equal(options().hiddenOpacity, 0);
+  assert.equal(options().dimmedOpacity, 0.3);
+  for (const hiddenOpacity of [-0.1, 1.1, NaN, Infinity])
+    assert.throws(() => options({ hiddenOpacity }));
+  assert.equal(options({ autoHideTimeout: 0 }).autoHideTimeout, 0);
+  for (const autoHideTimeout of [-1, NaN, Infinity, false, 2 ** 31])
+    assert.throws(() => options({ autoHideTimeout }));
+  const events = [
+    { at: 0, type: 'move', x: 100, y: 100, duration: 100 },
+    { at: 200, type: 'down' },
+    { at: 250, type: 'up' },
+    { at: 500, type: 'cursor', cursor: 'text' },
+    { at: 2000, type: 'move', x: 200, y: 100, duration: 100 },
+  ];
+  const config = options({ autoHideTimeout: 900, hiddenOpacity: 0.5 });
+  assert.equal(sampleTimeline(events, 1150, config).idleOpacity, 1);
+  assert.equal(sampleTimeline(events, 1240, config).idleOpacity, 0.75);
+  assert.equal(sampleTimeline(events, 1330, config).idleOpacity, 0.5);
+  assert.equal(sampleTimeline(events, 2050).idleOpacity, 1);
+  assert.equal(
+    sampleTimeline(events, 1330, options({ autoHideTimeout: 900, hiddenOpacity: 0.2 })).idleOpacity,
+    0.2,
+  );
+  assert.equal(
+    sampleTimeline(events, 1330, options({ autoHideTimeout: 900, hiddenOpacity: 0 })).idleOpacity,
+    0,
+  );
+  assert.equal(
+    sampleTimeline(events, 1240, config).idleOpacity,
+    0.75,
+    'scrubbing backward is deterministic',
+  );
+  assert.equal(sampleTimeline(events, 1800, options({ autoHideTimeout: 0 })).idleOpacity, 1);
+  assert.equal(
+    sampleTimeline(
+      [
+        { at: 0, type: 'down' },
+        { at: 5000, type: 'up' },
+      ],
+      4000,
+    ).idleOpacity,
+    1,
+  );
+});
+
+test('typing intervals dim presentation without resetting mouse idle time', () => {
+  const events = [
+    { at: 0, type: 'move', x: 100, y: 100, duration: 100 },
+    { at: 200, type: 'typing', duration: 300 },
+    { at: 1000, type: 'move', x: 200, y: 100, duration: 100 },
+  ];
+  validateTimeline(events);
+  assert.equal(sampleTimeline(events, 250).typing, true);
+  assert.equal(sampleTimeline(events, 250).idleFor, 150);
+  assert.equal(sampleTimeline(events, 600).typing, false);
+  assert.equal(sampleTimeline(events, 800).idleOpacity, 1);
+  assert.equal(
+    sampleTimeline(events, 800, options({ autoHideTimeout: 500, hiddenOpacity: 0.5 })).idleOpacity,
+    0.5,
+  );
+  assert.equal(sampleTimeline(events, 1050).typing, false);
+  assert.equal(timelineDuration([{ at: 0, type: 'typing', duration: 1200 }]), 1800);
+  const automatic = options({ autoHideTimeout: 500 });
+  assert.equal(
+    sampleTimeline(events, timelineDuration(events, automatic), automatic).idleOpacity,
+    0,
+  );
+  assert.throws(() => validateTimeline([{ at: 0, type: 'typing', duration: 0 }]), /duration/);
+  assert.throws(() => options({ dimmedOpacity: 1.1 }), /0–1/);
 });

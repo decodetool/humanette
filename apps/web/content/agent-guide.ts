@@ -1,4 +1,11 @@
-import { api, recording, setup, typingSpeedNote, demoNote } from './documentation';
+import {
+  api,
+  recording,
+  setup,
+  typingSpeedNote,
+  demoNote,
+  cursorDimmingNote,
+} from './documentation';
 import {
   skillInstall,
   agentDemoPrompt,
@@ -8,7 +15,7 @@ import {
 
 export const siteUrl = 'https://humanette.dev';
 export const releaseNotice =
-  'Published tarball rechecked November 11, 2026: npm humanette@1.2.0 includes createHuman with natural typing and typingSpeeds at the package root, the optional humanette/recording module, browser bundle, TypeScript declarations, all 35 cursor SVGs, and license notices. Its runtime bundles match the reviewed release. Install from npm; no Humanette source checkout or build is required.';
+  'Published tarball rechecked November 11, 2026: npm humanette@1.2.0 includes createHuman with natural typing and typingSpeeds at the package root, the optional humanette/recording module, browser bundle, TypeScript declarations, all 35 cursor SVGs, and license notices. Its runtime bundles match the reviewed release. Install from npm; no Humanette source checkout or build is required. The prepared 1.2.1 patch adds configurable idle/typing cursor dimming (autoHideTimeout: 0, hiddenOpacity: 0, dimmedOpacity: 0.3); it is not yet published.';
 
 export const install =
   'npm install --save-dev humanette@^1.2.0 playwright chrome-capture@0.1.2\nnpx --no-install playwright install chromium';
@@ -21,7 +28,7 @@ export const llmsIndex =
     'Website: https://humanette.dev. Source: https://github.com/seflless/humanette. Package name: humanette. Public API: import { createHuman } from "humanette", then await createHuman(page, { scale: 4 }) using an existing Playwright Page.',
     releaseNotice,
     'Humanette delivers real Playwright input, with optional native capture through humanette/recording. It is not an autonomous agent, video editor, or replacement for assertions. Keep navigation, readiness checks, and assertions in Playwright. Await human actions sequentially and await human.dispose() in finally. A visual website demo or a video alone is not proof that a feature passed its checks.',
-    'Main actions: human.moveTo, human.click, human.drag, human.selectText, human.type, human.press, human.wait, human.configure, and human.dispose. Targets generally accept Playwright locators, CSS selectors, or main-viewport CSS coordinates; selectText requires a locator or selector. Keyboard badges are opt-in and show modifier chords only, not all typed characters. Humanette does not guarantee capture FPS.',
+    'Main actions: human.moveTo, human.click, human.drag, human.selectText, human.type, human.press, human.wait, human.configure, human.hideCursor, human.showCursor, and human.dispose. Targets generally accept Playwright locators, CSS selectors, or main-viewport CSS coordinates; selectText requires a locator or selector. Keyboard badges are opt-in and show modifier chords only, not all typed characters. Humanette does not guarantee capture FPS.',
     'Install the Humanette skill: ' +
       skillInstall +
       '. Run in your project and choose your coding agent. ' +
@@ -64,12 +71,13 @@ export const agentGuide =
     'Durations and delays are milliseconds. Prefer page.getByRole(), page.getByLabel(), and page.getByTestId(). General targets accept a Locator, a CSS selector string, or { x, y } in main-viewport CSS pixels. selectText accepts only a Locator or selector. Locators scroll into view and resolve to their center before movement.',
     ...api.map(([name, description]) => '### ' + name + '\n\n' + description),
     '## Configuration',
-    'createHuman options include scale (default 2.5; examples use 4), seed (42), typing (default speed, 6×), settle (120 ms), fps (60 input samples/second target, NOT recording FPS), and keyboard (false). Enable keyboard: true only when modifier-chord badges are wanted; ordinary typed text is never shown in badges. All artwork is bundled; no cursor asset server is needed.',
-    'Appearance options: scale, color, filled, motionBlur, textSelectionOpacity, pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity, ringWidth, releaseRadius, releaseDuration. Typical defaults: color #397ef3, filled true, motionBlur 0.2, textSelectionOpacity 0.4. Use await human.configure({ scale: 4 }) to change appearance. Configuration availability follows the installed package version.',
+    'createHuman options include scale (default 2.5; examples use 4), seed (42), typing (default speed, 6×), settle (120 ms), fps (60 input samples/second target, NOT recording FPS), autoHideTimeout (0, disabled; set a positive millisecond delay to enable), hiddenOpacity (0), dimmedOpacity (0.3), and keyboard (false). Enable keyboard: true only when modifier-chord badges are wanted; ordinary typed text is never shown in badges. All artwork is bundled; no cursor asset server is needed.',
+    'Appearance options: scale, color, filled, motionBlur, dimmedOpacity, hiddenOpacity, autoHideTimeout, pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity, ringWidth, releaseRadius, releaseDuration. Typical defaults: color #397ef3, filled true, motionBlur 0.2, dimmedOpacity 0.3. Use await human.configure({ scale: 4 }) to change appearance. Configuration availability follows the installed package version.',
     'Action defaults: drag duration 900 ms, selectText drag duration 1400 ms, and natural typing at default speed (6×). Explicit type delay opts into fixed timing. Pass an AbortSignal to actions that accept signal; held mouse input is released on cancelled drags. Set explicit CSS cursor styles on custom interactive elements (pointer, text, grab/grabbing) so their intent can be detected.',
     '## Recording a walkthrough',
     'The optional humanette/recording module owns native capture, live sounds, and capture stabilization. It uses the optional chrome-capture@0.1.2 dependency, full Chrome 153+, and Node 24.11+. Install the recording dependencies above; scripts only import package APIs. Save it as record-demo.mjs and run node record-demo.mjs. It starts after app readiness and writes out/demo.mp4 with AV1 video and Opus tab audio; no FFmpeg, extension, virtual audio driver, or permission picker is needed.',
     fence('ts', recording),
+    cursorDimmingNote,
     typingSpeedNote,
     demoNote,
     'Await recording.stop before closing the browser. The helper enables app audio and injects quiet live click/typing sounds, including direct text insertion and shortcuts. Set sounds: false for app audio alone or audio: false, sounds: false for silence. These are recording options. createHuman includes varied real key holds and word/sentence pauses directly. Explicit per-call delay opts into fixed timing. Text remains exact. Typing uses the extracted Cuelume Type/Press cue with its MIT notice preserved; sound envelopes stay independent of typing cadence and rapid keystrokes are not throttled. Sounds and their audio contexts are cleaned up at stop. No automatic narration or music mixing is included. Inspect actual motion and audio: encoded dimensions, audio-track presence, and requested FPS alone cannot prove source resolution, audible sound, or distinct captured frames. Default presets request 60fps; 120fps needs suitable hardware and headed Chrome. AV1/Opus compatibility may require a separate H.264/AAC export.',

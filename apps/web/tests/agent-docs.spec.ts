@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { api, setup, recording, demoNote } from '../content/documentation';
+import { api, setup, recording, demoNote, cursorDimmingNote } from '../content/documentation';
 import { releaseNotice } from '../content/agent-guide';
 import { skillInstall, agentDemoPrompt, productDemoPrompt } from '../content/onboarding';
 
@@ -32,6 +32,7 @@ test('agent entry point and full guide are plain, complete, and linked without J
     setup,
     recording,
     demoNote,
+    cursorDimmingNote,
     ...api.flat(),
   ])
     expect(guide).toContain(content);

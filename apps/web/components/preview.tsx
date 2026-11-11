@@ -43,7 +43,7 @@ export function Preview({
     edges: [0, 300],
   });
   const events = given ?? scenarios[scenario],
-    duration = timelineDuration(events),
+    duration = timelineDuration(events, options(config)),
     current = time ?? localTime;
   const live = useRef({ events, config, current, geometry });
   live.current = { events, config, current, geometry };

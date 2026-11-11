@@ -17,7 +17,9 @@ const schema = {
   color: '#397ef3',
   filled: true as boolean,
   motionBlur: [0.2, 0, 0.6, 0.01],
-  textSelectionOpacity: [0.4, 0, 1, 0.05],
+  autoHideTimeout: [0, 0, 5000, 50],
+  hiddenOpacity: [0, 0, 1, 0.05],
+  dimmedOpacity: [0.3, 0, 1, 0.05],
   pressRadius: [16, 1, 60, 1],
   pressDuration: [90, 10, 500, 5],
   pressOpacity: [0.16, 0, 1, 0.01],
@@ -220,6 +222,8 @@ export function Workbench() {
         <DialRoot mode="inline" theme={resolved} defaultOpen productionEnabled />
         <p className="mt-4 text-xs leading-6 text-muted">
           Filled feedback sits behind the cursor. Press grows into hold; release expands and fades.
+          Auto hide timeout is in milliseconds; 0 disables idle dimming. Hidden opacity is the idle
+          level; 0 fully hides the cursor. Dimmed opacity applies while typing or selecting text.
           These values configure the actual package renderer.
         </p>
       </aside>

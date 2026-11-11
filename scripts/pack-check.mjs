@@ -53,7 +53,7 @@ await writeFile(
 execFileSync(process.execPath, ['consumer.mjs'], { cwd: scratch, stdio: 'inherit' });
 await writeFile(
   join(scratch, 'consumer.ts'),
-  "import {createHumanette,type TimelineEvent} from 'humanette/internal'; import {createHuman,typingPlan,type TypingSpeed} from 'humanette'; import {startRecording,type RecordingStats} from 'humanette/recording'; import type {Page} from 'playwright-core'; const events:TimelineEvent[]=[{at:0,type:'move',x:1,y:2,duration:300}]; const speed:TypingSpeed='fast';const make=async(page:Page)=>{const h=await createHuman(page,{typing:{speed}});await h.click('#save');await h.type('#message','Hi',{speed:'slow',pace:4});const r=await startRecording(page,'vertical',{sounds:{volume:0.1}});const stats:RecordingStats=await r.stop('out/demo.mp4');}; const pointer=()=>createHumanette({scale:2.5}).play(events);",
+  "import {createHumanette,type TimelineEvent} from 'humanette/internal'; import {createHuman,typingPlan,type TypingSpeed} from 'humanette'; import {startRecording,type RecordingStats} from 'humanette/recording'; import type {Page} from 'playwright-core'; const events:TimelineEvent[]=[{at:0,type:'move',x:1,y:2,duration:300}]; const speed:TypingSpeed='fast';const make=async(page:Page)=>{const h=await createHuman(page,{typing:{speed},autoHideTimeout:500,hiddenOpacity:0.5,dimmedOpacity:0.3});await h.configure({autoHideTimeout:0});await h.hideCursor();await h.showCursor();await h.click('#save');await h.type('#message','Hi',{speed:'slow',pace:4});const r=await startRecording(page,'vertical',{sounds:{volume:0.1}});const stats:RecordingStats=await r.stop('out/demo.mp4');}; const pointer=()=>createHumanette({scale:2.5}).play(events);",
 );
 execFileSync(
   process.execPath,

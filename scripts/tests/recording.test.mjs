@@ -352,3 +352,85 @@ test(
     }
   },
 );
+
+test(
+  'native video captures cursor dimming levels and full hiding',
+  { timeout: 60000 },
+  async () => {
+    const profile = { viewport: { width: 640, height: 400 }, dpr: 1, fps: 60 };
+    const { browser, context, preset } = await launchForPreset(chromium, profile);
+    try {
+      const page = await context.newPage();
+      await page.setContent(
+        '<body style="margin:0;background:#123"><input aria-label="Title" style="position:absolute;left:0;top:100px;box-sizing:border-box;width:600px;height:100px;padding:20px;border:0;background:#123;color:white"></body>',
+      );
+      const human = await createHuman(page, {
+        motionBlur: 0,
+        autoHideTimeout: 500,
+        hiddenOpacity: 0.5,
+      });
+      const recording = await startRecording(page, preset, { sounds: false, audio: false });
+      try {
+        await human.click(page.getByLabel('Title'));
+        await page.waitForTimeout(150);
+        await page.keyboard.type('Hello', { delay: 80 });
+        await page.waitForTimeout(900);
+        await human.configure({ hiddenOpacity: 0.25 });
+        await page.waitForTimeout(400);
+        await human.configure({ hiddenOpacity: 0 });
+        await page.waitForFunction(
+          () => document.querySelector('[data-humanette]').dataset.cursorOpacity === '0',
+        );
+        await page.waitForTimeout(300);
+        const file = join(output, 'idle-cursor.mp4');
+        await recording.stop(file);
+        // Decode every source frame: capture timestamps need not share Node's
+        // start instant. Crop excludes typed text and the browser focus outline.
+        const pixels = execFileSync(
+          'ffmpeg',
+          [
+            '-v',
+            'error',
+            '-i',
+            file,
+            '-vf',
+            'crop=160:80:220:110',
+            '-pix_fmt',
+            'rgb24',
+            '-fps_mode',
+            'passthrough',
+            '-f',
+            'rawvideo',
+            '-',
+          ],
+          { maxBuffer: 32 * 1024 * 1024 },
+        );
+        const size = 160 * 80 * 3;
+        const peaks = [];
+        for (let at = 0; at + size <= pixels.length; at += size) {
+          let peak = 0;
+          for (let i = at; i < at + size; i += 3) peak = Math.max(peak, pixels[i]);
+          peaks.push(peak);
+        }
+        const full = peaks.findIndex((value) => value > 230);
+        const dimmed = peaks.findIndex((value, i) => i > full && value > 110 && value < 170);
+        const custom = peaks.findIndex((value, i) => i > dimmed && value > 55 && value < 100);
+        const result = { frames: peaks.length, full, dimmed, custom, last: peaks.at(-1), peaks };
+        await writeFile(join(output, 'idle-cursor.json'), JSON.stringify(result, null, 2));
+        assert.ok(full >= 0, 'Visible cursor missing from native video');
+        assert.ok(dimmed > full, 'Configured 0.5 cursor dimming missing from native video');
+        assert.ok(custom > dimmed, 'Custom 0.25 idle dimming missing from native video');
+        assert.ok(result.last < 40, 'Hidden cursor still obstructs the field in native video');
+      } finally {
+        await human.dispose();
+        await recording.stop(join(output, 'idle-cursor.mp4'));
+      }
+    } catch (error) {
+      for (const page of context.pages())
+        await page.screenshot({ path: join(output, 'idle-cursor-failed.png') }).catch(() => {});
+      throw error;
+    } finally {
+      await browser.close();
+    }
+  },
+);

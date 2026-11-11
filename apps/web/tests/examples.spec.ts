@@ -37,6 +37,7 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     'Natural typing',
     'Text selection',
     'Drag & Drop',
+    'Auto dimming',
   ]);
   await expect(page.getByRole('button', { name: 'Clicks', exact: true })).toHaveCount(0);
   const clickStage = (await page.getByTestId('example-click').boundingBox())!;
@@ -99,6 +100,10 @@ test('example snippets contain only the relevant human actions', async ({ page }
     [
       'Drag & Drop',
       "await human.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
+    ],
+    [
+      'Auto dimming',
+      "await human.configure({ autoHideTimeout: 500 });\nawait human.moveTo(page.getByText('Pause here', { exact: true }));\nawait human.wait(1400);",
     ],
   ]) {
     await expect(page.getByRole('region', { name: title, exact: true }).locator('pre')).toHaveText(

@@ -46,7 +46,7 @@ Pass an existing Playwright Page to createHuman. Continue to use Playwright for 
 
 Targets accept Playwright Locator objects, CSS selector strings, or { x, y } in main-viewport CSS pixels. Locators are scrolled into view and centered before movement. Await each action in order.
 
-- createHuman(page, options?): attach the cursor. Options include scale, seed (42), typing (speed/pace), settle (120 ms), fps (60 input samples/sec target), keyboard (false), and feedback appearance.
+- createHuman(page, options?): attach the cursor. Options include scale, seed (42), typing (speed/pace), settle (120 ms), fps (60 input samples/sec target), keyboard (false), autoHideTimeout (0, idle dimming disabled), hiddenOpacity (0), dimmedOpacity (0.3), and feedback appearance.
 - moveTo(target, { duration?, signal? }): move without clicking.
 - click(target, { duration?, signal? }): move, slow on arrival, settle, and click.
 - selectText(locatorOrSelector, { duration?, signal? }): drag across visible text, including nested spans and wrapped lines. Defaults to a 1400 ms selection drag. Assumes left-to-right selectable text; use keyboard commands for inputs and specialized editors.
@@ -54,14 +54,41 @@ Targets accept Playwright Locator objects, CSS selector strings, or { x, y } in 
 - type(target, text, { speed?, pace?, delay?, selectAll?, signal? }): click and type with real key holds and natural pauses. Explicit delay selects fixed per-character timing.
 - press(key): send a Playwright shortcut, such as ControlOrMeta+A.
 - wait(milliseconds, signal?): add a short presentation hold.
-- configure(appearance): update cursor size and feedback.
+- configure(appearance): update cursor size, feedback, and dimming.
+- hideCursor(): fully hide the pointer until explicitly shown; input still works.
+- showCursor(): restore the pointer at its last position and resume automatic dimming.
 - dispose(): remove the overlay and listeners after pending actions finish; keep the page open.
 
 Pass an AbortSignal to cancel supported actions. Held mouse input is released even when a drag is cancelled. The overlay is reinstalled after navigation on the next action. Humanette respects CSP and browser permissions.
 
 ## Website previews (1.2.1)
 
-The repository’s homepage, Pointer Lab, and live demo share the package renderer and procedural click/Type-Press sound engines. The homepage typing preview uses the same seeded `typingPlan` and Slow/Default/Fast presets as real Playwright typing. Sounds are opt-in in browser previews; no audio assets are downloaded. Preview helpers are browser-safe exports of `humanette/internal`, reserved for this repository. Use `createHuman` and `humanette/recording` for product walkthroughs.
+The repository’s homepage, Pointer Lab, and live demo share the package renderer and procedural click/Type-Press sound engines. The four homepage gesture demos disable dimming; a dedicated Auto dimming demo explicitly enables a 500 ms idle timeout. The homepage typing preview uses the same seeded `typingPlan` and Slow/Default/Fast presets as real Playwright typing. Sounds are opt-in in browser previews; no audio assets are downloaded. Preview helpers are browser-safe exports of `humanette/internal`, reserved for this repository. Use `createHuman` and `humanette/recording` for product walkthroughs.
+
+## Cursor dimming (1.2.1)
+
+There are two cursor opacity levels: `dimmedOpacity` defaults to 0.3, and `hiddenOpacity` defaults to 0. The dimmed level applies immediately while typing or selecting text. `hiddenOpacity` is the idle level. Automatic idle dimming is off by default (autoHideTimeout: 0); set a positive millisecond delay, for example 500, to enable the 180 ms transition. Set hiddenOpacity to 0 for full hiding; autoHideTimeout: 0 disables the idle timer. Mouse movement or clicking restores the normal cursor; a held pointer preserves its drag/selection feedback. Typing stays active until 350 ms after the last key/input, without resetting the mouse idle clock. When states overlap, the lower opacity wins rather than multiplying them.
+
+```ts
+const human = await createHuman(page, {
+  dimmedOpacity: 0.3, // Typing and text selection
+  hiddenOpacity: 0, // Idle state; 0 fully hides it
+  autoHideTimeout: 0, // Off by default; set e.g. 500 milliseconds to enable
+});
+await human.configure({ hiddenOpacity: 0.25 });
+```
+
+All values can change through `human.configure` and survive navigation.
+
+```ts
+await human.hideCursor(); // Fully hide cursor/trail/feedback, regardless of hiddenOpacity
+await human.type('#title', 'Still real input');
+await human.showCursor(); // Show at the last position; resume automatic dimming
+```
+
+Manual hiding persists through mouse activity and navigation until explicitly shown. It does not change real input, app state, keyboard badges, or interaction audio. The internal renderer uses the same `hideCursor()` / `showCursor()` methods.
+
+The shared renderer stops RAF after each transition; keyboard badges and interaction sounds remain independent. Website `typing` intervals affect presentation only and never type into a product. Visual timelines calculate dimming in timeline time, preserving seek/pause. These settings are prepared in 1.2.1; published 1.2.0 does not include them.
 
 ## Natural typing
 
@@ -78,15 +105,15 @@ Text stays exact, without deliberate typos. Unicode graphemes stay together; lit
 
 ## Appearance
 
-Defaults: scale 2.5, color #397ef3, filled true, motionBlur 0.2, textSelectionOpacity 0.4. Examples use scale 4.
+Defaults: scale 2.5, color #397ef3, filled true, motionBlur 0.2, dimmedOpacity 0.3. Examples use scale 4.
 
 Feedback sits behind the cursor, grows on press, holds steady, then expands and fades on release. Configure pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity, ringWidth, releaseRadius, and releaseDuration.
 
 ```ts
-await human.configure({ scale: 4, textSelectionOpacity: 0.4 });
+await human.configure({ scale: 4, dimmedOpacity: 0.3 });
 ```
 
-Text-selection opacity applies while a text cursor is held down. Set it to 1 to keep the cursor opaque. Pointer size is not limited by the OS cursor settings. All artwork is embedded; no asset server is required.
+`dimmedOpacity` applies while typing or holding a text cursor down. Set it to 1 to disable that dimming. Pointer size is not limited by the OS cursor settings. All artwork is embedded; no asset server is required.
 
 ## Optional recording
 

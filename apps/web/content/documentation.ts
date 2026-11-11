@@ -51,7 +51,7 @@ try {
 export const api = [
   [
     'createHuman(page, options?)',
-    'Attach to your existing Playwright page. Options include scale (cursor size), seed (repeatable paths and typing), typing (speed or numeric pace), settle (aim pause, 120 ms by default), and fps (input sampling target, not recording FPS).',
+    'Attach to your existing Playwright page. Options include scale (cursor size), seed (repeatable paths and typing), typing (speed or numeric pace), settle (aim pause, 120 ms by default), fps (input sampling target, not recording FPS), autoHideTimeout (0 by default; positive milliseconds enable idle dimming), hiddenOpacity (0), and dimmedOpacity (0.3).',
   ],
   [
     'human.click(target, { duration?, signal? })',
@@ -83,7 +83,15 @@ export const api = [
   ],
   [
     'human.configure(appearance)',
-    'Change cursor size and feedback while the script is running. For example, await human.configure({ scale: 4, textSelectionOpacity: 0.4 }).',
+    'Change cursor size and feedback while the script is running. For example, await human.configure({ scale: 4, dimmedOpacity: 0.3 }).',
+  ],
+  [
+    'human.hideCursor()',
+    'Fully hide the cursor, its trail, and pointer feedback until showCursor is called. Mouse and keyboard input still work; the override survives navigation. This ignores hiddenOpacity.',
+  ],
+  [
+    'human.showCursor()',
+    'Restore the cursor at its last known position and resume automatic dimming. It resets the inactivity deadline and clears temporary typing dimming.',
   ],
   [
     'human.dispose()',
@@ -92,4 +100,7 @@ export const api = [
 ];
 
 export const demoNote =
-  'The homepage has click, natural typing, selection, and drag previews, using the package renderer, seeded typing timing, and the same procedural click and Type/Press sound engines as native recording. Audio is synthesized with Web Audio; no sound files are bundled or downloaded. Enable sound to hear the previews; they start muted. Slow, Default, and Fast change typing cadence without speeding up individual sounds. These are visual previews; the accompanying Playwright snippets perform real input. For live effects in your own Playwright session without recording, call installInteractionSounds(page) from humanette/recording and dispose the returned controller afterward. createHuman alone does not enable audio.';
+  'The homepage has click, natural typing, selection, drag, and auto-dimming previews, using the package renderer, seeded typing timing, and the same procedural click and Type/Press sound engines as native recording. Audio is synthesized with Web Audio; no sound files are bundled or downloaded. Enable sound to hear the previews; they start muted. Slow, Default, and Fast change typing cadence without speeding up individual sounds. These are visual previews; the accompanying Playwright snippets perform real input. For live effects in your own Playwright session without recording, call installInteractionSounds(page) from humanette/recording and dispose the returned controller afterward. createHuman alone does not enable audio.';
+
+export const cursorDimmingNote =
+  'Prepared for humanette 1.2.1: dimmedOpacity (0.3 by default) is the cursor level while typing or selecting text. Automatic idle dimming is off by default: autoHideTimeout: 0 disables it. A positive timeout such as 500 starts the 180 ms dimming transition after that many milliseconds without mouse activity. Its target is hiddenOpacity (0 by default, fully transparent). Editing dims immediately and lasts 350 ms after the last key/input; mouse movement or clicking clears it, and held pointers keep their drag/selection feedback. The lower applicable opacity wins, without multiplying effects. All three settings work with createHuman and human.configure and survive navigation. hideCursor fully hides pointer artwork until showCursor resumes automatic behavior; manual hiding also survives navigation. The homepage gesture demos disable dimming; a dedicated Auto dimming example opts in. Published 1.2.0 does not include the new settings.';

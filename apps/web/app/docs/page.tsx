@@ -1,7 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CodeBlock } from '../../components/code-block';
-import { setup, recording, typingSpeedNote, demoNote, api } from '../../content/documentation';
+import {
+  setup,
+  recording,
+  typingSpeedNote,
+  demoNote,
+  cursorDimmingNote,
+  api,
+} from '../../content/documentation';
 import {
   skillInstall,
   agentDemoPrompt,
@@ -82,15 +89,16 @@ export default function Docs() {
             ))}
           </div>
           <p className="mt-5 text-sm leading-7 text-muted">
-            Appearance options include scale, color, filled, motionBlur, textSelectionOpacity,
-            pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity,
-            ringWidth, releaseRadius, and releaseDuration.{' '}
+            Appearance options include scale, color, filled, motionBlur, dimmedOpacity, autoHideTimeout,
+            hiddenOpacity, pressRadius, pressDuration, pressOpacity, pressScale, holdRadius,
+            holdOpacity, ringWidth, releaseRadius, and releaseDuration.{' '}
             <Link href="/workbench" className="text-link">
               Tune them in Pointer Lab
             </Link>
             .
           </p>
         </section>
+        <p className="mt-5 text-sm leading-7 text-muted">{cursorDimmingNote}</p>
         <section id="recording" className="mt-12">
           <h2 className="text-2xl font-semibold tracking-tight">Record with Playwright</h2>
           <p className="my-5 text-sm leading-7 text-muted">

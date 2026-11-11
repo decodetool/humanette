@@ -5,6 +5,8 @@ import { cursors, type CursorTheme } from './cursors.js';
 import { cursorAt } from './resolve-cursor.js';
 import {
   options,
+  cursorIdleOpacity,
+  dimmingTimings,
   feedbackAt,
   humanPoint,
   moveDuration,
@@ -81,6 +83,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
   let position: Point = { x: 0, y: 0 },
     visual: Point = { ...position },
     visible = false,
+    manuallyHidden = false,
     pressed = false,
     type = 'auto',
     resolved = 'default',
@@ -89,7 +92,11 @@ export function createHumanette(input: HumanetteOptions = {}) {
     last = 0;
   let pressEvents: TimelineEvent[] = [],
     epoch = performance.now(),
-    frameOverride: Feedback | null = null;
+    frameOverride: (Feedback & { idleFor: number; typing: boolean }) | null = null,
+    lastActivity = performance.now(),
+    idleTimer: ReturnType<typeof setTimeout> | undefined,
+    typingUntil = 0,
+    typingTimer: ReturnType<typeof setTimeout> | undefined;
   let keyLabel = '',
     keyUntil = 0,
     active: AbortController | undefined;
@@ -109,6 +116,49 @@ export function createHumanette(input: HumanetteOptions = {}) {
       }
       native = undefined;
     }
+  }
+  function cancelIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = undefined;
+  }
+  function armIdle() {
+    cancelIdle();
+    if (
+      !visible ||
+      manuallyHidden ||
+      pressed ||
+      frameOverride ||
+      config.autoHideTimeout === 0 ||
+      config.hiddenOpacity === 1 ||
+      disposed
+    )
+      return;
+    const remaining = lastActivity + config.autoHideTimeout - performance.now();
+    if (remaining > 0)
+      idleTimer = setTimeout(() => {
+        idleTimer = undefined;
+        wake();
+      }, remaining);
+  }
+  function cancelTyping() {
+    clearTimeout(typingTimer);
+    typingTimer = undefined;
+    typingUntil = 0;
+  }
+  function noteTyping() {
+    cancelTyping();
+    typingUntil = performance.now() + dimmingTimings.typingHold;
+    typingTimer = setTimeout(() => {
+      typingTimer = undefined;
+      typingUntil = 0;
+      wake();
+    }, dimmingTimings.typingHold);
+    wake();
+  }
+  function activity() {
+    cancelTyping();
+    lastActivity = performance.now();
+    armIdle();
   }
   function load() {
     const ready = Object.entries(theme).map(async ([name, asset]) => {
@@ -216,12 +266,26 @@ export function createHumanette(input: HumanetteOptions = {}) {
     const feedbackTime = Math.max(now - epoch, pressEvents.at(-1)?.at ?? 0);
     const f = frameOverride ?? feedbackAt(pressEvents, feedbackTime, config);
     const selectingText = pressed && (resolved === 'text' || resolved === 'vertical-text');
-    const cursorOpacity = selectingText ? config.textSelectionOpacity : 1;
+    const idleFor = frameOverride?.idleFor ?? Math.max(now, performance.now()) - lastActivity;
+    const idleOpacity = cursorIdleOpacity(
+      idleFor,
+      pressed,
+      config.autoHideTimeout,
+      config.hiddenOpacity,
+    );
+    const typing = frameOverride?.typing ?? Math.max(now, performance.now()) < typingUntil;
+    const cursorOpacity = manuallyHidden
+      ? 0
+      : Math.min(
+          selectingText ? config.dimmedOpacity : 1,
+          typing && !pressed ? config.dimmedOpacity : 1,
+          idleOpacity,
+        );
     host.dataset.cursorOpacity = String(cursorOpacity);
     svgLayers.forEach((slot) => {
       slot.painted = false;
     });
-    if (visible && resolved !== 'none') {
+    if (visible && !manuallyHidden && resolved !== 'none') {
       ctx.save();
       ctx.globalAlpha = f.opacity;
       ctx.fillStyle = config.color;
@@ -234,7 +298,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
       const asset = theme[resolved] ?? theme.default,
         image = images.get(resolved),
         template = svgTemplates.get(resolved);
-      if (asset && (template || (image?.complete && image.naturalWidth))) {
+      if (cursorOpacity > 0 && asset && (template || (image?.complete && image.naturalWidth))) {
         const paint = (x: number, y: number, alpha: number, blur = 0) => {
           if (template) {
             const slot = svgLayers[blur ? 0 : 1];
@@ -304,6 +368,10 @@ export function createHumanette(input: HumanetteOptions = {}) {
       }
     }
     host.dataset.phase = f.phase;
+    if (!frameOverride && visible && !manuallyHidden && !pressed && config.autoHideTimeout > 0) {
+      if (idleFor >= config.autoHideTimeout && idleOpacity > config.hiddenOpacity) wake();
+      else if (idleFor < config.autoHideTimeout && idleTimer === undefined) armIdle();
+    }
     if (
       !frameOverride &&
       (f.phase === 'press' ||
@@ -323,10 +391,12 @@ export function createHumanette(input: HumanetteOptions = {}) {
     check();
     if (!Number.isFinite(p.x) || !Number.isFinite(p.y))
       throw new TypeError('Expected finite CSS-pixel coordinates.');
+    const moved = !visible || frameOverride !== null || p.x !== position.x || p.y !== position.y;
     position = { ...p };
     if (!visible) visual = { ...p };
     visible = true;
     frameOverride = null;
+    if (moved) activity();
     wake();
   }
   function down() {
@@ -341,6 +411,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
     }
     pressEvents.push({ at: now - epoch, type: 'down' });
     pressed = true;
+    activity();
     visual = { ...position };
     wake();
   }
@@ -350,6 +421,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
     frameOverride = null;
     pressEvents.push({ at: performance.now() - epoch, type: 'up' });
     pressed = false;
+    activity();
     visual = { ...position };
     wake();
   }
@@ -422,10 +494,43 @@ export function createHumanette(input: HumanetteOptions = {}) {
       if (!e.buttons && pressed) up();
     };
     for (const name of ['pointermove', 'pointerdown', 'pointerup']) listen(target, name, track);
+    const editing = (event: Event) => {
+      if (!event.isTrusted) return;
+      const element = event.composedPath()[0];
+      const editable =
+        element instanceof HTMLElement &&
+        (element.isContentEditable ||
+          element instanceof HTMLTextAreaElement ||
+          (element instanceof HTMLInputElement &&
+            ![
+              'button',
+              'checkbox',
+              'color',
+              'file',
+              'hidden',
+              'image',
+              'radio',
+              'range',
+              'reset',
+              'submit',
+            ].includes(element.type)));
+      if (editable) noteTyping();
+    };
+    listen(target, 'input', editing);
+    listen(target, 'keydown', (event) => {
+      if (
+        !['Meta', 'Control', 'Alt', 'Shift', 'AltGraph', 'Dead', 'Unidentified'].includes(
+          (event as KeyboardEvent).key,
+        )
+      )
+        editing(event);
+    });
     listen(target, 'pointerout', (event) => {
       const next = (event as PointerEvent).relatedTarget;
       if (!(next instanceof Node) || (root && !root.contains(next))) {
         visible = false;
+        cancelIdle();
+        cancelTyping();
         restoreNative();
         wake();
       }
@@ -433,6 +538,8 @@ export function createHumanette(input: HumanetteOptions = {}) {
     listen(window, 'blur', () => {
       if (pressed) up();
       visible = false;
+      cancelIdle();
+      cancelTyping();
       restoreNative();
       wake();
     });
@@ -492,6 +599,7 @@ export function createHumanette(input: HumanetteOptions = {}) {
     configure(next: Partial<FeedbackOptions>) {
       check();
       config = options({ ...config, ...next });
+      armIdle();
       wake();
     },
     setCursor(cursor: string) {
@@ -505,9 +613,20 @@ export function createHumanette(input: HumanetteOptions = {}) {
       ready = load();
       await ready;
     },
-    hide() {
-      visible = false;
-      restoreNative();
+    hideCursor() {
+      check();
+      manuallyHidden = true;
+      cancelIdle();
+      cancelTyping();
+      wake();
+    },
+    showCursor() {
+      check();
+      manuallyHidden = false;
+      visible = true;
+      visual = { ...position };
+      frameOverride = null;
+      activity();
       wake();
     },
     async moveTo(target: Point, opts: MoveOptions = {}) {
@@ -525,6 +644,8 @@ export function createHumanette(input: HumanetteOptions = {}) {
       validateTimeline(events);
       if (!Number.isFinite(time) || time < 0)
         throw new RangeError('Time must be finite and nonnegative.');
+      cancelIdle();
+      cancelTyping();
       const state = sampleTimeline(events, time, config, initial);
       position = { x: state.x, y: state.y };
       visual = { ...position };
@@ -548,11 +669,13 @@ export function createHumanette(input: HumanetteOptions = {}) {
       const rate = opts.rate ?? 1;
       if (!Number.isFinite(rate) || rate <= 0)
         throw new RangeError('Playback rate must be positive.');
-      const duration = timelineDuration(events);
+      const duration = timelineDuration(events, config);
       await animate(
         duration / rate,
         (p) => {
           const time = p * duration;
+          cancelIdle();
+          cancelTyping();
           const s = sampleTimeline(events, time, config, opts.initial);
           position = { x: s.x, y: s.y };
           visual = { ...position };
@@ -572,6 +695,8 @@ export function createHumanette(input: HumanetteOptions = {}) {
       disposed = true;
       cancelAnimationFrame(raf);
       clearInterval(poll);
+      cancelIdle();
+      cancelTyping();
       observer?.disconnect();
       removers.forEach((fn) => fn());
       restoreNative();

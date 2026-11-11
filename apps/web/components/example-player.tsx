@@ -3,13 +3,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createHumanette,
   typingPlan,
+  dimmingTimings,
   type TypingSpeed,
   sampleTimeline,
   type Humanette,
   type TimelineEvent,
 } from 'humanette/internal';
 import { useDemoAudio } from './demo-audio';
-export type Scene = 'click' | 'text' | 'drag' | 'typing';
+export type Scene = 'click' | 'text' | 'drag' | 'typing' | 'dimming';
 const typedText = 'Make something great.';
 const dragWidth = 344;
 export function ExamplePlayer({
@@ -22,6 +23,11 @@ export function ExamplePlayer({
   speed?: TypingSpeed;
 }) {
   const { audio } = useDemoAudio();
+  const appearance = useMemo(
+    () =>
+      scene === 'dimming' ? { autoHideTimeout: 500 } : { autoHideTimeout: 0, dimmedOpacity: 1 },
+    [scene],
+  );
   const strikes = useMemo(() => {
     let at = 1250;
     return typingPlan(typedText, { speed, seed: 42 }).map((step, i) => {
@@ -34,15 +40,17 @@ export function ExamplePlayer({
   const duration = scene === 'typing' ? Math.max(4800, strikes.at(-1)!.end + 1800) : 4600;
   const cues = useMemo(
     () =>
-      scene === 'typing'
-        ? [
-            { at: 1000, kind: 'click' as const },
-            ...strikes.flatMap((step) => [
-              { at: step.at, kind: 'press' as const, step },
-              { at: step.end, kind: 'release' as const, step },
-            ]),
-          ].sort((a, b) => a.at - b.at)
-        : [{ at: 1000, kind: 'click' as const }],
+      scene === 'dimming'
+        ? []
+        : scene === 'typing'
+          ? [
+              { at: 1000, kind: 'click' as const },
+              ...strikes.flatMap((step) => [
+                { at: step.at, kind: 'press' as const, step },
+                { at: step.end, kind: 'release' as const, step },
+              ]),
+            ].sort((a, b) => a.at - b.at)
+          : [{ at: 1000, kind: 'click' as const }],
     [scene, strikes],
   );
   const root = useRef<HTMLDivElement>(null);
@@ -70,43 +78,54 @@ export function ExamplePlayer({
     y: 160,
   };
   const events: TimelineEvent[] =
-    scene === 'typing'
+    scene === 'dimming'
       ? [
           { at: 0, type: 'cursor', cursor: 'auto' },
-          { at: 0, type: 'move', x: 64, y: 160, duration: 900 },
-          { at: 1000, type: 'down' },
-          { at: 1100, type: 'up' },
-          { at: 1150, type: 'cursor', cursor: 'text' },
-          { at: duration - 1100, type: 'cursor', cursor: 'auto' },
-          { at: duration - 1100, type: 'move', ...initial, duration: 900 },
+          { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
+          { at: 2600, type: 'move', ...initial, duration: 1000 },
         ]
-      : scene === 'click'
+      : scene === 'typing'
         ? [
             { at: 0, type: 'cursor', cursor: 'auto' },
-            { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
+            { at: 0, type: 'move', x: 64, y: 160, duration: 900 },
             { at: 1000, type: 'down' },
             { at: 1100, type: 'up' },
-            { at: 2400, type: 'move', ...initial, duration: 1000 },
+            { at: 1150, type: 'cursor', cursor: 'text' },
+            {
+              at: strikes[0].at,
+              type: 'typing',
+              duration: strikes.at(-1)!.end - strikes[0].at + dimmingTimings.typingHold,
+            },
+            { at: duration - 1100, type: 'cursor', cursor: 'auto' },
+            { at: duration - 1100, type: 'move', ...initial, duration: 900 },
           ]
-        : scene === 'text'
+        : scene === 'click'
           ? [
               { at: 0, type: 'cursor', cursor: 'auto' },
-              { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
+              { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
               { at: 1000, type: 'down' },
-              { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
-              { at: 2640, type: 'up' },
-              { at: 3200, type: 'move', ...initial, duration: 1000 },
+              { at: 1100, type: 'up' },
+              { at: 2400, type: 'move', ...initial, duration: 1000 },
             ]
-          : [
-              { at: 0, type: 'cursor', cursor: 'auto' },
-              { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
-              { at: 1000, type: 'down' },
-              { at: 1000, type: 'cursor', cursor: 'grabbing' },
-              { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
-              { at: 2640, type: 'up' },
-              { at: 2640, type: 'cursor', cursor: 'auto' },
-              { at: 3200, type: 'move', ...initial, duration: 1000 },
-            ];
+          : scene === 'text'
+            ? [
+                { at: 0, type: 'cursor', cursor: 'auto' },
+                { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
+                { at: 1000, type: 'down' },
+                { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
+                { at: 2640, type: 'up' },
+                { at: 3200, type: 'move', ...initial, duration: 1000 },
+              ]
+            : [
+                { at: 0, type: 'cursor', cursor: 'auto' },
+                { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
+                { at: 1000, type: 'down' },
+                { at: 1000, type: 'cursor', cursor: 'grabbing' },
+                { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
+                { at: 2640, type: 'up' },
+                { at: 2640, type: 'cursor', cursor: 'auto' },
+                { at: 3200, type: 'move', ...initial, duration: 1000 },
+              ];
   const live = useRef({ events, geometry, initial });
   live.current = { events, geometry, initial };
   function draw(at: number) {
@@ -127,7 +146,7 @@ export function ExamplePlayer({
   }
   useEffect(() => {
     let active = true;
-    const h = createHumanette({ root: root.current!, scale });
+    const h = createHumanette({ root: root.current!, scale, ...appearance });
     human.current = h;
     void h.ready
       .then(() => {
@@ -199,9 +218,9 @@ export function ExamplePlayer({
     };
   }, [scene]);
   useEffect(() => {
-    human.current?.configure({ scale });
+    human.current?.configure({ scale, ...appearance });
     if (ready) draw(clock.current);
-  }, [scale, geometry, ready]);
+  }, [scale, geometry, ready, appearance]);
   useEffect(() => {
     if (scene === 'typing') {
       startDelay.current = 600;
@@ -286,6 +305,15 @@ export function ExamplePlayer({
               <span aria-hidden className="ml-px h-5 border-l border-ink" />
             )}
             {time < 1000 && <span className="text-muted">Demo title</span>}
+          </div>
+        )}
+        {scene === 'dimming' && (
+          <div
+            ref={target}
+            data-testid="example-dimming-target"
+            className="demo-click-target absolute left-1/2 top-[calc(50%-16px)] flex h-12 w-32 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border text-sm font-medium"
+          >
+            Pause here
           </div>
         )}
         {scene === 'click' && (

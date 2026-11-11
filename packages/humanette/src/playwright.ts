@@ -58,18 +58,23 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
   let typingSequence = 0;
   let position: Point = { x: 0, y: 0 },
     disposed = false,
-    busy = false;
+    busy = false,
+    cursorHidden = false;
   async function install() {
     if (disposed) throw new Error('Humanette automation is disposed.');
     if (!(await page.evaluate(() => Boolean((window as Surface).__humanette)))) {
       await page.addScriptTag({
         path: fileURLToPath(new URL('./humanette.global.js', import.meta.url)),
       });
-      await page.evaluate(async (appearance) => {
-        const w = window as Surface;
-        w.__humanette = w.Humanette.createHumanette({ ...appearance, follow: true });
-        await w.__humanette.ready;
-      }, appearance);
+      await page.evaluate(
+        async ({ appearance, cursorHidden }) => {
+          const w = window as Surface;
+          w.__humanette = w.Humanette.createHumanette({ ...appearance, follow: true });
+          await w.__humanette.ready;
+          if (cursorHidden) w.__humanette.hideCursor();
+        },
+        { appearance, cursorHidden },
+      );
     }
   }
   async function point(target: Target): Promise<Point> {
@@ -232,6 +237,19 @@ export async function createHuman(page: Page, config: AutomationOptions = {}) {
       action(async () => {
         await install();
         await page.evaluate((value) => (window as Surface).__humanette!.configure(value), next);
+        Object.assign(appearance, next);
+      }),
+    hideCursor: () =>
+      action(async () => {
+        await install();
+        await page.evaluate(() => (window as Surface).__humanette!.hideCursor());
+        cursorHidden = true;
+      }),
+    showCursor: () =>
+      action(async () => {
+        await install();
+        await page.evaluate(() => (window as Surface).__humanette!.showCursor());
+        cursorHidden = false;
       }),
     async dispose() {
       if (busy) throw new Error('Wait for the running action before disposing.');

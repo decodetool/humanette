@@ -26,7 +26,7 @@ humanette@1.2.0 was published November 10, 2026. Its actual registry tarball was
 
 The repository moved to https://github.com/seflless/humanette on November 11, 2026. Local remotes, skill installation commands, website links, and the prepared package metadata use that owner.
 
-The prepared 1.2.1 patch shares procedural sound engines and the typing model with the website’s browser previews. It also migrates the maintained recording example to native audio/video capture. It has not been published; installation guidance continues to reference verified 1.2.0 until the new tarball is checked.
+The prepared 1.2.1 patch adds configurable idle/typing cursor dimming (autoHideTimeout: 0, hiddenOpacity: 0, dimmedOpacity: 0.3) and shares procedural sound engines and the typing model with the website’s browser previews. It also migrates the maintained recording example to native audio/video capture. It has not been published; installation guidance continues to reference verified 1.2.0 until the new tarball is checked.
 
 1. Confirm asset provenance/redistribution permissions and visually review hotspots. The SVGs pre-exist this PR in docs/; this code does not independently establish their authorship.
 2. Run bun check, bun run test:e2e, bun run test:recording, bun run pack:check, and bun run test:package. Then run bun run test:skill to test the skill in disposable projects through the prepared tarball registry. Inspect the packed file list; it must contain declarations, the classic browser bundle, assets, and license notices, but no website, auth state, or local paths.

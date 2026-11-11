@@ -16,7 +16,7 @@ For a product demo, ask `/humanette create a product demo of a my to-do app`.
 
 The [skill](skills/humanette/SKILL.md) includes a runnable local example. The published `humanette@1.2.0` tarball was verified November 11, 2026: natural typing, sounds, recording, and capture fixes are owned by the package. It includes the root API, optional `humanette/recording` module, types, browser bundle, cursor assets, and license notices. The skill installs from npm; no Humanette source checkout or build tools are needed.
 
-The pending 1.2.1 patch shares those sound engines and the typing model with the website previews. The homepage includes a natural typing demo with Slow, Default, and Fast presets. Enable sound to hear click and key effects; audio starts only after that gesture. The Pointer Lab and live demo use the same packaged engines. Visual previews illustrate actions; the Playwright examples deliver real input.
+The pending 1.2.1 patch adds cursor dimming with dimmedOpacity 0.3 for typing/selection and hiddenOpacity 0 for idle; automatic idle dimming is opt-in through autoHideTimeout (0 disables it by default). The website previews share those sound engines and the package typing model. The homepage includes natural typing with Slow/Default/Fast presets and a dedicated opt-in Auto dimming example; the four gesture previews keep their cursors fully visible. Enable sound to hear click and key effects; audio starts only after that gesture. The Pointer Lab and live demo use the same packaged engines. Visual previews illustrate actions; the Playwright examples deliver real input.
 
 ## Monorepo
 
