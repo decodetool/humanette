@@ -12,10 +12,10 @@ export function SiteNav() {
       <div className="shell flex min-h-18 items-center gap-3 py-4 sm:gap-6">
         <Link
           href="/"
-          aria-label="Humanette home"
+          aria-label="Bigcursor home"
           className="mr-auto text-xl font-semibold tracking-tight"
         >
-          humanette
+          bigcursor
         </Link>
         <nav aria-label="Main" className="flex items-center gap-4 text-sm sm:gap-6">
           {[
@@ -34,7 +34,7 @@ export function SiteNav() {
         </nav>
         <div className="flex items-center gap-2">
           <a
-            href="https://github.com/decodetool/humanette"
+            href="https://github.com/seflless/bigcursor"
             className="icon-button nav-icon w-[30px]"
             aria-label="GitHub"
             title="GitHub"

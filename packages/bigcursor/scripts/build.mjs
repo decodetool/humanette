@@ -1,9 +1,10 @@
 import { build } from 'esbuild';
-import { readdir, readFile, mkdir, writeFile, copyFile } from 'node:fs/promises';
+import { readdir, readFile, mkdir, writeFile, copyFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, join } from 'node:path';
 const root = fileURLToPath(new URL('../../../', import.meta.url));
-const pkg = resolve(root, 'packages/humanette');
+const pkg = resolve(root, 'packages/bigcursor');
+await rm(join(pkg, 'dist'), { recursive: true, force: true });
 await mkdir(join(pkg, 'dist/assets'), { recursive: true });
 const assets = {};
 for (const file of (await readdir(join(root, 'docs')))
@@ -36,6 +37,7 @@ await build({
     join(pkg, 'src/index.ts'),
     join(pkg, 'src/motion.ts'),
     join(pkg, 'src/playwright.ts'),
+    join(pkg, 'src/recording.ts'),
   ],
   outdir: join(pkg, 'dist'),
   bundle: true,
@@ -43,15 +45,15 @@ await build({
   platform: 'neutral',
   target: 'es2022',
   sourcemap: true,
-  external: ['node:*'],
+  external: ['node:*', 'chrome-capture', 'bigcursor-browser'],
   plugins: [plugin],
 });
 await build({
   entryPoints: [join(pkg, 'src/index.ts')],
-  outfile: join(pkg, 'dist/humanette.global.js'),
+  outfile: join(pkg, 'dist/bigcursor.global.js'),
   bundle: true,
   format: 'iife',
-  globalName: 'Humanette',
+  globalName: 'BigCursor',
   target: 'es2022',
   minify: true,
   plugins: [plugin],
@@ -60,4 +62,4 @@ await writeFile(
   join(pkg, 'dist/assets/manifest.json'),
   JSON.stringify(Object.keys(assets), null, 2) + '\n',
 );
-console.log(`Built Humanette with ${Object.keys(assets).length} embedded SVGs.`);
+console.log(`Built Bigcursor with ${Object.keys(assets).length} embedded SVGs.`);

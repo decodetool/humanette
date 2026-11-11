@@ -9,7 +9,7 @@ import {
   validateTimeline,
   type TimelineEvent,
   type FeedbackOptions,
-} from 'humanette/internal';
+} from 'bigcursor/internal';
 import { Preview } from './preview';
 import { useTheme } from './theme-provider';
 const schema = {
@@ -17,7 +17,9 @@ const schema = {
   color: '#397ef3',
   filled: true as boolean,
   motionBlur: [0.2, 0, 0.6, 0.01],
-  textSelectionOpacity: [0.4, 0, 1, 0.05],
+  autoHideTimeout: [0, 0, 5000, 50],
+  hiddenOpacity: [0, 0, 1, 0.05],
+  dimmedOpacity: [0.3, 0, 1, 0.05],
   pressRadius: [16, 1, 60, 1],
   pressDuration: [90, 10, 500, 5],
   pressOpacity: [0.16, 0, 1, 0.01],
@@ -30,7 +32,7 @@ const schema = {
 } satisfies DialConfig;
 export function Workbench() {
   const { resolved } = useTheme();
-  const controls = useDialKitController('Pointer feel', schema, { id: 'humanette-feel-v1' });
+  const controls = useDialKitController('Pointer feel', schema, { id: 'bigcursor-feel-v1' });
   const config = options(controls.values as unknown as FeedbackOptions);
   const [scenario, setScenario] = useState<'click' | 'text' | 'drag'>('click'),
     [events, setEvents] = useState<TimelineEvent[]>(scenarios.click),
@@ -79,14 +81,14 @@ export function Workbench() {
       url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'humanette-preset.json';
+    a.download = 'bigcursor-preset.json';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   async function load(file: File) {
     try {
       const value = JSON.parse(await file.text());
-      if (value.version !== 1) throw Error('Expected Humanette preset version 1.');
+      if (value.version !== 1) throw Error('Expected Bigcursor preset version 1.');
       const config = options(value.config);
       validateTimeline(value.events);
       controls.setValues({ ...config });
@@ -101,7 +103,7 @@ export function Workbench() {
   async function copy() {
     try {
       await navigator.clipboard.writeText(
-        'const human = await createHuman(page, ' + JSON.stringify(config, null, 2) + ');',
+        'const cursor = await createCursor(page, ' + JSON.stringify(config, null, 2) + ');',
       );
       setNotice('API configuration copied.');
     } catch {
@@ -220,6 +222,8 @@ export function Workbench() {
         <DialRoot mode="inline" theme={resolved} defaultOpen productionEnabled />
         <p className="mt-4 text-xs leading-6 text-muted">
           Filled feedback sits behind the cursor. Press grows into hold; release expands and fades.
+          Auto hide timeout is in milliseconds; 0 disables idle dimming. Hidden opacity is the idle
+          level; 0 fully hides the cursor. Dimmed opacity applies while typing or selecting text.
           These values configure the actual package renderer.
         </p>
       </aside>

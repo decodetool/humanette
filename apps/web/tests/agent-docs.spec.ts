@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { api, setup, recording } from '../content/documentation';
+import { api, setup, recording, demoNote, cursorDimmingNote } from '../content/documentation';
+import { releaseNotice } from '../content/agent-guide';
 import { skillInstall, agentDemoPrompt, productDemoPrompt } from '../content/onboarding';
 
 test('agent entry point and full guide are plain, complete, and linked without JavaScript', async ({
@@ -9,10 +10,10 @@ test('agent entry point and full guide are plain, complete, and linked without J
   expect(index.status()).toBe(200);
   expect(index.headers()['content-type']).toContain('text/plain');
   const summary = await index.text();
-  expect(summary).toMatch(/^# Humanette\n\n> /);
-  expect(summary).toContain('createHuman');
-  expect(summary).toContain('npm humanette@1.0.0 contains no runtime');
-  expect(summary).toContain('https://humanette.dev/docs.md');
+  expect(summary).toMatch(/^# Bigcursor\n\n> /);
+  expect(summary).toContain('createCursor');
+  expect(summary).toContain(releaseNotice);
+  expect(summary).toContain('https://bigcursor.dev/docs.md');
   expect(summary).not.toContain('<html');
   expect(summary.length).toBeLessThan(5000);
 
@@ -30,15 +31,22 @@ test('agent entry point and full guide are plain, complete, and linked without J
     productDemoPrompt,
     setup,
     recording,
+    demoNote,
+    cursorDimmingNote,
     ...api.flat(),
   ])
     expect(guide).toContain(content);
-  for (const detail of ['Node.js >=22', 'modifier chords', 'humanette@^1.1.0', 'not a recorder']) {
+  for (const detail of [
+    'Node.js >=22',
+    'modifier chords',
+    'bigcursor@^1.1.1',
+    'bigcursor/recording',
+  ]) {
     expect(summary + guide).toContain(detail);
   }
   expect(guide).toContain(skillInstall);
   const links = new Set(
-    [...(summary + guide).matchAll(/\]\((https:\/\/humanette\.dev[^)]+)\)/g)].map(
+    [...(summary + guide).matchAll(/\]\((https:\/\/bigcursor\.dev[^)]+)\)/g)].map(
       (match) => new URL(match[1]).pathname,
     ),
   );
@@ -51,7 +59,7 @@ test('agent entry point and full guide are plain, complete, and linked without J
   expect(html).not.toContain('For coding agents:');
   const docsHtml = await (await request.get('/docs')).text();
   expect(docsHtml).toContain('type="text/markdown"');
-  expect(docsHtml).toContain('https://humanette.dev/docs.md');
+  expect(docsHtml).toContain('https://bigcursor.dev/docs.md');
 });
 
 test('getting started copies each command and prompt; examples link targets the home section', async ({
@@ -62,13 +70,13 @@ test('getting started copies each command and prompt; examples link targets the 
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Copy humanette skill install' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Copy bigcursor skill install' })).toHaveCount(0);
   await page.getByRole('link', { name: 'Getting started', exact: true }).click();
   await expect(page).toHaveURL(/\/docs$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Getting started');
   await expect(page.locator('#agent-setup, #manual-install')).toHaveCount(0);
   for (const [label, content] of [
-    ['humanette skill install', skillInstall],
+    ['bigcursor skill install', skillInstall],
     ['agent demo prompt', agentDemoPrompt],
     ['product demo prompt', productDemoPrompt],
   ]) {
@@ -102,7 +110,7 @@ test('crawl metadata uses canonical public URLs and includes the docs', async ({
   const robots = await request.get('/robots.txt');
   expect(robots.status()).toBe(200);
   expect(await robots.text()).toContain('Allow: /');
-  expect(await robots.text()).toContain('Sitemap: https://humanette.dev/sitemap.xml');
+  expect(await robots.text()).toContain('Sitemap: https://bigcursor.dev/sitemap.xml');
   const sitemap = await request.get('/sitemap.xml');
   expect(sitemap.status()).toBe(200);
   expect(sitemap.headers()['content-type']).toContain('xml');
@@ -111,11 +119,11 @@ test('crawl metadata uses canonical public URLs and includes the docs', async ({
   expect(xml).not.toContain('/demos');
   expect(xml).not.toContain('/examples');
   for (const path of ['', '/docs', '/workbench']) {
-    expect(xml).toContain(`<loc>https://humanette.dev${path}</loc>`);
+    expect(xml).toContain(`<loc>https://bigcursor.dev${path}</loc>`);
     await page.goto(path || '/');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      `https://humanette.dev${path}`,
+      `https://bigcursor.dev${path}`,
     );
   }
 });

@@ -1,17 +1,17 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import type { createHumanette } from 'humanette/internal';
+import type { createCursorRenderer } from 'bigcursor/internal';
 
 declare global {
   interface Window {
-    Humanette: typeof import('humanette/internal');
-    testCursor: ReturnType<typeof createHumanette>;
+    BigCursor: typeof import('bigcursor/internal');
+    testCursor: ReturnType<typeof createCursorRenderer>;
     testShadows: ShadowRoot[];
     testImages: number;
     testFrames: number;
   }
 }
-const bundle = readFileSync('../../packages/humanette/dist/humanette.global.js', 'utf8');
+const bundle = readFileSync('../../packages/bigcursor/dist/bigcursor.global.js', 'utf8');
 
 test.beforeEach(async ({ page }) => {
   await page.goto('about:blank');
@@ -49,10 +49,11 @@ test('bundled SVG retains artwork, display-size viewport and scaled hotspot; sto
   page,
 }) => {
   await page.evaluate(async () => {
-    window.testCursor = window.Humanette.createHumanette({
+    window.testCursor = window.BigCursor.createCursorRenderer({
       root: document.querySelector<HTMLElement>('#root')!,
       scale: 4,
       motionBlur: 0,
+      autoHideTimeout: 0,
     });
     await window.testCursor.ready;
     window.testCursor.setCursor('default');
@@ -79,22 +80,22 @@ test('bundled SVG retains artwork, display-size viewport and scaled hotspot; sto
     window.testCursor.setCursor('text');
     window.testCursor.down();
   });
-  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.4');
+  await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '0.3');
   await page.screenshot({ path: 'test-results/svg-text-pressed.png' });
   await page.evaluate(() => {
     window.testCursor.up();
-    window.testCursor.hide();
+    window.testCursor.hideCursor();
   });
   await expect
     .poll(() => page.evaluate(() => (window.testShadows.at(-1)!.host as HTMLElement).style.display))
     .toBe('none');
   await page.evaluate(() => window.testCursor.dispose());
-  await expect(page.locator('[data-humanette]')).toHaveCount(0);
+  await expect(page.locator('[data-bigcursor]')).toHaveCount(0);
 });
 
 test('custom image themes stay inert and do not fall back to default SVG', async ({ page }) => {
   await page.evaluate(async () => {
-    window.testCursor = window.Humanette.createHumanette({ scale: 4 });
+    window.testCursor = window.BigCursor.createCursorRenderer({ scale: 4 });
     await window.testCursor.ready;
     window.testCursor.setCursor('pointer');
     window.testCursor.setPosition({ x: 200, y: 150 });
@@ -121,7 +122,7 @@ test('custom image themes stay inert and do not fall back to default SVG', async
     .toBe('none');
   expect(await page.evaluate(() => window.testImages)).toBe(1);
   await page.evaluate(async () => {
-    await window.testCursor.setTheme({ pointer: window.Humanette.cursors.pointer });
+    await window.testCursor.setTheme({ pointer: window.BigCursor.cursors.pointer });
   });
   await expect
     .poll(() => page.evaluate(() => (window.testShadows.at(-1)!.host as HTMLElement).style.display))
@@ -133,7 +134,7 @@ test('scale, press feedback, trail and keyboard ordering preserve the SVG geomet
   page,
 }) => {
   await page.evaluate(async () => {
-    window.testCursor = window.Humanette.createHumanette({ scale: 4, keyboard: true });
+    window.testCursor = window.BigCursor.createCursorRenderer({ scale: 4, keyboard: true });
     await window.testCursor.ready;
     window.testCursor.setCursor('default');
     window.testCursor.setPosition({ x: 200, y: 150 });
@@ -185,7 +186,7 @@ test('scale, press feedback, trail and keyboard ordering preserve the SVG geomet
 
 test('press and release finish when frame timestamps precede the input event', async ({ page }) => {
   await page.evaluate(async () => {
-    window.testCursor = window.Humanette.createHumanette({ scale: 4, motionBlur: 0 });
+    window.testCursor = window.BigCursor.createCursorRenderer({ scale: 4, motionBlur: 0 });
     await window.testCursor.ready;
     window.testCursor.setCursor('default');
     window.testCursor.setPosition({ x: 200, y: 150 });
@@ -200,7 +201,7 @@ test('press and release finish when frame timestamps precede the input event', a
     window.requestAnimationFrame = (callback) => request((time) => callback(time - 100));
     window.testCursor.down();
   });
-  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-phase', 'hold');
+  await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-phase', 'hold');
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -209,7 +210,7 @@ test('press and release finish when frame timestamps precede the input event', a
     )
     .toBeCloseTo(256 * 0.94);
   await page.evaluate(() => window.testCursor.up());
-  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-phase', 'up');
+  await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-phase', 'up');
   await expect
     .poll(() =>
       page.evaluate(() => window.testShadows.at(-1)?.querySelector('svg')?.getAttribute('width')),
@@ -223,11 +224,11 @@ test('press and release finish when frame timestamps precede the input event', a
 
 test('canvas renderer remains explicitly selectable', async ({ page }) => {
   await page.evaluate(async () => {
-    window.testCursor = window.Humanette.createHumanette({ renderer: 'canvas', scale: 4 });
+    window.testCursor = window.BigCursor.createCursorRenderer({ renderer: 'canvas', scale: 4 });
     await window.testCursor.ready;
     window.testCursor.setPosition({ x: 200, y: 150 });
   });
-  await expect(page.locator('[data-humanette]')).toHaveAttribute('data-renderer', 'canvas');
+  await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-renderer', 'canvas');
   expect(await page.evaluate(() => window.testImages)).toBeGreaterThan(0);
   expect(await page.evaluate(() => window.testShadows.some((s) => !!s.querySelector('svg')))).toBe(
     false,

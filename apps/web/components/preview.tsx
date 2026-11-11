@@ -1,15 +1,16 @@
 'use client';
+import { DemoSoundToggle, useDemoAudio } from './demo-audio';
 import { useEffect, useRef, useState } from 'react';
 import {
-  createHumanette,
+  createCursorRenderer,
   scenarios,
   sampleTimeline,
   options,
   timelineDuration,
-  type Humanette,
+  type CursorRenderer,
   type TimelineEvent,
   type FeedbackOptions,
-} from 'humanette/internal';
+} from 'bigcursor/internal';
 export interface PreviewProps {
   events?: TimelineEvent[];
   config?: Partial<FeedbackOptions>;
@@ -26,9 +27,10 @@ export function Preview({
   scenario = 'click',
   compact = false,
 }: PreviewProps) {
+  const { audio } = useDemoAudio();
   const root = useRef<HTMLDivElement>(null),
     text = useRef<HTMLSpanElement>(null),
-    human = useRef<Humanette | null>(null),
+    cursor = useRef<CursorRenderer | null>(null),
     [playing, setPlaying] = useState(false),
     [localTime, setLocalTime] = useState(0),
     [rate, setRate] = useState(1),
@@ -41,7 +43,7 @@ export function Preview({
     edges: [0, 300],
   });
   const events = given ?? scenarios[scenario],
-    duration = timelineDuration(events),
+    duration = timelineDuration(events, options(config)),
     current = time ?? localTime;
   const live = useRef({ events, config, current, geometry });
   live.current = { events, config, current, geometry };
@@ -69,8 +71,8 @@ export function Preview({
   };
   useEffect(() => {
     let active = true;
-    const h = createHumanette({ root: root.current!, ...live.current.config });
-    human.current = h;
+    const h = createCursorRenderer({ root: root.current!, ...live.current.config });
+    cursor.current = h;
     const seek = () => h.seek(mapped(), live.current.current, initial());
     void h.ready
       .then(() => {
@@ -112,17 +114,17 @@ export function Preview({
       active = false;
       observer.disconnect();
       h.dispose();
-      human.current = null;
+      cursor.current = null;
     };
   }, []);
   useEffect(() => {
-    human.current?.stop();
+    cursor.current?.stop();
     setPlaying(false);
     setLocalTime(0);
   }, [events]);
   useEffect(() => {
-    human.current?.configure(config ?? {});
-    human.current?.seek(mapped(), current, initial());
+    cursor.current?.configure(config ?? {});
+    cursor.current?.seek(mapped(), current, initial());
   }, [config, current, events, geometry]);
   function update(t: number) {
     setLocalTime(t);
@@ -130,14 +132,25 @@ export function Preview({
   }
   async function play() {
     if (playing) {
-      human.current?.stop();
+      cursor.current?.stop();
       setPlaying(false);
       return;
     }
     setError('');
     setPlaying(true);
     try {
-      await human.current?.play(mapped(), { rate, initial: initial(), onFrame: update });
+      let previous = -1;
+      await cursor.current?.play(mapped(), {
+        rate,
+        initial: initial(),
+        onFrame(t) {
+          for (const event of live.current.events)
+            if (event.type === 'down' && event.at > previous && event.at <= t)
+              audio.current?.click();
+          previous = t;
+          update(t);
+        },
+      });
     } catch (e) {
       if (!(e instanceof DOMException && e.name === 'AbortError')) setError(String(e));
     } finally {
@@ -233,7 +246,7 @@ export function Preview({
           max={duration}
           value={current}
           onChange={(e) => {
-            human.current?.stop();
+            cursor.current?.stop();
             setPlaying(false);
             update(Number(e.target.value));
           }}
@@ -241,6 +254,7 @@ export function Preview({
         <span className="font-mono text-[10px] text-muted">
           {(current / 1000).toFixed(1)} / {(duration / 1000).toFixed(1)}s
         </span>
+        <DemoSoundToggle />
         {!compact && (
           <select
             aria-label="Playback speed"

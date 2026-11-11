@@ -1,6 +1,6 @@
 {
-  "name": "humanette",
-  "version": "1.1.0",
+  "name": "bigcursor",
+  "version": "1.1.1",
   "description": "Natural, reproducible pointer motion and legible cursor feedback for browser demos and automation.",
   "type": "module",
   "main": "./dist/playwright.js",
@@ -22,9 +22,13 @@
       "types": "./dist/playwright.d.ts",
       "import": "./dist/playwright.js"
     },
-    "./browser": "./dist/humanette.global.js",
+    "./browser": "./dist/bigcursor.global.js",
     "./assets/*": "./dist/assets/*",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./recording": {
+      "types": "./dist/recording.d.ts",
+      "import": "./dist/recording.js"
+    }
   },
   "files": [
     "dist",
@@ -42,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decodetool/humanette.git",
-    "directory": "packages/humanette"
+    "url": "git+https://github.com/seflless/bigcursor.git",
+    "directory": "packages/bigcursor"
   },
-  "homepage": "https://github.com/decodetool/humanette",
+  "homepage": "https://github.com/seflless/bigcursor",
   "license": "ISC",
   "engines": {
     "node": ">=22"
@@ -62,13 +66,18 @@
     "pointer"
   ],
   "devDependencies": {
-    "playwright-core": "1.64.0-alpha-2026-09-28"
+    "playwright-core": "1.64.0-alpha-2026-09-28",
+    "chrome-capture": "0.1.2"
   },
   "peerDependencies": {
-    "playwright-core": ">=1.58.0 || 1.64.0-alpha-2026-09-28"
+    "playwright-core": ">=1.58.0 || 1.64.0-alpha-2026-09-28",
+    "chrome-capture": "0.1.2"
   },
   "peerDependenciesMeta": {
     "playwright-core": {
+      "optional": true
+    },
+    "chrome-capture": {
       "optional": true
     }
   }

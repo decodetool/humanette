@@ -1,7 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CodeBlock } from '../../components/code-block';
-import { setup, recording, api } from '../../content/documentation';
+import { releaseStatus } from '../../content/agent-guide';
+import {
+  setup,
+  recording,
+  typingSpeedNote,
+  demoNote,
+  cursorDimmingNote,
+  api,
+} from '../../content/documentation';
 import {
   skillInstall,
   agentDemoPrompt,
@@ -11,7 +19,7 @@ import {
 export const metadata: Metadata = {
   title: 'Getting started',
   description:
-    'Install the Humanette skill, ask an agent to demo a feature, or create a repeatable product walkthrough. Includes the Playwright API and recording guide.',
+    'Install the Bigcursor skill, ask an agent to demo a feature, or create a repeatable product walkthrough. Includes the Playwright API and recording guide.',
   alternates: { canonical: '/docs', types: { 'text/markdown': '/docs.md' } },
 };
 export default function Docs() {
@@ -29,11 +37,12 @@ export default function Docs() {
       <article className="min-w-0 max-w-4xl">
         <h1 className="text-4xl font-semibold tracking-tight">Getting started</h1>
         <section id="skill-install" className="mt-8">
-          <h2 className="mb-5 text-2xl font-semibold tracking-tight">Install humanette skill</h2>
-          <CodeBlock label="humanette skill install" language="bash" code={skillInstall} wrap />
+          <h2 className="mb-5 text-2xl font-semibold tracking-tight">Install bigcursor skill</h2>
+          <CodeBlock label="bigcursor skill install" language="bash" code={skillInstall} wrap />
           <p className="mt-4 text-sm leading-7 text-muted">
             Run in your project and choose your coding agent when prompted.
           </p>
+          <p className="mt-3 text-sm leading-7 text-muted">{releaseStatus}</p>
         </section>
         <section id="usage" className="mt-10">
           <h2 className="text-2xl font-semibold tracking-tight">Usage</h2>
@@ -58,7 +67,7 @@ export default function Docs() {
           <CodeBlock code={setup} />
           <p className="mt-5 text-sm leading-7 text-muted">
             Await actions in order. Keep normal Playwright navigation, assertions, and app-readiness
-            checks; use Humanette for the actions you want people to follow.
+            checks; use Bigcursor for the actions you want people to follow.
           </p>
         </section>
         <section id="api" className="mt-12">
@@ -70,7 +79,7 @@ export default function Docs() {
           </p>
           <CodeBlock
             code={
-              "await human.click(page.getByRole('button', { name: 'Save' }));\nawait human.moveTo({ x: 320, y: 180 });\nawait human.drag({ x: 100, y: 200 }, { x: 600, y: 200 });"
+              "await cursor.click(page.getByRole('button', { name: 'Save' }));\nawait cursor.moveTo({ x: 320, y: 180 });\nawait cursor.drag({ x: 100, y: 200 }, { x: 600, y: 200 });"
             }
           />
           <div className="mt-6 divide-y divide-line border-y border-line">
@@ -82,27 +91,32 @@ export default function Docs() {
             ))}
           </div>
           <p className="mt-5 text-sm leading-7 text-muted">
-            Appearance options include scale, color, filled, motionBlur, textSelectionOpacity,
-            pressRadius, pressDuration, pressOpacity, pressScale, holdRadius, holdOpacity,
-            ringWidth, releaseRadius, and releaseDuration.{' '}
+            Appearance options include scale, color, filled, motionBlur, dimmedOpacity, autoHideTimeout,
+            hiddenOpacity, pressRadius, pressDuration, pressOpacity, pressScale, holdRadius,
+            holdOpacity, ringWidth, releaseRadius, and releaseDuration.{' '}
             <Link href="/workbench" className="text-link">
               Tune them in Pointer Lab
             </Link>
             .
           </p>
         </section>
+        <p className="mt-5 text-sm leading-7 text-muted">{cursorDimmingNote}</p>
         <section id="recording" className="mt-12">
           <h2 className="text-2xl font-semibold tracking-tight">Record with Playwright</h2>
           <p className="my-5 text-sm leading-7 text-muted">
-            Playwright records the page, including Humanette’s cursor. This example saves to one
-            fixed filename. Recording starts when the page is created, so navigation and loading are
-            included; trim that lead-in for a finished product video.
+            The skill records high-resolution MP4 video with app audio and live click and typing
+            sounds. It handles setup automatically. Saved scripts import the same runtime from{' '}
+            <code>bigcursor/recording</code>. Use Node 24.11+, chrome-capture@0.1.2, and full Chrome
+            153+.
           </p>
           <CodeBlock code={recording} />
+          <p className="mt-5 text-sm leading-7 text-muted">{typingSpeedNote}</p>
+          <p className="mt-5 text-sm leading-7 text-muted">{demoNote}</p>
           <p className="mt-5 text-sm leading-7 text-muted">
-            The video above is explicitly 1280 × 800. A device scale factor of 2 does not make that
-            video Retina resolution. Rehearse your script, avoid long pauses, and inspect the actual
-            output before increasing resolution or frame rate.
+            Recording starts after the page is ready and finalizes when stop completes. The archive
+            preset requests 2560 × 1600 at 60 fps. Inspect the result: encoded FPS and an audio
+            track alone do not prove smooth motion or audible sound. The native MP4 uses AV1/Opus;
+            some destinations may need a separate H.264/AAC export.
           </p>
           <p className="mt-3 text-sm leading-7 text-muted">
             In this repository, run <code>bun dev</code>, then <code>bun example:playwright</code>.
@@ -113,7 +127,7 @@ export default function Docs() {
         <section id="limits" className="mt-12 border-t border-line pt-8">
           <h2 className="text-2xl font-semibold tracking-tight">Limitations</h2>
           <p className="mt-4 text-sm leading-7 text-muted">
-            Humanette is not a recorder and does not guarantee capture FPS. Input delivery and
+            Bigcursor’s optional recording module does not guarantee capture FPS. Input delivery and
             distinct captured frames depend on browser workload and the recorder. A high-FPS file
             can still contain repeated frames.
           </p>

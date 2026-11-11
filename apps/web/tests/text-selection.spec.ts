@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { createHuman } from 'humanette';
+import { createCursor } from 'bigcursor';
 
 async function seek(page: Page, time: number) {
   await page.getByLabel('Timeline position').evaluate((element, value) => {
@@ -17,7 +17,7 @@ for (const width of [1280, 390]) {
   test(`text highlight follows the drag at ${width}px and survives release`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/workbench');
-    await expect(page.locator('[data-humanette]')).toHaveCount(1);
+    await expect(page.locator('[data-bigcursor]')).toHaveCount(1);
     await page.getByRole('button', { name: 'Select text', exact: true }).click();
     const highlight = page.getByTestId('selection-highlight');
     const label = page.getByTestId('selection-text');
@@ -25,7 +25,7 @@ for (const width of [1280, 390]) {
     await seek(page, 850);
     await expect.poll(selectedWidth).toBe(0);
     await seek(page, 1100);
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.4');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '0.3');
     await expect.poll(selectedWidth).toBeGreaterThan(0);
     expect(await selectedWidth()).toBeLessThan((await label.boundingBox())!.width * 0.8);
     await page.screenshot({ path: `test-results/text-selection-${width}.png` });
@@ -34,7 +34,7 @@ for (const width of [1280, 390]) {
       .poll(async () => Math.abs((await selectedWidth()) - (await label.boundingBox())!.width))
       .toBeLessThan(1);
     await seek(page, 2900);
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '1');
     await expect
       .poll(async () => Math.abs((await selectedWidth()) - (await label.boundingBox())!.width))
       .toBeLessThan(1);
@@ -45,16 +45,16 @@ for (const width of [1280, 390]) {
 
 test('real text drags fade the cursor, but hover and release stay opaque', async ({ page }) => {
   await page.goto('/examples/live');
-  const human = await createHuman(page);
+  const cursor = await createCursor(page);
   try {
-    await human.moveTo('#select-text');
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
+    await cursor.moveTo('#select-text');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '1');
     await page.mouse.down();
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '0.4');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '0.3');
     await page.mouse.up();
-    await expect(page.locator('[data-humanette]')).toHaveAttribute('data-cursor-opacity', '1');
+    await expect(page.locator('[data-bigcursor]')).toHaveAttribute('data-cursor-opacity', '1');
   } finally {
     await page.mouse.up();
-    await human.dispose();
+    await cursor.dispose();
   }
 });

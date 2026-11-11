@@ -76,21 +76,23 @@ test('theme starts from system, then persists a two-state choice; navigation and
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await nav.getByRole('link', { name: 'Docs', exact: true }).click();
   await expect(page).toHaveURL(/\/docs$/);
-  await page.getByRole('button', { name: 'Copy humanette skill install', exact: true }).click();
+  await page.getByRole('button', { name: 'Copy bigcursor skill install', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveText('Copied');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(skillInstall);
   await page.getByRole('link', { name: 'Examples', exact: true }).click();
   await expect(page).toHaveURL(/\/#examples$/);
   await expect(page.locator('#examples').getByRole('heading', { level: 2 })).toHaveText([
     'Move and click',
+    'Natural typing',
     'Text selection',
     'Drag & Drop',
+    'Auto dimming',
   ]);
   await expect(page.getByLabel('Cursor size')).toHaveCount(0);
   await expect(page.locator('.token.keyword').first()).toBeVisible();
   await page.getByRole('button', { name: 'Copy Move and click example' }).click();
   const example = await page.evaluate(() => navigator.clipboard.readText());
-  expect(example).toBe("await human.click(page.getByRole('button', { name: 'Click me' }));");
+  expect(example).toBe("await cursor.click(page.getByRole('button', { name: 'Click me' }));");
   await page.goto('/docs');
   await expect(page.getByRole('link', { name: 'Install the skill', exact: true })).toHaveAttribute(
     'href',

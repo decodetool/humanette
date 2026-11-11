@@ -1,4 +1,4 @@
-# Humanette
+# Bigcursor
 
 ## Register
 
@@ -10,7 +10,7 @@ Developers and agent-automation authors evaluating an npm package beside their e
 
 ## Product Purpose
 
-Make browser actions easier to follow in product demos with legible contextual cursors, natural movement, and press/hold/release feedback. The public package and documentation are Playwright-first, with native locator targeting and a workbench for tuning. The shared visual runtime powers site previews internally. Humanette is not a video recorder and does not guarantee a capture frame rate.
+Make browser actions easier to follow in product demos with legible contextual cursors, natural movement, and press/hold/release feedback. The public package and documentation are Playwright-first, with native locator targeting and a workbench for tuning. The shared visual runtime powers site previews internally. The optional recording module captures native video and tab audio; Bigcursor does not guarantee a capture frame rate.
 
 ## Brand Personality
 

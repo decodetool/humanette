@@ -10,8 +10,8 @@ export default function Home() {
           Screen Studio for browser automation
         </h1>
         <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-muted">
-          Humanette adds large cursors, natural mouse movement, and visible clicks to video captures
-          made with Playwright.
+          Bigcursor adds large cursors, natural movement and typing, and live click and keyboard
+          sounds to video captures made with Playwright.
         </p>
         <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-muted">
           Let coding agents show their work, or create repeatable product walkthroughs.
@@ -20,8 +20,8 @@ export default function Home() {
           Getting started
         </Link>
       </section>
-      <section id="examples" className="mt-12">
-        <h1 className="text-3xl font-semibold tracking-tight">Examples</h1>
+      <section id="examples" className="mt-20 sm:mt-24">
+        <h1 className="text-center text-4xl font-semibold tracking-tight sm:text-5xl">Examples</h1>
         <Examples />
       </section>
     </div>

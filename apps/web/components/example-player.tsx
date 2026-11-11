@@ -1,19 +1,64 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  createHumanette,
+  createCursorRenderer,
+  typingPlan,
+  dimmingTimings,
+  type TypingSpeed,
   sampleTimeline,
-  type Humanette,
+  type CursorRenderer,
   type TimelineEvent,
-} from 'humanette/internal';
-export type Scene = 'click' | 'text' | 'drag';
-const duration = 4600;
-const cursorGutter = 20;
-export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: number }) {
+} from 'bigcursor/internal';
+import { useDemoAudio } from './demo-audio';
+export type Scene = 'click' | 'text' | 'drag' | 'typing' | 'dimming';
+const typedText = 'Make something great.';
+const dragWidth = 344;
+export function ExamplePlayer({
+  scene,
+  scale = 4,
+  speed = 'default',
+}: {
+  scene: Scene;
+  scale?: number;
+  speed?: TypingSpeed;
+}) {
+  const { audio } = useDemoAudio();
+  const appearance = useMemo(
+    () =>
+      scene === 'dimming' ? { autoHideTimeout: 500 } : { autoHideTimeout: 0, dimmedOpacity: 1 },
+    [scene],
+  );
+  const strikes = useMemo(() => {
+    let at = 1250;
+    return typingPlan(typedText, { speed, seed: 42 }).map((step, i) => {
+      at += step.waitBefore;
+      const start = at;
+      at += step.hold;
+      return { ...step, at: start, end: at, gesture: `home-typing-${i}` };
+    });
+  }, [speed]);
+  const duration = scene === 'typing' ? Math.max(4800, strikes.at(-1)!.end + 1800) : 4600;
+  const cues = useMemo(
+    () =>
+      scene === 'dimming'
+        ? []
+        : scene === 'typing'
+          ? [
+              { at: 1000, kind: 'click' as const },
+              ...strikes.flatMap((step) => [
+                { at: step.at, kind: 'press' as const, step },
+                { at: step.end, kind: 'release' as const, step },
+              ]),
+            ].sort((a, b) => a.at - b.at)
+          : [{ at: 1000, kind: 'click' as const }],
+    [scene, strikes],
+  );
   const root = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
-  const human = useRef<Humanette | null>(null);
+  const target = useRef<HTMLDivElement>(null);
+  const cursor = useRef<CursorRenderer | null>(null);
   const clock = useRef(0);
+  const startDelay = useRef(scene === 'typing' ? 600 : 0);
   const measure = useRef<() => void>(() => {});
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -23,6 +68,7 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
   const [geometry, setGeometry] = useState({
     ratio: 1,
     ratioY: 0.25,
+    originX: 20,
     left: 0,
     right: 280,
     edges: [0, 280],
@@ -32,33 +78,54 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
     y: 160,
   };
   const events: TimelineEvent[] =
-    scene === 'click'
+    scene === 'dimming'
       ? [
           { at: 0, type: 'cursor', cursor: 'auto' },
           { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
-          { at: 1000, type: 'down' },
-          { at: 1100, type: 'up' },
-          { at: 2400, type: 'move', ...initial, duration: 1000 },
+          { at: 2600, type: 'move', ...initial, duration: 1000 },
         ]
-      : scene === 'text'
+      : scene === 'typing'
         ? [
             { at: 0, type: 'cursor', cursor: 'auto' },
-            { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
+            { at: 0, type: 'move', x: 64, y: 160, duration: 900 },
             { at: 1000, type: 'down' },
-            { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
-            { at: 2640, type: 'up' },
-            { at: 3200, type: 'move', ...initial, duration: 1000 },
+            { at: 1100, type: 'up' },
+            { at: 1150, type: 'cursor', cursor: 'text' },
+            {
+              at: strikes[0].at,
+              type: 'typing',
+              duration: strikes.at(-1)!.end - strikes[0].at + dimmingTimings.typingHold,
+            },
+            { at: duration - 1100, type: 'cursor', cursor: 'auto' },
+            { at: duration - 1100, type: 'move', ...initial, duration: 900 },
           ]
-        : [
-            { at: 0, type: 'cursor', cursor: 'auto' },
-            { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
-            { at: 1000, type: 'down' },
-            { at: 1000, type: 'cursor', cursor: 'grabbing' },
-            { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
-            { at: 2640, type: 'up' },
-            { at: 2640, type: 'cursor', cursor: 'auto' },
-            { at: 3200, type: 'move', ...initial, duration: 1000 },
-          ];
+        : scene === 'click'
+          ? [
+              { at: 0, type: 'cursor', cursor: 'auto' },
+              { at: 0, type: 'move', x: 64, y: 160, duration: 800 },
+              { at: 1000, type: 'down' },
+              { at: 1100, type: 'up' },
+              { at: 2400, type: 'move', ...initial, duration: 1000 },
+            ]
+          : scene === 'text'
+            ? [
+                { at: 0, type: 'cursor', cursor: 'auto' },
+                { at: 0, type: 'move', x: geometry.left, y: 160, duration: 800 },
+                { at: 1000, type: 'down' },
+                { at: 1120, type: 'move', x: geometry.right, y: 160, duration: 1400 },
+                { at: 2640, type: 'up' },
+                { at: 3200, type: 'move', ...initial, duration: 1000 },
+              ]
+            : [
+                { at: 0, type: 'cursor', cursor: 'auto' },
+                { at: 0, type: 'move', x: 280, y: 160, duration: 800 },
+                { at: 1000, type: 'down' },
+                { at: 1000, type: 'cursor', cursor: 'grabbing' },
+                { at: 1120, type: 'move', x: 64, y: 160, duration: 1400 },
+                { at: 2640, type: 'up' },
+                { at: 2640, type: 'cursor', cursor: 'auto' },
+                { at: 3200, type: 'move', ...initial, duration: 1000 },
+              ];
   const live = useRef({ events, geometry, initial });
   live.current = { events, geometry, initial };
   function draw(at: number) {
@@ -66,21 +133,21 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
     const {
       events,
       initial,
-      geometry: { ratio, ratioY },
+      geometry: { ratio, ratioY, originX },
     } = live.current;
-    human.current?.seek(
+    cursor.current?.seek(
       events.map((e) =>
-        e.type === 'move' ? { ...e, x: e.x * ratio + cursorGutter, y: e.y * ratioY } : e,
+        e.type === 'move' ? { ...e, x: e.x * ratio + originX, y: e.y * ratioY } : e,
       ),
       at,
-      { x: initial.x * ratio + cursorGutter, y: initial.y * ratioY },
+      { x: initial.x * ratio + originX, y: initial.y * ratioY },
     );
     setTime(at);
   }
   useEffect(() => {
     let active = true;
-    const h = createHumanette({ root: root.current!, scale });
-    human.current = h;
+    const h = createCursorRenderer({ root: root.current!, scale, ...appearance });
+    cursor.current = h;
     void h.ready
       .then(() => {
         if (active) {
@@ -98,6 +165,9 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       const ratio = 1;
       if (!box.width) return;
       const bounds = label.current?.getBoundingClientRect();
+      const targetBounds = target.current?.getBoundingClientRect();
+      const contentWidth = scene === 'drag' ? dragWidth : (targetBounds?.width ?? 128);
+      const left = bounds && targetBounds ? bounds.left - targetBounds.left : 0;
       const edges = [0];
       const node = label.current?.firstChild;
       if (node) {
@@ -111,8 +181,9 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       setGeometry({
         ratio,
         ratioY: (box.height - 32) / 320,
-        left: bounds ? bounds.left - box.left - cursorGutter : 0,
-        right: bounds ? bounds.right - box.left - cursorGutter : 280,
+        originX: (box.width - contentWidth) / 2,
+        left,
+        right: bounds ? left + bounds.width : 280,
         edges,
       });
     };
@@ -121,6 +192,7 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
     const resize = new ResizeObserver(measureGeometry);
     resize.observe(root.current!);
     if (label.current) resize.observe(label.current);
+    if (target.current) resize.observe(target.current);
     let intersecting = false;
     const updateVisibility = () => setVisible(intersecting && !document.hidden);
     const observer = new IntersectionObserver(([entry]) => {
@@ -142,13 +214,19 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       document.removeEventListener('visibilitychange', updateVisibility);
       reduced.removeEventListener('change', onReduced);
       h.dispose();
-      human.current = null;
+      cursor.current = null;
     };
   }, [scene]);
   useEffect(() => {
-    human.current?.configure({ scale });
+    cursor.current?.configure({ scale, ...appearance });
     if (ready) draw(clock.current);
-  }, [scale, geometry, ready]);
+  }, [scale, geometry, ready, appearance]);
+  useEffect(() => {
+    if (scene === 'typing') {
+      startDelay.current = 600;
+      draw(0);
+    }
+  }, [scene, speed]);
   useEffect(() => {
     if (!playing || !visible || !ready) return;
     // Refresh after font/style edits and before each take, not on every frame.
@@ -159,14 +237,33 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       // Integrate RAF time, not frame count; freeze while hidden or paused.
       const delta = last === undefined ? 0 : Math.max(0, now - last);
       last = now;
-      const next = clock.current + delta;
-      if (next >= duration) measure.current();
+      // Stagger the typing preview while keeping its visuals and sounds on one clock.
+      const delay = Math.min(delta, startDelay.current);
+      startDelay.current -= delay;
+      const next = clock.current + delta - delay;
+      function soundBetween(from: number, to: number) {
+        for (const cue of cues) {
+          if (cue.at <= from || cue.at > to) continue;
+          if (cue.kind === 'click') audio.current?.click();
+          else if (cue.kind === 'press')
+            audio.current?.keyDown(cue.step.text === ' ' ? 'space' : 'printable', cue.step.gesture);
+          else audio.current?.keyUp(cue.step.gesture);
+        }
+      }
+      if (next >= duration) {
+        soundBetween(clock.current, duration);
+        measure.current();
+        soundBetween(-1, next % duration);
+      } else soundBetween(clock.current, next);
       draw(next % duration);
       frame = requestAnimationFrame(tick);
     }
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [playing, visible, ready]);
+    return () => {
+      cancelAnimationFrame(frame);
+      if (scene === 'typing') for (const step of strikes) audio.current?.keyUp(step.gesture);
+    };
+  }, [playing, visible, ready, duration, cues, audio, strikes, scene]);
   const state = sampleTimeline(events, time, undefined, initial);
   const width = geometry.right - geometry.left;
   const offset = Math.max(0, Math.min(width, state.x - geometry.left));
@@ -191,20 +288,50 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
       data-running={playing && visible && ready}
     >
       <div ref={root} data-testid="example-stage" className="relative -mx-5 h-28 overflow-hidden">
+        {scene === 'typing' && (
+          <div
+            ref={target}
+            className="field absolute left-1/2 top-[calc(50%-16px)] flex h-12 w-72 -translate-x-1/2 -translate-y-1/2 cursor-text items-center text-base"
+            aria-label="Demo title"
+            data-testid="example-typing-target"
+          >
+            <span>
+              {strikes
+                .filter((step) => step.at <= time)
+                .map((step) => step.text)
+                .join('')}
+            </span>
+            {time >= 1000 && time < duration - 1100 && (
+              <span aria-hidden className="ml-px h-5 border-l border-ink" />
+            )}
+            {time < 1000 && <span className="text-muted">Demo title</span>}
+          </div>
+        )}
+        {scene === 'dimming' && (
+          <div
+            ref={target}
+            data-testid="example-dimming-target"
+            className="demo-click-target absolute left-1/2 top-[calc(50%-16px)] flex h-12 w-32 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border text-sm font-medium"
+          >
+            Pause here
+          </div>
+        )}
         {scene === 'click' && (
           <div
+            ref={target}
             data-testid="example-click-target"
             data-hovered={state.x >= 0 && state.x <= 128}
             data-pressed={time >= 1000 && time < 1100}
-            className="demo-click-target absolute left-5 top-[calc(50%-16px)] flex h-12 w-32 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border text-sm font-medium"
+            className="demo-click-target absolute left-1/2 top-[calc(50%-16px)] flex h-12 w-32 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border text-sm font-medium"
           >
             {time >= 1100 ? 'Clicked' : 'Click me'}
           </div>
         )}
         {scene === 'text' && (
           <div
+            ref={target}
             data-testid="example-text-target"
-            className="absolute left-5 top-[calc(50%-16px)] -translate-y-1/2 cursor-text whitespace-nowrap text-[1em]"
+            className="absolute left-1/2 top-[calc(50%-16px)] -translate-x-1/2 -translate-y-1/2 cursor-text whitespace-nowrap text-[1em]"
           >
             Select{' '}
             <span className="relative inline-block">
@@ -223,12 +350,15 @@ export function ExamplePlayer({ scene, scale = 4 }: { scene: Scene; scale?: numb
         )}
         {scene === 'drag' && (
           <>
-            <div className="absolute left-5 top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-y-1/2 items-center justify-center rounded-lg border border-dashed border-muted text-sm text-muted whitespace-nowrap">
+            <div
+              style={{ left: `calc(50% - ${dragWidth / 2}px)` }}
+              className="absolute top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-y-1/2 items-center justify-center rounded-lg border border-dashed border-muted text-sm text-muted whitespace-nowrap"
+            >
               Drop here
             </div>
             <div
               data-testid="example-drag-target"
-              style={{ left: cardX + cursorGutter }}
+              style={{ left: `calc(50% - ${dragWidth / 2}px + ${cardX}px)` }}
               className="absolute top-[calc(50%-16px)] flex h-14 w-32 px-6 -translate-x-1/2 -translate-y-1/2 cursor-grab items-center justify-center rounded-lg border border-line bg-success-surface text-sm font-medium whitespace-nowrap"
             >
               {time >= 2640 && time < 3900 ? 'Delivered ✓' : 'Drag me'}

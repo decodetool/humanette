@@ -5,7 +5,7 @@ test('CSS reference moves without a cursor and can be paused', async ({ page }) 
   await page.goto('/examples/live');
   const reference = page.getByTestId('motion-reference');
   await expect(reference).toHaveAttribute('data-running', 'true');
-  await expect(page.locator('[data-humanette]')).toHaveCount(0);
+  await expect(page.locator('[data-bigcursor]')).toHaveCount(0);
   for (const id of ['motion-rotation', 'motion-travel']) {
     const element = page.getByTestId(id);
     await expect(id === 'motion-travel' ? element.locator(':scope > div') : element).toBeInViewport(

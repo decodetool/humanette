@@ -4,18 +4,15 @@ import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright';
-import { createHuman } from 'humanette';
+import { createCursor } from 'bigcursor';
+import { launchForPreset, startRecording } from 'bigcursor/recording';
 
 const output = resolve(process.argv[2] ?? 'out');
 await mkdir(output, { recursive: true });
-const browser = await chromium.launch();
+const { browser, context, preset } = await launchForPreset(chromium, 'archive');
 try {
-  const context = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
-    recordVideo: { dir: output, size: { width: 1280, height: 800 } },
-  });
   const page = await context.newPage();
-  const video = page.video();
+  let recording;
   try {
     await page.setContent(`<!doctype html>
       <html lang="en"><head><meta charset="utf-8"><title>My day</title>
@@ -59,28 +56,33 @@ try {
           input.value = '';
         });
       </script></body></html>`);
-    const human = await createHuman(page, { scale: 4, seed: 42 });
+    await page.evaluate(() => document.fonts.ready);
+    recording = await startRecording(page, preset);
+    const cursor = await createCursor(page, { scale: 4, seed: 42 });
     try {
-      await human.wait(500);
-      await human.type(page.getByLabel('New task'), 'Buy groceries');
-      await human.click(page.getByRole('button', { name: 'Add task' }));
+      await cursor.wait(500);
+      await cursor.type(page.getByLabel('New task'), 'Buy groceries');
+      await cursor.click(page.getByRole('button', { name: 'Add task' }));
       const task = page.getByRole('checkbox', { name: 'Buy groceries' });
       await task.waitFor();
       assert.equal(await task.isChecked(), false);
-      await human.wait(500);
-      await human.click(task);
+      await cursor.wait(500);
+      await cursor.click(task);
       assert.equal(await task.isChecked(), true, 'The task should be complete');
-      await human.wait(900);
+      await cursor.wait(900);
       await page.screenshot({ path: resolve(output, 'todo-demo.png') });
     } finally {
-      await human.dispose();
+      try {
+        const stats = await recording.stop(resolve(output, 'todo-demo.mp4'));
+        console.log(JSON.stringify(stats));
+      } finally {
+        await cursor.dispose();
+      }
     }
   } finally {
     await context.close();
   }
-  const filename = resolve(output, 'todo-demo.webm');
-  await video.saveAs(filename);
-  await video.delete();
+  const filename = resolve(output, 'todo-demo.mp4');
   console.log(`Recorded ${filename}; verified that Buy groceries was added and completed.`);
 } finally {
   await browser.close();

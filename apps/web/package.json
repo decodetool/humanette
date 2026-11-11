@@ -1,5 +1,5 @@
 {
-  "name": "@humanette/web",
+  "name": "@bigcursor/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "dialkit": "2.0.2",
-    "humanette": "workspace:*",
+    "bigcursor": "workspace:*",
     "motion": "^12",
     "next": "16.3.6",
     "prism-react-renderer": "^2.4.1",

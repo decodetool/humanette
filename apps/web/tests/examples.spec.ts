@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createHuman } from 'humanette';
+import { createCursor } from 'bigcursor';
 
 test('homepage stacks compact scenes without tabs or removed marketing copy', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -27,23 +27,26 @@ test('homepage stacks compact scenes without tabs or removed marketing copy', as
     page.getByRole('heading', { name: 'Screen Studio for browser automation', exact: true }),
   ).toBeVisible();
   const heroCopy = page.getByText(
-    'Humanette adds large cursors, natural mouse movement, and visible clicks to video captures made with Playwright.',
+    'Bigcursor adds large cursors, natural movement and typing, and live click and keyboard sounds to video captures made with Playwright.',
     { exact: true },
   );
   await expect(heroCopy).toHaveCSS('text-align', 'center');
   expect((await heroCopy.boundingBox())!.width).toBeGreaterThan(700);
   await expect(page.locator('#examples').getByRole('heading', { level: 2 })).toHaveText([
     'Move and click',
+    'Natural typing',
     'Text selection',
     'Drag & Drop',
+    'Auto dimming',
   ]);
   await expect(page.getByRole('button', { name: 'Clicks', exact: true })).toHaveCount(0);
   const clickStage = (await page.getByTestId('example-click').boundingBox())!;
   const clickTarget = (await page.getByText('Click me', { exact: true }).boundingBox())!;
-  expect(clickTarget.x).toBe(clickStage.x);
+  const center = clickStage.x + clickStage.width / 2;
+  expect(Math.abs(clickTarget.x + clickTarget.width / 2 - center)).toBeLessThan(1);
   const drop = (await page.getByText('Drop here', { exact: true }).boundingBox())!;
   const draggable = (await page.getByText('Drag me', { exact: true }).boundingBox())!;
-  expect(drop.x).toBe(clickStage.x);
+  expect(Math.abs((drop.x + draggable.x + draggable.width) / 2 - center)).toBeLessThan(1);
   expect(draggable.x - drop.x).toBe(216);
   expect(draggable.width).toBe(128);
   expect(drop.width).toBe(128);
@@ -89,14 +92,18 @@ test('examples autoplay, loop, and freeze offscreen without player controls', as
   await expect(scene).toHaveAttribute('data-playback-time', offscreen!);
 });
 
-test('example snippets contain only the relevant human actions', async ({ page }) => {
+test('example snippets contain only the relevant cursor actions', async ({ page }) => {
   await page.goto('/#examples');
   for (const [title, code] of [
-    ['Move and click', "await human.click(page.getByRole('button', { name: 'Click me' }));"],
-    ['Text selection', "await human.selectText(page.getByText('these words', { exact: true }));"],
+    ['Move and click', "await cursor.click(page.getByRole('button', { name: 'Click me' }));"],
+    ['Text selection', "await cursor.selectText(page.getByText('these words', { exact: true }));"],
     [
       'Drag & Drop',
-      "await human.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
+      "await cursor.drag(\n  page.getByText('Drag me', { exact: true }),\n  page.getByText('Drop here', { exact: true }),\n  { duration: 1400 },\n);",
+    ],
+    [
+      'Auto dimming',
+      "await cursor.configure({ autoHideTimeout: 500 });\nawait cursor.moveTo(page.getByText('Pause here', { exact: true }));\nawait cursor.wait(1400);",
     ],
   ]) {
     await expect(page.getByRole('region', { name: title, exact: true }).locator('pre')).toHaveText(
@@ -128,13 +135,13 @@ for (const [scene, hover] of [
     await page.goto('/#examples');
     const preview = page.getByTestId(`example-${scene}`);
     await preview.scrollIntoViewIfNeeded();
-    await expect(preview.locator('[data-humanette]')).toHaveAttribute('data-cursor', 'default');
+    await expect(preview.locator('[data-bigcursor]')).toHaveAttribute('data-cursor', 'default');
     const recording = preview.evaluate(
       (element, scene) =>
         new Promise<Array<{ time: number; inside: boolean; cursor: string }>>((resolve) => {
           const scopes = (window as unknown as { exampleScopes: WeakMap<Element, ShadowRoot> })
             .exampleScopes;
-          const host = element.querySelector('[data-humanette]')!;
+          const host = element.querySelector('[data-bigcursor]')!;
           const target = element.querySelector(`[data-testid="example-${scene}-target"]`)!;
           const samples: Array<{ time: number; inside: boolean; cursor: string }> = [];
           const observer = new MutationObserver(() => {
@@ -182,7 +189,7 @@ for (const theme of ['light', 'dark'] as const) {
   test(`click demo has a secondary fill with distinct hover and pressed states in ${theme} mode`, async ({
     page,
   }) => {
-    await page.addInitScript((value) => localStorage.setItem('humanette-theme', value), theme);
+    await page.addInitScript((value) => localStorage.setItem('bigcursor-theme', value), theme);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     const target = page.getByTestId('example-click-target');
@@ -279,13 +286,13 @@ test('root API selects nested, wrapped text using a native locator', async ({ pa
   await page.setContent(
     '<p style="width:140px;font:24px sans-serif">Select <strong>all these</strong> words across lines.</p>',
   );
-  const human = await createHuman(page);
+  const cursor = await createCursor(page);
   try {
-    await human.selectText(page.locator('p'), { duration: 250 });
+    await cursor.selectText(page.locator('p'), { duration: 250 });
     expect(await page.evaluate(() => getSelection()?.toString())).toBe(
       'Select all these words across lines.',
     );
   } finally {
-    await human.dispose();
+    await cursor.dispose();
   }
 });

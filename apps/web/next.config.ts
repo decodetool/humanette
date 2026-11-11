@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 import { networkInterfaces } from 'node:os';
 
 const config: NextConfig = {
-  transpilePackages: ['humanette'],
+  transpilePackages: ['bigcursor'],
   devIndicators: false,
   // Allow Next's advertised LAN URL to hydrate, without trusting arbitrary origins.
   allowedDevOrigins: Object.values(networkInterfaces()).flatMap((addresses) =>

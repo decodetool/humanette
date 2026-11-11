@@ -10,7 +10,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let saved: string | null = null;
     try {
-      saved = localStorage.getItem('humanette-theme');
+      saved = localStorage.getItem('bigcursor-theme');
     } catch {}
     const value =
       saved === 'light' || saved === 'dark'
@@ -21,14 +21,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dataset.theme = value;
     update(value);
     try {
-      localStorage.setItem('humanette-theme', value);
+      localStorage.setItem('bigcursor-theme', value);
     } catch {}
   }, []);
   function setTheme(value: Theme) {
     update(value);
     document.documentElement.dataset.theme = value;
     try {
-      localStorage.setItem('humanette-theme', value);
+      localStorage.setItem('bigcursor-theme', value);
     } catch {}
   }
   return <ThemeContext.Provider value={{ resolved, setTheme }}>{children}</ThemeContext.Provider>;
